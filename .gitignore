@@ -1,0 +1,43 @@
+# --- Data -------------------------------------------------------------------
+# Raw and derived data never enter git. The repo ships download scripts and
+# checksums instead; see docs/adr/ and the "Data provenance" section of README.
+data/raw/*
+data/interim/*
+data/processed/*
+!data/**/.gitkeep
+
+# Model weights and other large binaries live on the HF Hub, not here.
+models/
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.joblib
+*.pkl
+
+# --- Python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# --- Tooling ----------------------------------------------------------------
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# --- Environment / secrets --------------------------------------------------
+.env
+*.key
+kaggle.json
+
+# --- OS / editors -----------------------------------------------------------
+.DS_Store
+.idea/
+.vscode/
