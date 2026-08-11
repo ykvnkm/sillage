@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # Weekly run against a cold cache. Catches rot in external sources and in
+  # transitive dependencies even when nobody has touched the code.
+  schedule:
+    - cron: "0 6 * * 1"
+
+# A new push to the same branch cancels the previous, still-running job.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v9.0.0
+        with:
+          enable-cache: true
+
+      # --locked fails if uv.lock is out of sync with pyproject.toml instead of
+      # silently re-resolving. This is the actual reproducibility check: it proves
+      # the committed lock file describes the committed intent.
+      - name: Install dependencies from the lock file
+        run: uv sync --locked
+
+      - name: Cache pre-commit environments
+        uses: actions/cache@v6.1.0
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      # The same hooks developers run locally, so CI and pre-commit can never
+      # disagree about what "clean" means. See ADR-0002.
+      - name: Lint, format and file checks
+        run: uv run pre-commit run --all-files --show-diff-on-failure
+
+      - name: Tests
+        run: uv run pytest
