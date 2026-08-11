@@ -4,8 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
-  # Weekly run against a cold cache. Catches rot in external sources and in
-  # transitive dependencies even when nobody has touched the code.
+  # Weekly run. A lock file pins what to install but cannot guarantee it still
+  # exists: releases get yanked, external sources move. Catches that rot while
+  # nobody is touching the code.
   schedule:
     - cron: "0 6 * * 1"
 
