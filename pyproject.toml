@@ -11,7 +11,10 @@ requires-python = ">=3.11"
 
 # Runtime dependencies are added only when a module actually imports them.
 # An honest lock file is one where every entry can be traced to a real import.
-dependencies = []
+dependencies = [
+    "pandas>=3.0.5",
+    "pandera>=0.32.1",
+]
 
 # Single source of truth for the version: src/sillage/__init__.py
 dynamic = ["version"]

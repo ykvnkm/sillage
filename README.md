@@ -47,6 +47,19 @@ uv run sillage-data list      # что зарегистрировано и за�
 uv run sillage-data fetch     # скачать в data/raw/ и сверить контрольные суммы
 ```
 
+### Контракты
+
+Контрольная сумма отвечает на вопрос «те ли это байты», но не на вопрос «валидны
+ли эти данные». Второе описано схемами pandera в
+[`schemas.py`](src/sillage/data/schemas.py) и проверяется **при загрузке**, а не
+отдельной командой ([ADR-0004](docs/adr/0004-data-contracts-are-checked-on-load.md)):
+
+```python
+from sillage.data.loaders import load_curated_openpom
+
+df = load_curated_openpom()   # 4983 × 140, иначе исключение с указанием строки
+```
+
 ## Разработка
 
 Единственное требование — [`uv`](https://docs.astral.sh/uv/). Интерпретатор
