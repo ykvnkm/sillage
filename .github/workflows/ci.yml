@@ -19,6 +19,14 @@ permissions:
   contents: read
 
 jobs:
+  # Deliberately a single job for now. Splitting into `lint` and `test` buys
+  # parallelism and clearer failure attribution, but each job repeats checkout +
+  # uv install + sync, which currently costs more than it saves: one test, seven
+  # packages. Split when either arrives, whichever is first:
+  #   - a matrix (several Python versions or operating systems);
+  #   - a test suite longer than a minute.
+  # When splitting, update the required status check in the branch ruleset in the
+  # same change: it is matched by job name, and a stale name blocks every PR.
   checks:
     runs-on: ubuntu-latest
     steps:
@@ -48,3 +56,10 @@ jobs:
 
       - name: Tests
         run: uv run pytest
+
+      # Deselected on every ordinary run: a suite that depends on someone else's
+      # uptime is not a suite you can trust. On the weekly schedule a failure here
+      # is the signal it is meant to be -- an external source moved or vanished.
+      - name: External sources still reachable
+        if: github.event_name == 'schedule'
+        run: uv run pytest -m network

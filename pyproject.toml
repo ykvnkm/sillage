@@ -16,6 +16,9 @@ dependencies = []
 # Single source of truth for the version: src/sillage/__init__.py
 dynamic = ["version"]
 
+[project.scripts]
+sillage-data = "sillage.data.cli:main"
+
 [dependency-groups]
 # Development-only tools. Not installed for end users of the package.
 dev = [
@@ -55,4 +58,8 @@ select = [
 # --- Tests -------------------------------------------------------------------
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-ra --strict-markers"
+# Network tests are deselected by default: a suite whose result depends on someone
+# else's uptime is not a suite you can trust. CI runs them on a schedule instead,
+# with `-m network`, where a failure means the external source moved.
+addopts = "-ra --strict-markers -m 'not network'"
+markers = ["network: reaches an external source over the internet"]
