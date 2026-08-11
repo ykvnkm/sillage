@@ -1,0 +1,58 @@
+[project]
+name = "sillage"
+description = "Open molecule -> mixture -> perception system for perfumery"
+readme = "README.md"
+authors = [{ name = "ykvnkm", email = "michailyakovenk3@gmail.com" }]
+
+# What the package supports. Deliberately open-ended upwards: training runs on
+# Colab/Kaggle, whose interpreter we do not control. The version we develop
+# against is pinned separately in .python-version.
+requires-python = ">=3.11"
+
+# Runtime dependencies are added only when a module actually imports them.
+# An honest lock file is one where every entry can be traced to a real import.
+dependencies = []
+
+# Single source of truth for the version: src/sillage/__init__.py
+dynamic = ["version"]
+
+[dependency-groups]
+# Development-only tools. Not installed for end users of the package.
+dev = [
+    "pre-commit>=4.6.2",
+    "pytest>=8.0",
+    "ruff>=0.14",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/sillage/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sillage"]
+
+# --- Linting and formatting --------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes: unused imports, undefined names
+    "I",   # isort: import ordering
+    "UP",  # pyupgrade: outdated syntax
+    "B",   # flake8-bugbear: likely bugs
+    "SIM", # flake8-simplify
+    "RUF", # ruff-specific rules
+]
+
+# --- Tests -------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"

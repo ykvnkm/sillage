@@ -1,0 +1,42 @@
+# Hooks run on staged files before every commit.
+# Install once per clone:  uv run pre-commit install
+# Run against everything:  uv run pre-commit run --all-files
+
+repos:
+  # Generic file-level safety checks. These have no counterpart in the project's
+  # own tooling, so they come from the upstream repo, pinned by revision.
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      # The technical guarantee that a dataset never reaches git history.
+      # .gitignore protects known paths; this protects the ones we forgot.
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: detect-private-key
+      - id: check-merge-conflict
+      # macOS is case-insensitive, CI runs on Linux. Catches Model.py vs model.py
+      # before it becomes an import error that reproduces only in CI.
+      - id: check-case-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+
+  # Ruff is run through the project's own environment rather than an upstream
+  # mirror, so the hook and CI can never disagree on the version: uv.lock is the
+  # single source of truth. See docs/adr/0002.
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff check
+        entry: uv run ruff check --fix --force-exclude
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format --force-exclude
+        language: system
+        types_or: [python, pyi]
+        require_serial: true

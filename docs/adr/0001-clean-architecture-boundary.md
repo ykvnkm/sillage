@@ -41,6 +41,30 @@ src/sillage/
 Инвариант защищается автоматическим тестом в CI, а не соглашением: тест
 импортирует `domain` и падает при обнаружении тяжёлых зависимостей.
 
+## Примерная целевая структура проекта
+
+src/sillage/
+├── domain/          # ядро: чистый Python, ноль сторонних импортов
+│   ├── molecule.py       # Molecule, OdorProfile, Descriptor
+│   ├── mixture.py        # Mixture, Concentration
+│   ├── note.py           # Note, Material  (мост L2)
+│   └── ports.py          # ПРОТОКОЛЫ: OdorPredictor, Featurizer, EmbeddingIndex
+├── application/     # сценарии использования, оркестрируют порты
+│   ├── predict_odor.py
+│   ├── find_similar.py
+│   └── build_accord.py
+├── adapters/        # реализации портов — здесь и только здесь тяжёлые либы
+│   ├── chem/             # rdkit_featurizer.py      ← RDKit живёт тут
+│   ├── models/           # baseline_predictor.py, gnn_predictor.py  ← torch тут
+│   └── storage/          # parquet_repo.py, vector_index.py
+├── interfaces/      # точки входа
+│   ├── api/              # FastAPI
+│   └── cli/
+└── research/        # ЯВНО вне чистой архитектуры, и это осознанно
+    ├── training/
+    ├── evaluation/
+    └── experiments/
+
 ## Обоснование порта `OdorPredictor`
 
 Обычная претензия к портам — интерфейс под единственную реализацию. Здесь это
