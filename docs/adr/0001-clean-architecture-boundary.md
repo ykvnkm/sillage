@@ -43,6 +43,7 @@ src/sillage/
 
 ## Примерная целевая структура проекта
 
+```
 src/sillage/
 ├── domain/          # ядро: чистый Python, ноль сторонних импортов
 │   ├── molecule.py       # Molecule, OdorProfile, Descriptor
@@ -64,6 +65,7 @@ src/sillage/
     ├── training/
     ├── evaluation/
     └── experiments/
+```
 
 ## Обоснование порта `OdorPredictor`
 
