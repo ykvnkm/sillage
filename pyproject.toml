@@ -14,6 +14,7 @@ requires-python = ">=3.11"
 dependencies = [
     "pandas>=3.0.5",
     "pandera>=0.32.1",
+    "rdkit>=2026.3.5",
 ]
 
 # Single source of truth for the version: src/sillage/__init__.py
@@ -25,6 +26,8 @@ sillage-data = "sillage.data.cli:main"
 [dependency-groups]
 # Development-only tools. Not installed for end users of the package.
 dev = [
+    "jupyterlab>=4.6.3",
+    "matplotlib>=3.11.1",
     "pre-commit>=4.6.2",
     "pytest>=8.0",
     "ruff>=0.14",
@@ -57,6 +60,19 @@ select = [
     "SIM", # flake8-simplify
     "RUF", # ruff-specific rules
 ]
+ignore = [
+    # Ambiguous-unicode rules. They guard against Cyrillic letters that look like
+    # Latin ones sneaking into identifiers. This project writes Russian in strings,
+    # comments and docstrings on purpose, so the rule fires on every line of prose.
+    "RUF001", # ambiguous character in a string
+    "RUF002", # ambiguous character in a docstring
+    "RUF003", # ambiguous character in a comment
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Notebooks are read top to bottom, so a section that starts with its own imports
+# is clearer than one big import cell at the top.
+"notebooks/*.ipynb" = ["E402"]
 
 # --- Tests -------------------------------------------------------------------
 [tool.pytest.ini_options]
