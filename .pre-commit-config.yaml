@@ -11,7 +11,17 @@ repos:
       # The technical guarantee that a dataset never reaches git history.
       # .gitignore protects known paths; this protects the ones we forgot.
       - id: check-added-large-files
+        alias: check-large-files
         args: [--maxkb=1024]
+        exclude: \.ipynb$
+      # Notebooks keep their outputs on purpose (charts are part of the write-up),
+      # so they get a looser cap. Still a cap: it catches a whole DataFrame printed
+      # into a cell or a 20 MB image pasted in.
+      - id: check-added-large-files
+        alias: check-large-notebooks
+        name: check for oversized notebooks
+        args: [--maxkb=2048]
+        files: \.ipynb$
       - id: detect-private-key
       - id: check-merge-conflict
       # macOS is case-insensitive, CI runs on Linux. Catches Model.py vs model.py
@@ -21,7 +31,17 @@ repos:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
+        exclude: \.ipynb$
       - id: mixed-line-ending
+
+  # Notebooks keep their outputs (see docs/adr/0005) but lose the metadata that
+  # changes on every run: execution counts, kernel paths, widget state. That noise,
+  # not the charts, is what makes notebook diffs unreadable.
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.9.1
+    hooks:
+      - id: nbstripout
+        args: [--keep-output]
 
   # Ruff is run through the project's own environment rather than an upstream
   # mirror, so the hook and CI can never disagree on the version: uv.lock is the
@@ -32,11 +52,11 @@ repos:
         name: ruff check
         entry: uv run ruff check --fix --force-exclude
         language: system
-        types_or: [python, pyi]
+        types_or: [python, pyi, jupyter]
         require_serial: true
       - id: ruff-format
         name: ruff format
         entry: uv run ruff format --force-exclude
         language: system
-        types_or: [python, pyi]
+        types_or: [python, pyi, jupyter]
         require_serial: true
