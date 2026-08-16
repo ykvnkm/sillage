@@ -59,7 +59,7 @@ uv run sillage-data fetch     # скачать в data/raw/ и сверить к
 ```python
 from sillage.data.loaders import load_curated_openpom
 
-df = load_curated_openpom()   # 4983 × 140, иначе исключение с указанием строки
+df = load_curated_openpom()  # 4983 × 140, иначе исключение с указанием строки
 ```
 
 ## Исследование
