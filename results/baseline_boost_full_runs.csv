@@ -1,0 +1,2 @@
+model,features,n_features,split,seed,macro_ap,macro_auc,micro_ap,micro_auc,labels_scored,seconds
+boosting,morgan-bin-r2+desc,2264,stratified,0,0.3484797459236161,0.8560156557262623,0.43828327646220755,0.9083888836409157,138,820.2973404168151
