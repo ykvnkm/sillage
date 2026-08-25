@@ -1,0 +1,2 @@
+model,features,split,macro_ap_mean,macro_ap_std,macro_auc_mean,micro_ap_mean,micro_auc_mean,labels_scored,n_seeds,seconds
+boosting,morgan-bin-r2+desc,stratified,0.3484797459236161,0.0,0.8560156557262623,0.43828327646220755,0.9083888836409157,138,1,820.2973404168151

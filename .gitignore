@@ -7,7 +7,10 @@ data/processed/*
 !data/**/.gitkeep
 
 # Model weights and other large binaries live on the HF Hub, not here.
-models/
+# Anchored with a leading slash: an unanchored `models/` matches at ANY depth and
+# silently swallowed src/sillage/models/ -- code that git then refuses to track
+# without saying a word.
+/models/
 *.ckpt
 *.pt
 *.pth
