@@ -43,6 +43,14 @@ class OdorPredictor(Protocol):
     def describe(self) -> ModelDescription: ...
 
 
+class MoleculeDepicter(Protocol):
+    """Draws a molecule for a person to look at."""
+
+    def svg(self, smiles: str, width: int, height: int) -> str:
+        """Raises :class:`~sillage.domain.molecule.InvalidMolecule` on bad input."""
+        ...
+
+
 class ReferenceLibrary(Protocol):
     """Molecules with known expert labels, searchable by structure."""
 
