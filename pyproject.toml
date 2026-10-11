@@ -12,12 +12,15 @@ requires-python = ">=3.11"
 # Runtime dependencies are added only when a module actually imports them.
 # An honest lock file is one where every entry can be traced to a real import.
 dependencies = [
+    "fastapi>=0.143.0",
     "joblib>=1.6.0",
     "numpy>=2.4.6",
     "pandas>=3.0.5",
     "pandera>=0.32.1",
+    "prometheus-client>=0.26.0",
     "rdkit>=2026.3.5",
     "scikit-learn>=1.9.1",
+    "uvicorn>=0.54.0",
 ]
 
 # Single source of truth for the version: src/sillage/__init__.py
@@ -30,6 +33,7 @@ sillage-predict = "sillage.interfaces.cli:main"
 [dependency-groups]
 # Development-only tools. Not installed for end users of the package.
 dev = [
+    "httpx2>=2.13.1",
     "jupyterlab>=4.6.3",
     "matplotlib>=3.11.1",
     "pre-commit>=4.6.2",

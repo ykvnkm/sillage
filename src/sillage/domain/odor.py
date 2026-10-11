@@ -108,6 +108,25 @@ class DescriptorScore:
 
 
 @dataclass(frozen=True, slots=True)
+class ModelDescription:
+    """What a user may know about the model answering them."""
+
+    name: str
+    descriptors: tuple[str, ...]
+    unverified: tuple[str, ...]
+    """Descriptors with too few examples to calibrate: never shown with a number."""
+
+    scope: str
+    """The declared domain, in one sentence a person can read."""
+
+    trained_on: int
+    metrics: dict[str, float]
+    floor: dict[str, float]
+    """The same metrics for a predictor that never saw a molecule. A metric without
+    its floor is unreadable: micro AUC starts at 0.78 here (journal E-004)."""
+
+
+@dataclass(frozen=True, slots=True)
 class OdorProfile:
     """Scores for every descriptor the model knows, in the model's label order."""
 

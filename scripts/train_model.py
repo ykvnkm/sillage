@@ -23,8 +23,10 @@ from sillage.research.train import (
 
 CARD_TEMPLATE = """# Model card: {name}
 
-Автоматически сгенерировано `scripts/train_model.py` {created_at}.
-Не редактировать руками — правки перезапишутся при следующем обучении.
+Автоматически сгенерировано `scripts/train_model.py`. Не редактировать руками —
+правки перезапишутся при следующем обучении. Время обучения сюда намеренно не
+пишется (оно есть в `card.json` рядом с весами): иначе переобучение той же модели с
+тем же сидом меняло бы этот файл, и в истории git появлялись бы пустые правки.
 
 ## Что эта модель делает
 
@@ -136,7 +138,6 @@ def _render_card(outcome) -> str:
     metrics, floor = card.metrics, card.baseline_metrics
     return CARD_TEMPLATE.format(
         name=card.name,
-        created_at=card.created_at,
         n_labels=len(card.label_names),
         n_calibrated=outcome.model.calibrator.n_fitted if outcome.model.calibrator else 0,
         n_uncalibrated=(
