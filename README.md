@@ -9,37 +9,48 @@
 откалибрована и отдаётся через веб-интерфейс и HTTP API в Docker-контейнере;
 следующий шаг — поиск молекул по названию.
 
-<!-- BEGIN DEMO -->
-**Демо:** [https://ykvnkm-sillage.hf.space](https://ykvnkm-sillage.hf.space) · веса: [huggingface.co/ykvnkm/sillage-odor-baseline-v1](https://huggingface.co/ykvnkm/sillage-odor-baseline-v1)
-<!-- END DEMO -->
+### Запустить у себя
+
+Нужен только Docker. Образ сам скачает опубликованную модель с
+[HF Hub](https://huggingface.co/ykvnkm/sillage-odor-baseline-v1) и сверит её по
+контрольным суммам:
 
 ```bash
-uv run python scripts/fetch_model.py          # скачать опубликованную модель с HF Hub
-uv run python scripts/train_model.py          # или обучить заново: ~40 секунд
+git clone https://github.com/ykvnkm/sillage.git && cd sillage
+docker build -t sillage . && docker run --rm -p 8000:8000 sillage
+```
+
+Затем откройте http://localhost:8000. Первая сборка занимает несколько минут.
+Публичного адреса пока нет: бесплатный хостинг Docker-приложений на Hugging Face
+закрыли в июле 2026, решение о хостинге отложено
+([ADR-0015](docs/adr/0015-public-deployment-is-deferred.md)).
+
+Без Docker, из исходников (нужен [`uv`](https://docs.astral.sh/uv/)):
+
+```bash
+uv sync                                        # зависимости строго по uv.lock
+uv run python scripts/fetch_model.py           # модель с HF Hub (или обучить: scripts/train_model.py, ~40 с)
+uv run uvicorn sillage.interfaces.api.app:app  # сайт на http://localhost:8000
+```
+
+Из терминала:
+
+```bash
 uv run sillage-predict "COc1cc(C=O)ccc1O"      # ванилин
 uv run sillage-predict "BrCCCCCC=O" --json     # отказ: брома нет в обучающих данных
-```
-
-Веб-интерфейс и HTTP API (FastAPI, документация на `/docs`, метрики Prometheus
-на `/metrics`):
-
-```bash
-docker build -t sillage . && docker run --rm -p 8000:8000 sillage
-open http://localhost:8000                  # интерфейс
 curl -X POST localhost:8000/predict -H 'content-type: application/json' \
-     -d '{"smiles": "COc1cc(C=O)ccc1O"}'
+     -d '{"smiles": "COc1cc(C=O)ccc1O"}'      # HTTP API, документация на /docs
 ```
-
-Дизайн интерфейса описан в [`DESIGN.md`](DESIGN.md).
 
 Отказ — HTTP 422 с кодом причины, в одной форме для любого отказа
 ([ADR-0013](docs/adr/0013-http-contract-refusals-are-422.md)). Запрос целиком
 занимает около 10 мс на CPU.
 
-Ответ — дескрипторы со словом уверенности (`likely` ≥ 0.85 сбывается в 89% случаев),
+Ответ — дескрипторы со словом уверенности («очень вероятно» сбывается в 89% случаев),
 отдельный список неоткалиброванных меток без чисел, метки экспертов, если молекула
 известна, и пять ближайших известных молекул. Вне области определения — отказ с
-кодом причины. Model card: [`docs/model-cards/odor-baseline-v1.md`](docs/model-cards/odor-baseline-v1.md).
+кодом причины. Model card: [`docs/model-cards/odor-baseline-v1.md`](docs/model-cards/odor-baseline-v1.md),
+дизайн интерфейса: [`DESIGN.md`](DESIGN.md).
 
 ## Архитектура
 

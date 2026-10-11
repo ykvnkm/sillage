@@ -1,13 +1,14 @@
 """Check that a running sillage service actually works, end to end.
 
     python scripts/smoke_test.py http://localhost:8000
-    python scripts/smoke_test.py https://<owner>-sillage.hf.space --wait 900
+    python scripts/smoke_test.py https://<public address> --wait 900
 
 Standard library only. CI runs it against the freshly built container on every pull
-request, and against the public Space after each deploy. Unit tests prove the code;
-this proves the *image*: system libraries present, model downloaded and loadable,
-static files packaged. Those are exactly the failures unit tests cannot see
-(journal E-014: the drawing module crashed at import on a missing libXrender).
+request; once the service has a public address, the same check runs against it.
+Unit tests prove the code; this proves the *image*: system libraries present, model
+downloaded and loadable, static files packaged. Those are exactly the failures unit
+tests cannot see (journal E-014: the drawing module crashed at import on a missing
+libXrender).
 """
 
 from __future__ import annotations
