@@ -14,6 +14,7 @@ weight of 1347 cannot share an optimisation landscape.
 from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import dataclass
 
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import HistGradientBoostingClassifier
@@ -79,6 +80,25 @@ def logistic_regression_single_scaler(
     """One scaler for the whole matrix. Kept to reproduce the finding in E-005."""
     chosen = StandardScaler() if scaler == "standard" else MaxAbsScaler()
     return Pipeline([("scale", chosen), ("model", _classifier(c, seed))])
+
+
+@dataclass(frozen=True, slots=True)
+class BlockScaledLogisticRegression:
+    """A named, picklable factory for the shipping estimator.
+
+    Exists because a lambda cannot be pickled, and a model that cannot be saved is
+    not a product: `joblib.dump` on a classifier holding a closure fails with
+    `PicklingError`. Making the factory a dataclass fixes that and has a second
+    benefit -- the configuration is stored explicitly inside the saved artefact
+    instead of being lost with the closure.
+    """
+
+    feature_names: tuple[str, ...]
+    c: float = 0.1
+    seed: int = DEFAULT_SEED
+
+    def __call__(self) -> Pipeline:
+        return logistic_regression(self.feature_names, c=self.c, seed=self.seed)
 
 
 def gradient_boosting(
