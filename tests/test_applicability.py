@@ -8,7 +8,12 @@ from rdkit import DataStructs
 from rdkit.Chem import rdFingerprintGenerator
 
 from sillage.features import morgan_fingerprints, parse_smiles
-from sillage.models.applicability import ApplicabilityDomain, ChemicalScope, tanimoto_similarity
+from sillage.models.applicability import (
+    ApplicabilityDomain,
+    ChemicalScope,
+    element_vocabulary,
+    tanimoto_similarity,
+)
 
 FAMILIAR = [
     "CCO",
@@ -189,3 +194,55 @@ def test_the_bounds_are_configurable() -> None:
 
     assert not ChemicalScope().contains(heavy)[0]
     assert ChemicalScope(max_weight=1000).contains(heavy)[0]
+
+
+# --- element vocabulary ------------------------------------------------------
+
+
+def test_the_vocabulary_keeps_only_elements_seen_often_enough() -> None:
+    molecules = parse_smiles(["CCO", "CCCO", "CCN", "CSC", "CC(=O)O"])
+
+    assert element_vocabulary(molecules, min_molecules=2) == ("C", "O")
+    assert element_vocabulary(molecules, min_molecules=1) == ("C", "N", "O", "S")
+
+
+def test_an_element_the_model_never_saw_is_refused() -> None:
+    """Bromostyrene, the case from the step 2.1 demo: 7 confident predictions, AP 0.061.
+
+    There is no bromine anywhere in the training data, so this is a guarantee rather
+    than a heuristic -- the model holds no information about bromine's contribution.
+    """
+    scope = ChemicalScope(allowed_elements=("C", "N", "O", "S"))
+
+    reason = scope.reason_for_rejection(parse_smiles(["BrC=Cc1ccccc1"])[0])
+
+    assert reason == "contains Br, absent from the training data"
+
+
+def test_a_barely_seen_element_is_refused_too() -> None:
+    """Chlorine appears in one training molecule: present, but carrying no signal."""
+    scope = ChemicalScope(allowed_elements=("C", "N", "O", "S"))
+
+    assert "Cl" in scope.reason_for_rejection(parse_smiles(["CC(=O)c1ccc(Cl)cc1"])[0])
+
+
+def test_molecules_within_the_vocabulary_pass() -> None:
+    scope = ChemicalScope(allowed_elements=("C", "N", "O", "S"))
+    ordinary = parse_smiles(["O=Cc1ccc(O)cc1", "CCCCCCCC=O", "CSCCC(=O)O", "C1CNCCN1"])
+
+    assert scope.contains(ordinary).all()
+
+
+def test_the_check_is_skipped_when_no_vocabulary_is_declared() -> None:
+    """Before a model exists there is no training data to derive a vocabulary from."""
+    assert ChemicalScope().reason_for_rejection(parse_smiles(["BrC=Cc1ccccc1"])[0]) is None
+
+
+def test_every_unseen_element_is_named_in_the_reason() -> None:
+    """A refusal a user cannot act on is barely better than a wrong answer."""
+    scope = ChemicalScope(allowed_elements=("C",))
+
+    reason = scope.reason_for_rejection(parse_smiles(["BrCCCl"])[0])
+
+    assert "Br" in reason
+    assert "Cl" in reason

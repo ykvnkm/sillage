@@ -33,6 +33,7 @@ X, 0.87 similar" is worth showing a user even when it cannot gate a prediction.
 
 from __future__ import annotations
 
+from collections import Counter
 from collections.abc import Sequence
 from dataclasses import dataclass
 
@@ -70,6 +71,17 @@ class ChemicalScope:
     require_single_component: bool = True
     require_neutral: bool = True
 
+    allowed_elements: tuple[str, ...] | None = None
+    """Chemical elements the model has actually been trained on. ``None`` skips the
+    check, which is only appropriate before a model exists.
+
+    This is the one rule that is a logical guarantee rather than a heuristic. The
+    training data contains no bromine at all, so a bromine compound is not a hard
+    case -- there is no information about bromine's contribution anywhere in the
+    model, and any output is extrapolation by definition. Measured: molecules with
+    an out-of-vocabulary element score AP 0.270 against 0.562, and carry 3.5
+    confident predictions each against 0.2 (journal E-010)."""
+
     def reason_for_rejection(self, molecule: Mol) -> str | None:
         """Why this molecule is out of scope, or None when it is in scope."""
         if self.require_single_component and len(Chem.GetMolFrags(molecule)) > 1:
@@ -78,6 +90,12 @@ class ChemicalScope:
             return "no carbon: inorganic"
         if self.require_neutral and any(a.GetFormalCharge() != 0 for a in molecule.GetAtoms()):
             return "carries a formal charge: ionic"
+
+        if self.allowed_elements is not None:
+            present = {atom.GetSymbol() for atom in molecule.GetAtoms()}
+            unseen = sorted(present - set(self.allowed_elements))
+            if unseen:
+                return f"contains {', '.join(unseen)}, absent from the training data"
 
         weight = Descriptors.MolWt(molecule)
         if not self.min_weight <= weight <= self.max_weight:
@@ -89,6 +107,20 @@ class ChemicalScope:
     def contains(self, molecules: Sequence[Mol]) -> np.ndarray:
         """Boolean mask: True where the model may be asked at all."""
         return np.array([self.reason_for_rejection(m) is None for m in molecules], dtype=bool)
+
+
+def element_vocabulary(molecules: Sequence[Mol], *, min_molecules: int = 5) -> tuple[str, ...]:
+    """Elements appearing in at least *min_molecules* of the given molecules.
+
+    The threshold is not cosmetic. In this dataset phosphorus appears in 2 training
+    molecules, chlorine and fluorine in 1 each: present, but carrying no usable
+    signal. Both the unseen element (bromine) and the barely-seen one (chlorine)
+    produce worse predictions than the dataset average, so the cut is set above them.
+    """
+    counts: Counter[str] = Counter()
+    for molecule in molecules:
+        counts.update({atom.GetSymbol() for atom in molecule.GetAtoms()})
+    return tuple(sorted(element for element, n in counts.items() if n >= min_molecules))
 
 
 def tanimoto_similarity(query: np.ndarray, reference: np.ndarray) -> np.ndarray:

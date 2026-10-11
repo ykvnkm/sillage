@@ -25,6 +25,7 @@ from sillage.features import parse_smiles
 from sillage.features.matrix import FeatureMatrix
 from sillage.metrics import MultilabelReport, evaluate
 from sillage.models import (
+    ChemicalScope,
     MultilabelClassifier,
     PrevalenceBaseline,
     gradient_boosting,
@@ -81,6 +82,24 @@ class Dataset:
             molecules=parse_smiles(frame[SMILES_COLUMN].tolist()),
             labels=frame[list(OPENPOM_DESCRIPTORS)].to_numpy(np.int8),
             label_names=OPENPOM_DESCRIPTORS,
+        )
+
+    def in_scope(self, scope: ChemicalScope) -> np.ndarray:
+        """Mask of molecules the model is declared for."""
+        return scope.contains(self.molecules)
+
+    def restrict(self, keep: np.ndarray) -> Dataset:
+        """A dataset of only the kept rows, with the label vocabulary unchanged.
+
+        The vocabulary is deliberately not pruned: dropping a label because the
+        filter emptied it would silently change what macro averaging means, and the
+        metric layer already reports unscorable labels instead of hiding them.
+        """
+        keep = np.asarray(keep, dtype=bool)
+        return Dataset(
+            molecules=[m for m, k in zip(self.molecules, keep, strict=True) if k],
+            labels=self.labels[keep],
+            label_names=self.label_names,
         )
 
     def split(self, strategy: str, seed: int) -> Split:
