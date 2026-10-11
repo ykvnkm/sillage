@@ -1,12 +1,22 @@
 # The prediction service, CPU only.
 #
-#   uv run python scripts/train_model.py     # weights are not in git; build after training
 #   docker build -t sillage .
 #   docker run --rm -p 8000:8000 sillage
 #
-# Two stages: the first resolves and installs dependencies with uv, the second is a
-# clean runtime that receives only the finished virtual environment and the model.
-# No compiler, no uv, no source tree, no dev dependencies in the final image.
+# Three stages: the model, downloaded at the revision pinned in deploy/hub.json and
+# checked file by file against its sha256; the dependencies, installed by uv from
+# the lock file; and a clean runtime that receives only those two results. No
+# compiler, no uv, no source tree, no dev dependencies in the final image.
+#
+# The same file builds locally, in CI and on the Hugging Face Space, and no build
+# depends on whatever happens to sit in a developer's models/ directory.
+
+FROM python:3.11-slim-bookworm AS model
+
+WORKDIR /fetch
+COPY deploy/hub.json scripts/fetch_model.py ./
+RUN python fetch_model.py --manifest hub.json --out /model
+
 
 FROM python:3.11-slim-bookworm AS build
 
@@ -44,7 +54,7 @@ RUN apt-get update \
 RUN useradd --create-home --uid 1000 sillage
 
 COPY --from=build --chown=sillage:sillage /app/.venv /app/.venv
-COPY --chown=sillage:sillage models/odor-baseline-v1 /app/model
+COPY --from=model --chown=sillage:sillage /model /app/model
 
 ENV PATH=/app/.venv/bin:$PATH \
     PYTHONUNBUFFERED=1 \
@@ -58,5 +68,6 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
     CMD ["python", "-c", "import os, urllib.request; urllib.request.urlopen(f'http://127.0.0.1:{os.environ[\"PORT\"]}/health', timeout=4)"]
 
-# PORT is read at start, not baked in: HF Spaces (step 2.6) expects 7860.
+# PORT is read at start, not baked in, so a platform can choose it. The Space card
+# declares app_port 8000, so the default serves there too.
 CMD ["sh", "-c", "exec uvicorn sillage.interfaces.api.app:app --host 0.0.0.0 --port \"$PORT\""]

@@ -19,14 +19,12 @@ permissions:
   contents: read
 
 jobs:
-  # Deliberately a single job for now. Splitting into `lint` and `test` buys
-  # parallelism and clearer failure attribution, but each job repeats checkout +
-  # uv install + sync, which currently costs more than it saves: one test, seven
-  # packages. Split when either arrives, whichever is first:
+  # Lint and tests stay in one job: splitting them would repeat checkout + uv
+  # install + sync for a suite that runs in seconds. Split when either arrives:
   #   - a matrix (several Python versions or operating systems);
   #   - a test suite longer than a minute.
-  # When splitting, update the required status check in the branch ruleset in the
-  # same change: it is matched by job name, and a stale name blocks every PR.
+  # The required status check in the branch ruleset is matched by job name: renaming
+  # `checks` means updating the ruleset in the same change, or every PR is blocked.
   checks:
     runs-on: ubuntu-latest
     steps:
@@ -63,3 +61,49 @@ jobs:
       - name: External sources still reachable
         if: github.event_name == 'schedule'
         run: uv run pytest -m network
+
+  # A separate job because it tests a different thing: not the code but the image.
+  # System libraries, the model download and its checksums, packaged static files --
+  # failures no unit test can see (journal E-014).
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Build the service image
+        run: docker build -t sillage:ci .
+
+      - name: Run it and check it end to end
+        run: |
+          docker run -d --name sillage -p 8000:8000 sillage:ci
+          python3 scripts/smoke_test.py http://localhost:8000 --wait 90 \
+            || { docker logs sillage; exit 1; }
+
+  # Only after a merge to main, and only once both the code and the image passed.
+  deploy:
+    needs: [checks, image]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v9.0.0
+        with:
+          enable-cache: true
+
+      - name: Install dependencies from the lock file
+        run: uv sync --locked
+
+      - name: Upload to the Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: uv run python scripts/deploy_space.py
+
+      # The Space builds the image itself, which takes a few minutes. Wait for it and
+      # check the public URL the same way as the container above: a deploy is not
+      # done when the upload finishes, it is done when the link works.
+      - name: Check the public link
+        run: |
+          url=$(python3 -c "import json; print(json.load(open('deploy/hub.json'))['space_url'])")
+          python3 scripts/smoke_test.py "$url" --wait 1200

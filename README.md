@@ -7,10 +7,15 @@
 **Статус:** Фазы 0–1 завершены, идёт продуктовый трек Фазы 2
 ([дорожная карта](docs/roadmap-product.md)). Модель structure → odour обучена,
 откалибрована и отдаётся через веб-интерфейс и HTTP API в Docker-контейнере;
-следующий шаг — публичная ссылка на HF Spaces.
+следующий шаг — поиск молекул по названию.
+
+<!-- BEGIN DEMO -->
+**Демо:** [https://ykvnkm-sillage.hf.space](https://ykvnkm-sillage.hf.space) · веса: [huggingface.co/ykvnkm/sillage-odor-baseline-v1](https://huggingface.co/ykvnkm/sillage-odor-baseline-v1)
+<!-- END DEMO -->
 
 ```bash
-uv run python scripts/train_model.py          # ~40 секунд, пишет models/odor-baseline-v1
+uv run python scripts/fetch_model.py          # скачать опубликованную модель с HF Hub
+uv run python scripts/train_model.py          # или обучить заново: ~40 секунд
 uv run sillage-predict "COc1cc(C=O)ccc1O"      # ванилин
 uv run sillage-predict "BrCCCCCC=O" --json     # отказ: брома нет в обучающих данных
 ```

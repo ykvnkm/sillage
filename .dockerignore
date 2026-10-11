@@ -1,11 +1,13 @@
 # Allow-list: send the build exactly what the image needs. Everything else stays
-# out -- raw data (licence terms forbid redistributing it), the local .venv (built for
-# macOS, useless on Linux), notebooks, caches, git history.
+# out -- raw data (never shipped, see "Data provenance" in README), local model
+# files (the build fetches the pinned ones), the local .venv (built for macOS,
+# useless on Linux), notebooks, caches, git history.
 *
 !pyproject.toml
 !uv.lock
 !README.md
 !src/
-!models/odor-baseline-v1/
+!scripts/fetch_model.py
+!deploy/hub.json
 **/__pycache__
 **/*.pyc
