@@ -6,14 +6,26 @@
 
 **Статус:** Фазы 0–1 завершены, идёт продуктовый трек Фазы 2
 ([дорожная карта](docs/roadmap-product.md)). Модель structure → odour обучена,
-откалибрована, сохранена в артефакт и вызывается одной командой; следующий шаг —
-HTTP API.
+откалибрована и отдаётся через HTTP API в Docker-контейнере; следующий шаг —
+веб-интерфейс.
 
 ```bash
 uv run python scripts/train_model.py          # ~40 секунд, пишет models/odor-baseline-v1
 uv run sillage-predict "COc1cc(C=O)ccc1O"      # ванилин
 uv run sillage-predict "BrCCCCCC=O" --json     # отказ: брома нет в обучающих данных
 ```
+
+HTTP API (FastAPI, документация на `/docs`, метрики Prometheus на `/metrics`):
+
+```bash
+docker build -t sillage . && docker run --rm -p 8000:8000 sillage
+curl -X POST localhost:8000/predict -H 'content-type: application/json' \
+     -d '{"smiles": "COc1cc(C=O)ccc1O"}'
+```
+
+Отказ — HTTP 422 с кодом причины, в одной форме для любого отказа
+([ADR-0013](docs/adr/0013-http-contract-refusals-are-422.md)). Запрос целиком
+занимает около 10 мс на CPU.
 
 Ответ — дескрипторы со словом уверенности (`likely` ≥ 0.85 сбывается в 89% случаев),
 отдельный список неоткалиброванных меток без чисел, метки экспертов, если молекула

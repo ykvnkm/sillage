@@ -14,7 +14,7 @@ from __future__ import annotations
 from typing import Protocol
 
 from sillage.domain.molecule import KnownMolecule, Molecule, Neighbour
-from sillage.domain.odor import OdorProfile
+from sillage.domain.odor import ModelDescription, OdorProfile
 from sillage.domain.report import Refusal
 
 
@@ -39,6 +39,8 @@ class OdorPredictor(Protocol):
     def name(self) -> str: ...
 
     def predict(self, molecule: Molecule) -> OdorProfile: ...
+
+    def describe(self) -> ModelDescription: ...
 
 
 class ReferenceLibrary(Protocol):

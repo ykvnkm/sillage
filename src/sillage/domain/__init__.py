@@ -13,6 +13,7 @@ from sillage.domain.odor import (
     UNVERIFIED_MENTION,
     Confidence,
     DescriptorScore,
+    ModelDescription,
     OdorProfile,
     confidence_of,
 )
@@ -26,6 +27,7 @@ __all__ = [
     "DescriptorScore",
     "InvalidMolecule",
     "KnownMolecule",
+    "ModelDescription",
     "Molecule",
     "Neighbour",
     "OdorProfile",

@@ -1,0 +1,11 @@
+# Allow-list: send the build exactly what the image needs. Everything else stays
+# out -- raw data (licence terms forbid redistributing it), the local .venv (built for
+# macOS, useless on Linux), notebooks, caches, git history.
+*
+!pyproject.toml
+!uv.lock
+!README.md
+!src/
+!models/odor-baseline-v1/
+**/__pycache__
+**/*.pyc

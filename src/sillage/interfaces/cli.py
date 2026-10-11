@@ -11,10 +11,10 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import asdict
 from typing import Any
 
 from sillage.domain import Caveat, OdorReport, Refusal
+from sillage.interfaces.api.schemas import result_out
 from sillage.interfaces.composition import build_predict_odor
 
 CAVEAT_TEXT = {
@@ -86,33 +86,8 @@ def render(result: OdorReport | Refusal) -> str:
 
 
 def to_dict(result: OdorReport | Refusal) -> dict[str, Any]:
-    """Only what may be shown: probabilities of uncalibrated labels never appear."""
-    if isinstance(result, Refusal):
-        return {
-            "refused": True,
-            "reason": str(result.reason),
-            "detail": result.detail,
-            "molecule": None if result.molecule is None else asdict(result.molecule),
-        }
-
-    def describe(score) -> dict[str, Any]:
-        return {
-            "descriptor": score.name,
-            "confidence": str(score.confidence),
-            "probability": None if score.probability is None else round(score.probability, 3),
-            "base_rate": round(score.base_rate, 4),
-        }
-
-    return {
-        "refused": False,
-        "model": result.model_name,
-        "molecule": asdict(result.molecule),
-        "predicted": [describe(s) for s in result.profile.confident()],
-        "unverified": [describe(s) for s in result.profile.unverified()],
-        "known": None if result.known is None else asdict(result.known),
-        "neighbours": [asdict(n) for n in result.neighbours],
-        "caveats": [str(c) for c in result.caveats],
-    }
+    """The same JSON the HTTP API returns: one contract, two entry points."""
+    return result_out(result).model_dump()
 
 
 if __name__ == "__main__":
