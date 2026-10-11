@@ -14,7 +14,12 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from sillage.models import BlockScaledLogisticRegression, ChemicalScope, MultilabelClassifier
+from sillage.models import (
+    BlockScaledLogisticRegression,
+    ChemicalScope,
+    MultilabelClassifier,
+    PerLabelCalibrator,
+)
 from sillage.models.artifact import (
     ARTIFACT_VERSION,
     CARD_FILE,
@@ -58,6 +63,7 @@ def trained_model() -> OdorModel:
     return OdorModel(
         card=card,
         estimator=estimator,
+        calibrator=PerLabelCalibrator.fit(estimator.predict_proba(x), y, base_rates=y.mean(axis=0)),
         scope=ChemicalScope(max_weight=350.0),
         reference_smiles=("CCO", "c1ccccc1"),
     )

@@ -21,6 +21,7 @@ from sillage.models import (
     BlockScaledLogisticRegression,
     ChemicalScope,
     MultilabelClassifier,
+    PerLabelCalibrator,
     PrevalenceBaseline,
     element_vocabulary,
 )
@@ -47,6 +48,10 @@ class TrainingOutcome:
             f"model:    {self.model.card.name}  ({self.model.card.estimator})",
             f"features: {self.model.card.feature_set}",
             f"trained:  {self.model.card.n_train} molecules, tested on {self.model.card.n_test}",
+            f"calibrated: {self.model.calibrator.n_fitted} of "
+            f"{self.model.calibrator.n_labels} labels"
+            if self.model.calibrator is not None
+            else "calibrated: no",
             "",
             "                    model     floor",
             f"macro AP          {self.report.macro_average_precision:>7.4f}   "
@@ -106,6 +111,15 @@ def train_odor_model(
     estimator.fit(x_train, y_train)
     report = evaluate(y_test, estimator.predict_proba(x_test), data.label_names)
 
+    # Calibrated on the validation split, which training never touched. Fitting the
+    # calibrator on training data yields a model that looks perfectly calibrated and
+    # is not: it has memorised those answers (journal E-011).
+    calibrator = PerLabelCalibrator.fit(
+        estimator.predict_proba(features.values[split.val]),
+        data.labels[split.val],
+        base_rates=y_train.mean(axis=0),
+    )
+
     floor = PrevalenceBaseline().fit(x_train, y_train)
     baseline_report = evaluate(y_test, floor.predict_proba(x_test), data.label_names)
 
@@ -128,6 +142,7 @@ def train_odor_model(
     model = OdorModel(
         card=card,
         estimator=estimator,
+        calibrator=calibrator,
         scope=scope,
         reference_smiles=tuple(_canonical_smiles(data, split.train)),
     )

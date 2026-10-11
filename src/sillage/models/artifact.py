@@ -34,13 +34,15 @@ from rdkit.Chem import Mol
 
 from sillage.features import parse_smiles
 from sillage.models.applicability import ChemicalScope
+from sillage.models.calibration import PerLabelCalibrator
 from sillage.models.multilabel import MultilabelClassifier
 
-ARTIFACT_VERSION = 1
+ARTIFACT_VERSION = 2
 """Bumped whenever the on-disk layout changes. A mismatch refuses to load rather
 than silently misreading an old directory."""
 
 CARD_FILE = "card.json"
+CALIBRATOR_FILE = "calibrator.joblib"
 ESTIMATOR_FILE = "estimator.joblib"
 REFERENCE_FILE = "reference.json"
 
@@ -100,6 +102,10 @@ class OdorModel:
     card: ModelCard
     estimator: MultilabelClassifier
     scope: ChemicalScope
+    calibrator: PerLabelCalibrator | None
+    """Fitted on the validation split. Without it the raw scores are not
+    probabilities: uncalibrated, a 0.94 is right 83% of the time (journal E-011)."""
+
     reference_smiles: tuple[str, ...]
     """Training molecules, kept so the product can answer "the closest thing I know
     is X". Fingerprints are recomputed on load rather than stored: it takes under a
@@ -122,6 +128,22 @@ class OdorModel:
                 f"(feature set {self.card.feature_set!r}), got {features.shape[1]}"
             )
         return self.estimator.predict_proba(features)
+
+    def probabilities(self, features: np.ndarray) -> np.ndarray:
+        """Calibrated probabilities. The only output the product may show."""
+        scores = self.raw_scores(features)
+        if self.calibrator is None:
+            raise ArtifactError(
+                f"Model {self.card.name!r} has no calibrator; raw scores must not be "
+                "presented as probabilities"
+            )
+        return self.calibrator.transform(scores)
+
+    def is_calibrated(self) -> np.ndarray:
+        """Per-label flag: True where the probability may be stated as such."""
+        if self.calibrator is None:
+            return np.zeros(len(self.label_names), dtype=bool)
+        return self.calibrator.fitted
 
     def _expected_width(self) -> int:
         for fitted in self.estimator.estimators_:
@@ -147,6 +169,7 @@ class OdorModel:
             json.dumps(list(self.reference_smiles), indent=0) + "\n", encoding="utf-8"
         )
         joblib.dump(self.estimator, directory / ESTIMATOR_FILE, compress=3)
+        joblib.dump(self.calibrator, directory / CALIBRATOR_FILE, compress=3)
         return directory
 
     @classmethod
@@ -160,7 +183,7 @@ class OdorModel:
         directory = Path(directory)
         missing = [
             name
-            for name in (CARD_FILE, ESTIMATOR_FILE, REFERENCE_FILE)
+            for name in (CARD_FILE, ESTIMATOR_FILE, REFERENCE_FILE, CALIBRATOR_FILE)
             if not (directory / name).exists()
         ]
         if missing:
@@ -178,6 +201,7 @@ class OdorModel:
         return cls(
             card=card,
             estimator=joblib.load(directory / ESTIMATOR_FILE),
+            calibrator=joblib.load(directory / CALIBRATOR_FILE),
             scope=_scope_from_card(card),
             reference_smiles=tuple(
                 json.loads((directory / REFERENCE_FILE).read_text(encoding="utf-8"))
