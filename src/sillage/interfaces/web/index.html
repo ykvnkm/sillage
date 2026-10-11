@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>sillage · чем пахнет эта молекула?</title>
+  <meta name="description" content="Предсказывает запах молекулы по её структуре и честно говорит, насколько уверен: словами, точность которых измерена.">
+  <meta name="theme-color" content="#2b1709">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans+Condensed:wght@500;600;700&family=Fira+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="/static/app.css">
+  <script src="/static/descriptors.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <header class="shell">
+    <div class="shell__inner">
+      <a class="brand" href="/" aria-label="sillage, на главную">
+        <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M16 3.5 26.8 9.75v12.5L16 28.5 5.2 22.25V9.75Z" />
+          <path d="M16 9.2 21.9 12.6v6.8L16 22.8l-5.9-3.4v-6.8Z" />
+        </svg>
+        <span>sillage</span>
+      </a>
+      <nav class="shell__nav" aria-label="Основная навигация">
+        <a href="#how">Как читать ответ</a>
+        <a href="/docs">API</a>
+        <a href="https://github.com/ykvnkm/sillage" rel="noopener">Исходный код</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="query" aria-labelledby="query-title">
+      <h1 id="query-title">Чем пахнет эта молекула?</h1>
+      <p class="query__lede">
+        Вставьте структуру в формате SMILES. Модель ответит словами, точность которых
+        измерена на молекулах, которых она никогда не видела, и прямо скажет, когда
+        не знает.
+      </p>
+
+      <form class="query__form" id="query-form" novalidate>
+        <label class="query__label" for="smiles">SMILES</label>
+        <div class="query__field">
+          <input id="smiles" name="smiles" type="text" inputmode="text" lang="en"
+                 autocomplete="off" autocapitalize="off" spellcheck="false"
+                 maxlength="500" placeholder="COc1cc(C=O)ccc1O"
+                 aria-describedby="query-hint">
+          <button class="button" type="submit" id="submit">
+            <span class="button__text">Предсказать</span>
+          </button>
+        </div>
+        <p class="query__hint" id="query-hint">
+          Одна нейтральная органическая молекула массой до 400&nbsp;г/моль из атомов C,&nbsp;N,&nbsp;O
+          и&nbsp;S. Поиск по названию скоро появится.
+        </p>
+      </form>
+
+      <div class="examples">
+        <span class="examples__label" id="examples-label">Примеры</span>
+        <ul class="examples__list" aria-labelledby="examples-label">
+          <li><button type="button" class="chip" data-smiles="COc1cc(C=O)ccc1O">Ванилин</button></li>
+          <li><button type="button" class="chip" data-smiles="CCCC(=O)OCC">Этилбутират</button></li>
+          <li><button type="button" class="chip" data-smiles="CCCCCC1C(CC(=O)OC)CCC1=O">Гедион</button></li>
+          <li><button type="button" class="chip" data-smiles="CC1(C)CCCC2(C)C1CCC1(C)OCCC12">Амброксид</button></li>
+          <li><button type="button" class="chip" data-smiles="CC1=CC[C@@H](CC1=O)C(C)=C">(R)-карвон</button></li>
+          <li><button type="button" class="chip" data-smiles="CC(C)(C=O)Cc1ccccc1">Модель её не видела</button></li>
+          <li><button type="button" class="chip chip--quiet" data-smiles="BrCCCCCC=O">Вне области модели</button></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="result" id="result" aria-live="polite" aria-busy="false" hidden></section>
+
+    <section class="how" id="how" aria-labelledby="how-title">
+      <h2 id="how-title">Как читать ответ</h2>
+
+      <div class="how__grid">
+        <div class="how__block">
+          <h3>Слова измерены</h3>
+          <p>
+            Каждое слово уверенности проверено на молекулах, которых модель не видела.
+            «Очень вероятно» обещает примерно девять случаев из десяти, и обещание держит.
+          </p>
+          <table class="calibration">
+            <caption class="visually-hidden">Обещанная и наблюдаемая точность для каждого слова уверенности</caption>
+            <thead>
+              <tr><th scope="col">Слово</th><th scope="col">Диапазон</th><th scope="col">Обещано</th><th scope="col">Сбылось</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row"><span class="grade grade--likely">Очень вероятно</span></th><td>85–100%</td><td>90%</td><td>89%</td></tr>
+              <tr><th scope="row"><span class="grade grade--probable">Вероятно</span></th><td>55–85%</td><td>64%</td><td>67%</td></tr>
+              <tr><th scope="row"><span class="grade grade--possible">Возможно</span></th><td>35–55%</td><td>44%</td><td>45%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="how__block">
+          <h3>Полоска и засечка</h3>
+          <div class="meter meter--demo" aria-hidden="true">
+            <span class="meter__fill grade-fill--probable" style="--p: 0.72"></span>
+            <span class="meter__base" style="--b: 0.11"></span>
+          </div>
+          <p>
+            Полоска — шанс, что эксперт назовёт эту ноту. Засечка — как часто эту ноту
+            называют у любой молекулы. Полоска далеко за засечкой значит, что модель
+            что-то видит; полоска у засечки — что она угадывает среднее.
+          </p>
+          <h3>Без проверки</h3>
+          <p>
+            <span id="unverified-count">31</span> нот встречаются в данных слишком
+            редко, чтобы измерить на них модель. Они появляются, только когда модель
+            склоняется к ним, и никогда не показываются с числом.
+          </p>
+        </div>
+
+        <div class="how__block">
+          <h3>На чём обучена</h3>
+          <dl class="facts" id="model-facts">
+            <div><dt>Модель</dt><dd data-fact="name">odor-baseline-v1</dd></div>
+            <div><dt>Обучена на</dt><dd data-fact="trained_on">3 824 молекулах</dd></div>
+            <div><dt>Качество</dt><dd data-fact="quality">macro AP 0,355 против 0,037 у угадывания по частотам</dd></div>
+            <div><dt>Отвечает для</dt><dd>однокомпонентных нейтральных органических молекул массой 30–400&nbsp;г/моль из атомов C,&nbsp;N,&nbsp;O,&nbsp;S</dd></div>
+          </dl>
+          <p class="how__limits">
+            Модель не видит стереохимию: зеркальные молекулы получают одинаковый ответ,
+            хотя карвон с одной стороны зеркала пахнет тмином, а с другой — мятой.
+            Метки — мнение экспертов, и эксперты расходятся.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>
+      Описания запахов — из коллекций Goodscents и Leffingwell в обработке OpenPOM.
+      Предсказания — исследовательская модель, а не оценка безопасности или
+      соответствия нормам.
+    </p>
+  </footer>
+</body>
+</html>

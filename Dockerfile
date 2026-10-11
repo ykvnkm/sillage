@@ -34,6 +34,13 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 FROM python:3.11-slim-bookworm
 
+# System libraries RDKit's wheels link against (found with `ldd` over every RDKit
+# .so in the image). The drawing module needs the X ones even when it only writes
+# SVG; without them the service fails at import, before serving a single request.
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends libxrender1 libxext6 libexpat1 \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN useradd --create-home --uid 1000 sillage
 
 COPY --from=build --chown=sillage:sillage /app/.venv /app/.venv

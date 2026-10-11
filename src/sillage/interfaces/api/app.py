@@ -8,6 +8,8 @@ Endpoints:
 - ``POST /predict`` -- SMILES in, odour report out. **A refusal is HTTP 422** with a
   stable ``reason`` code, the same body shape whether the input failed schema
   validation or fell outside the model's scope. A caller handles one error format.
+- ``GET /`` -- the web interface (static HTML, CSS and JS; no build step).
+- ``GET /depict?smiles=...`` -- the molecule drawn as SVG.
 - ``GET /model`` -- what model answers, its scope, metrics and their floor.
 - ``GET /health`` -- liveness, for the container healthcheck.
 - ``GET /metrics`` -- Prometheus exposition.
@@ -22,15 +24,17 @@ from __future__ import annotations
 import time
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
+from pathlib import Path
 
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
 from sillage import __version__
-from sillage.application import PredictOdor
-from sillage.domain import Refusal
+from sillage.application import MAX_INPUT_LENGTH
+from sillage.domain import InvalidMolecule, Refusal
 from sillage.interfaces.api.metrics import ServiceMetrics
 from sillage.interfaces.api.schemas import (
     ModelOut,
@@ -41,23 +45,28 @@ from sillage.interfaces.api.schemas import (
     refusal_out,
     report_out,
 )
+from sillage.interfaces.composition import Services
 
 REFUSAL_STATUS = 422
+WEB_DIR = Path(__file__).resolve().parent.parent / "web"
+DRAWING_CACHE = "public, max-age=86400"
+"""A drawing is a pure function of the SMILES string: safe to cache for a day."""
 
 
-def create_app(load: Callable[[], PredictOdor] | None = None) -> FastAPI:
+def create_app(load: Callable[[], Services] | None = None) -> FastAPI:
     """Build the app. *load* is called once at startup; tests pass their own."""
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         if load is None:
-            from sillage.interfaces.composition import build_predict_odor
+            from sillage.interfaces.composition import build_services
 
-            predict = build_predict_odor()
+            services = build_services()
         else:
-            predict = load()
-        app.state.predict = predict
-        app.state.metrics = ServiceMetrics(predict.predictor.name)
+            services = load()
+        app.state.predict = services.predict
+        app.state.depict = services.depict
+        app.state.metrics = ServiceMetrics(services.predict.predictor.name)
         yield
 
     app = FastAPI(
@@ -109,6 +118,31 @@ def create_app(load: Callable[[], PredictOdor] | None = None) -> FastAPI:
         if isinstance(result, Refusal):
             return JSONResponse(refusal_out(result).model_dump(), status_code=REFUSAL_STATUS)
         return report_out(result)
+
+    @app.get("/", include_in_schema=False)
+    def index() -> FileResponse:
+        return FileResponse(WEB_DIR / "index.html")
+
+    app.mount("/static", StaticFiles(directory=WEB_DIR / "static"), name="static")
+
+    @app.get(
+        "/depict",
+        response_class=Response,
+        responses={200: {"content": {"image/svg+xml": {}}}, REFUSAL_STATUS: {"model": RefusalOut}},
+    )
+    def depict(
+        request: Request,
+        smiles: str = Query(min_length=1, max_length=MAX_INPUT_LENGTH),
+        width: int = Query(default=320, ge=80, le=800),
+        height: int = Query(default=240, ge=80, le=800),
+    ) -> Response:
+        """The molecule as an SVG drawing, in the page's ink colour."""
+        try:
+            svg = request.app.state.depict.svg(smiles.strip(), width, height)
+        except InvalidMolecule as error:
+            body = RefusalOut(reason="invalid_input", detail=str(error))
+            return JSONResponse(body.model_dump(), status_code=REFUSAL_STATUS)
+        return Response(svg, media_type="image/svg+xml", headers={"Cache-Control": DRAWING_CACHE})
 
     @app.get("/model", response_model=ModelOut)
     def model(request: Request) -> ModelOut:

@@ -13,12 +13,12 @@ import pytest
 from fastapi.testclient import TestClient
 
 from sillage.interfaces.api.app import create_app
-from sillage.interfaces.composition import build_predict_odor
+from sillage.interfaces.composition import build_services
 
 
 @pytest.fixture
 def client(artifact: Path) -> Iterator[TestClient]:
-    with TestClient(create_app(lambda: build_predict_odor(artifact))) as test_client:
+    with TestClient(create_app(lambda: build_services(artifact))) as test_client:
         yield test_client
 
 
@@ -119,10 +119,57 @@ def test_metrics_label_routes_by_template_not_by_raw_path(client: TestClient) ->
 
 
 def test_each_app_has_its_own_counters(artifact: Path) -> None:
-    load = lambda: build_predict_odor(artifact)  # noqa: E731
+    load = lambda: build_services(artifact)  # noqa: E731
     with TestClient(create_app(load)) as first:
         first.post("/predict", json={"smiles": "CCCCO"})
     with TestClient(create_app(load)) as second:
         text = second.get("/metrics").text
 
     assert 'sillage_predictions_total{outcome="answered"}' not in text
+
+
+# --- web interface and drawings ---------------------------------------------------
+
+
+def test_root_serves_the_web_interface(client: TestClient) -> None:
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
+    assert 'id="query-form"' in response.text
+
+
+@pytest.mark.parametrize("path", ["/static/app.css", "/static/app.js", "/static/favicon.svg"])
+def test_static_assets_are_served(client: TestClient, path: str) -> None:
+    assert client.get(path).status_code == 200
+
+
+def test_depict_returns_a_cacheable_svg(client: TestClient) -> None:
+    response = client.get("/depict", params={"smiles": "COc1cc(C=O)ccc1O", "width": 300})
+
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "image/svg+xml"
+    assert "max-age" in response.headers["cache-control"]
+    assert response.text.lstrip().startswith("<svg")
+    assert "viewBox='0 0 300 240'" in response.text
+
+
+def test_depict_draws_in_one_ink(client: TestClient) -> None:
+    """Colour means confidence on this page; a red oxygen would compete with it."""
+    import re
+
+    svg = client.get("/depict", params={"smiles": "OCC(=O)N"}).text
+
+    assert set(re.findall(r"#[0-9A-Fa-f]{6}", svg)) == {"#25180F"}
+
+
+@pytest.mark.parametrize(
+    "params",
+    [{"smiles": "hello"}, {"smiles": ""}, {"smiles": "CCO", "width": 5000}, {}],
+)
+def test_depict_refuses_like_predict(client: TestClient, params: dict) -> None:
+    response = client.get("/depict", params=params)
+
+    assert response.status_code == 422
+    assert response.json()["refused"] is True
+    assert response.json()["reason"] == "invalid_input"
