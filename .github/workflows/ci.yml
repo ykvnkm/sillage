@@ -78,32 +78,3 @@ jobs:
           docker run -d --name sillage -p 8000:8000 sillage:ci
           python3 scripts/smoke_test.py http://localhost:8000 --wait 90 \
             || { docker logs sillage; exit 1; }
-
-  # Only after a merge to main, and only once both the code and the image passed.
-  deploy:
-    needs: [checks, image]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7.0.1
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v9.0.0
-        with:
-          enable-cache: true
-
-      - name: Install dependencies from the lock file
-        run: uv sync --locked
-
-      - name: Upload to the Hugging Face Space
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: uv run python scripts/deploy_space.py
-
-      # The Space builds the image itself, which takes a few minutes. Wait for it and
-      # check the public URL the same way as the container above: a deploy is not
-      # done when the upload finishes, it is done when the link works.
-      - name: Check the public link
-        run: |
-          url=$(python3 -c "import json; print(json.load(open('deploy/hub.json'))['space_url'])")
-          python3 scripts/smoke_test.py "$url" --wait 1200

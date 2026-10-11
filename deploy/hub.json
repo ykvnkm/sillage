@@ -9,7 +9,5 @@
       "calibrator.joblib": "1c7cf90a1873c1080e170773b1e2253ee8186bf581f19aba0cb9fd6c1fff881f",
       "reference.json": "62d29d2f26e0e1b4fb530933e1e7d5b766023e8f51f0ac749a617eaf7f59b27e"
     }
-  },
-  "space": "ykvnkm/sillage",
-  "space_url": "https://ykvnkm-sillage.hf.space"
+  }
 }

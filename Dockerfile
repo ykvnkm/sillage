@@ -8,8 +8,8 @@
 # the lock file; and a clean runtime that receives only those two results. No
 # compiler, no uv, no source tree, no dev dependencies in the final image.
 #
-# The same file builds locally, in CI and on the Hugging Face Space, and no build
-# depends on whatever happens to sit in a developer's models/ directory.
+# The same file builds locally and in CI, and no build depends on whatever happens
+# to sit in a developer's models/ directory.
 
 FROM python:3.11-slim-bookworm AS model
 
@@ -68,6 +68,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
     CMD ["python", "-c", "import os, urllib.request; urllib.request.urlopen(f'http://127.0.0.1:{os.environ[\"PORT\"]}/health', timeout=4)"]
 
-# PORT is read at start, not baked in, so a platform can choose it. The Space card
-# declares app_port 8000, so the default serves there too.
+# PORT is read at start, not baked in, so a hosting platform can choose it.
 CMD ["sh", "-c", "exec uvicorn sillage.interfaces.api.app:app --host 0.0.0.0 --port \"$PORT\""]
