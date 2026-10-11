@@ -69,9 +69,20 @@ micro AUC начинается с 0.78 просто от ранжировани�
 Измерено по {labels_scored:.0f} из {labels_total:.0f} дескрипторов. Основная метрика
 проекта — **macro AP**: только у неё пол честно низкий.
 
+## Калибровка
+
+Выход **откалиброван** по каждой метке (Platt scaling на валидационном сплите,
+[ADR-0011](../adr/0011-calibration-is-per-label-and-refuses-weak-labels.md)).
+Откалибровано {n_calibrated} меток из {n_labels}; у остальных {n_uncalibrated}
+слишком мало примеров, и по ним выдаётся не вероятность, а только порядок — продукт
+обязан показывать по ним пометку «оценка ненадёжна».
+
+Проверено на тестовом сплите: в диапазоне 0.85–1.00 модель обещает 0.903 и
+оказывается права в 0.889 случаев. До калибровки обещала 0.942 при реальных 0.826.
+
 ## Известные ограничения
 
-1. **Выход не калиброван.** 0.9 не означает «в 90% случаев прав».
+1. **По {n_uncalibrated} дескрипторам вероятности нет** — только ранжирование.
 2. **Стереохимия отсутствует в данных.** Колонка источника называется
    `nonStereoSMILES`. Зеркальные изомеры пахнут по-разному (карвон: тмин против
    мяты), и модель их не различает в принципе.
@@ -126,6 +137,12 @@ def _render_card(outcome) -> str:
         name=card.name,
         created_at=card.created_at,
         n_labels=len(card.label_names),
+        n_calibrated=outcome.model.calibrator.n_fitted if outcome.model.calibrator else 0,
+        n_uncalibrated=(
+            len(card.label_names) - outcome.model.calibrator.n_fitted
+            if outcome.model.calibrator
+            else len(card.label_names)
+        ),
         min_weight=card.scope["min_weight"],
         max_weight=card.scope["max_weight"],
         data_source=card.data_source,
