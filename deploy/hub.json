@@ -1,0 +1,15 @@
+{
+  "model": {
+    "name": "odor-baseline-v1",
+    "repo": "ykvnkm/sillage-odor-baseline-v1",
+    "revision": "572810be9f97f7632fe3a8d1290522fce676ffa7",
+    "files": {
+      "card.json": "348a6df29142b67e2dbf72a80f4ca3e5cc359ec5bf9a3008120e97edb6056df0",
+      "estimator.joblib": "5a0d4332c244d37a04870b097203d3fdcc4be0b35333ab0df26d81e7c460a7ae",
+      "calibrator.joblib": "1c7cf90a1873c1080e170773b1e2253ee8186bf581f19aba0cb9fd6c1fff881f",
+      "reference.json": "62d29d2f26e0e1b4fb530933e1e7d5b766023e8f51f0ac749a617eaf7f59b27e"
+    }
+  },
+  "space": "ykvnkm/sillage",
+  "space_url": "https://ykvnkm-sillage.hf.space"
+}
