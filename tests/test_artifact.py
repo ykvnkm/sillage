@@ -26,6 +26,7 @@ from sillage.models.artifact import (
     ArtifactError,
     ModelCard,
     OdorModel,
+    ReferenceMolecule,
     build_card,
 )
 
@@ -65,7 +66,10 @@ def trained_model() -> OdorModel:
         estimator=estimator,
         calibrator=PerLabelCalibrator.fit(estimator.predict_proba(x), y, base_rates=y.mean(axis=0)),
         scope=ChemicalScope(max_weight=350.0),
-        reference_smiles=("CCO", "c1ccccc1"),
+        reference=(
+            ReferenceMolecule("CCO", ("alcoholic", "ethereal"), "train"),
+            ReferenceMolecule("c1ccccc1", (), "test"),
+        ),
     )
 
 
@@ -104,10 +108,14 @@ def test_the_scope_is_reconstructed(trained_model: OdorModel, tmp_path: Path) ->
 
 
 def test_reference_molecules_are_kept(trained_model: OdorModel, tmp_path: Path) -> None:
+    """Labels and split travel with each molecule: a neighbour without its expert
+    labels says nothing about smell, and monitoring needs to know which ones were
+    trained on."""
     trained_model.save(tmp_path / "m")
 
     reloaded = OdorModel.load(tmp_path / "m")
 
+    assert reloaded.reference == trained_model.reference
     assert reloaded.reference_smiles == ("CCO", "c1ccccc1")
     assert len(reloaded.reference_molecules()) == 2
 

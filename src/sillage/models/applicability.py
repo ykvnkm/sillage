@@ -41,6 +41,8 @@ import numpy as np
 from rdkit import Chem
 from rdkit.Chem import Descriptors, Mol
 
+from sillage.domain import RefusalReason
+
 DEFAULT_COVERAGE = 0.95
 
 
@@ -82,27 +84,44 @@ class ChemicalScope:
     an out-of-vocabulary element score AP 0.270 against 0.562, and carry 3.5
     confident predictions each against 0.2 (journal E-010)."""
 
-    def reason_for_rejection(self, molecule: Mol) -> str | None:
-        """Why this molecule is out of scope, or None when it is in scope."""
+    def violation(self, molecule: Mol) -> tuple[RefusalReason, str] | None:
+        """The first rule this molecule breaks, as a stable code and a sentence.
+
+        The code is what the API returns and what drift monitoring counts; the
+        sentence is what a person reads. None when the molecule is in scope.
+        """
         if self.require_single_component and len(Chem.GetMolFrags(molecule)) > 1:
-            return "several disconnected components (a salt or a mixture)"
+            return (
+                RefusalReason.MULTIPLE_COMPONENTS,
+                "several disconnected components (a salt or a mixture)",
+            )
         if self.require_carbon and not any(a.GetSymbol() == "C" for a in molecule.GetAtoms()):
-            return "no carbon: inorganic"
+            return RefusalReason.INORGANIC, "no carbon: inorganic"
         if self.require_neutral and any(a.GetFormalCharge() != 0 for a in molecule.GetAtoms()):
-            return "carries a formal charge: ionic"
+            return RefusalReason.CHARGED, "carries a formal charge: ionic"
 
         if self.allowed_elements is not None:
             present = {atom.GetSymbol() for atom in molecule.GetAtoms()}
             unseen = sorted(present - set(self.allowed_elements))
             if unseen:
-                return f"contains {', '.join(unseen)}, absent from the training data"
+                return (
+                    RefusalReason.UNSEEN_ELEMENT,
+                    f"contains {', '.join(unseen)}, absent from the training data",
+                )
 
         weight = Descriptors.MolWt(molecule)
         if not self.min_weight <= weight <= self.max_weight:
             return (
-                f"molecular weight {weight:.0f} outside {self.min_weight:.0f}-{self.max_weight:.0f}"
+                RefusalReason.WEIGHT_OUT_OF_RANGE,
+                f"molecular weight {weight:.0f} outside "
+                f"{self.min_weight:.0f}-{self.max_weight:.0f}",
             )
         return None
+
+    def reason_for_rejection(self, molecule: Mol) -> str | None:
+        """Why this molecule is out of scope, or None when it is in scope."""
+        found = self.violation(molecule)
+        return None if found is None else found[1]
 
     def contains(self, molecules: Sequence[Mol]) -> np.ndarray:
         """Boolean mask: True where the model may be asked at all."""

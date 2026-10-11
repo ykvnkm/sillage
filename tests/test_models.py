@@ -8,13 +8,13 @@ import pytest
 from sklearn.linear_model import LogisticRegression
 
 from sillage.features import parse_smiles
+from sillage.features import sets as feature_sets
 from sillage.models import (
     MultilabelClassifier,
     PrevalenceBaseline,
     gradient_boosting,
     logistic_regression,
 )
-from sillage.research import feature_sets
 from sillage.research.baseline import RunSpec, grid, summarise
 
 

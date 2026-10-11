@@ -1,8 +1,13 @@
-"""Named feature sets for the phase 1 ablation.
+"""Named feature sets.
 
 Naming them, rather than passing parameters around, means a results table can be
 read a year later without reconstructing what "run 7" used. The name is the
 experiment's identity and is what ends up in ``results/``.
+
+The name is also what a saved model records in its card, which is why this module
+lives under ``features`` and not under ``research``: the service has to rebuild
+exactly the features the model was trained on, and it must never import research
+code to do it (ADR-0001).
 """
 
 from __future__ import annotations

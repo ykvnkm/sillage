@@ -13,7 +13,7 @@ Layout on disk::
     models/<name>/
         card.json        metadata, metrics, label names, data provenance
         estimator.joblib the fitted one-vs-rest classifier
-        reference.json   training SMILES, for nearest-neighbour lookups
+        reference.json   every in-scope dataset molecule with its expert labels
 
 Weights are not committed: `/models/` is excluded in `.gitignore`, and the card is
 reproduced as a human-readable model card under `docs/`.
@@ -37,7 +37,7 @@ from sillage.models.applicability import ChemicalScope
 from sillage.models.calibration import PerLabelCalibrator
 from sillage.models.multilabel import MultilabelClassifier
 
-ARTIFACT_VERSION = 2
+ARTIFACT_VERSION = 3
 """Bumped whenever the on-disk layout changes. A mismatch refuses to load rather
 than silently misreading an old directory."""
 
@@ -52,6 +52,23 @@ class ArtifactError(RuntimeError):
 
 
 @dataclass(frozen=True, slots=True)
+class ReferenceMolecule:
+    """A dataset molecule the product can point at: "the closest thing I know"."""
+
+    smiles: str
+    """Canonical, without stereochemistry -- the same form the service reads input into."""
+
+    descriptors: tuple[str, ...]
+    """Expert labels. What the dataset says, not what the model predicts."""
+
+    split: str
+    """``train``, ``val`` or ``test``. Every part is shown to users -- a neighbour is a
+    fact about the dataset, and the measurements are already done -- but monitoring
+    asks "how far is this input from what the model *learnt* on", and for that only
+    ``train`` counts."""
+
+
+@dataclass(frozen=True, slots=True)
 class ModelCard:
     """Everything a caller needs to interpret this model's output."""
 
@@ -60,7 +77,7 @@ class ModelCard:
     created_at: str
 
     feature_set: str
-    """Name in :data:`sillage.research.feature_sets.FEATURE_SETS`. The model is only
+    """Name in :data:`sillage.features.sets.FEATURE_SETS`. The model is only
     valid on features built by that exact entry."""
 
     estimator: str
@@ -106,10 +123,11 @@ class OdorModel:
     """Fitted on the validation split. Without it the raw scores are not
     probabilities: uncalibrated, a 0.94 is right 83% of the time (journal E-011)."""
 
-    reference_smiles: tuple[str, ...]
-    """Training molecules, kept so the product can answer "the closest thing I know
-    is X". Fingerprints are recomputed on load rather than stored: it takes under a
-    second and removes a second thing that can fall out of sync."""
+    reference: tuple[ReferenceMolecule, ...]
+    """Dataset molecules, kept so the product can answer "the closest thing I know is
+    X, and experts call it Y". Fingerprints are recomputed on load rather than
+    stored: it takes under a second and removes a second thing that can fall out of
+    sync."""
 
     @property
     def label_names(self) -> tuple[str, ...]:
@@ -119,8 +137,7 @@ class OdorModel:
         """Uncalibrated per-label scores for an already-built feature matrix.
 
         Deliberately low-level and deliberately named *raw*: these numbers are not
-        probabilities you can trust yet. Calibration arrives in step 2.2, and the
-        product must never show them to a user unmediated.
+        probabilities. The product must never show them to a user unmediated.
         """
         if features.shape[1] != self._expected_width():
             raise ArtifactError(
@@ -151,6 +168,10 @@ class OdorModel:
                 return int(fitted.n_features_in_)
         raise ArtifactError("Model has no fitted estimators")
 
+    @property
+    def reference_smiles(self) -> tuple[str, ...]:
+        return tuple(entry.smiles for entry in self.reference)
+
     def reference_molecules(self) -> list[Mol]:
         return parse_smiles(self.reference_smiles)
 
@@ -166,7 +187,8 @@ class OdorModel:
             encoding="utf-8",
         )
         (directory / REFERENCE_FILE).write_text(
-            json.dumps(list(self.reference_smiles), indent=0) + "\n", encoding="utf-8"
+            json.dumps([asdict(entry) for entry in self.reference], ensure_ascii=False) + "\n",
+            encoding="utf-8",
         )
         joblib.dump(self.estimator, directory / ESTIMATOR_FILE, compress=3)
         joblib.dump(self.calibrator, directory / CALIBRATOR_FILE, compress=3)
@@ -203,8 +225,13 @@ class OdorModel:
             estimator=joblib.load(directory / ESTIMATOR_FILE),
             calibrator=joblib.load(directory / CALIBRATOR_FILE),
             scope=_scope_from_card(card),
-            reference_smiles=tuple(
-                json.loads((directory / REFERENCE_FILE).read_text(encoding="utf-8"))
+            reference=tuple(
+                ReferenceMolecule(
+                    smiles=entry["smiles"],
+                    descriptors=tuple(entry["descriptors"]),
+                    split=entry["split"],
+                )
+                for entry in json.loads((directory / REFERENCE_FILE).read_text(encoding="utf-8"))
             ),
         )
 
