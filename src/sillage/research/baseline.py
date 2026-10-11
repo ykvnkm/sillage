@@ -22,6 +22,7 @@ from rdkit.Chem import Mol
 from sillage.data.loaders import load_curated_openpom
 from sillage.data.schemas import OPENPOM_DESCRIPTORS, SMILES_COLUMN
 from sillage.features import parse_smiles
+from sillage.features import sets as feature_sets
 from sillage.features.matrix import FeatureMatrix
 from sillage.metrics import MultilabelReport, evaluate
 from sillage.models import (
@@ -32,7 +33,6 @@ from sillage.models import (
     logistic_regression,
     logistic_regression_single_scaler,
 )
-from sillage.research import feature_sets
 from sillage.splits import Split, iterative_stratification, scaffold_split
 
 # A factory takes the seed and the feature-column names: the block-wise scaler in

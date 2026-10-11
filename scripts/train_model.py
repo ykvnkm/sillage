@@ -29,14 +29,15 @@ CARD_TEMPLATE = """# Model card: {name}
 ## Что эта модель делает
 
 По структуре молекулы предсказывает, какие из {n_labels} ольфакторных дескрипторов
-ей свойственны. Выход — {n_labels} независимых оценок, не вероятности: калибровки
-пока нет, и показывать эти числа пользователю напрямую нельзя.
+ей свойственны. Выход — {n_labels} независимых оценок; по {n_calibrated} из них это
+откалиброванные вероятности (раздел «Калибровка»), по остальным — только порядок.
 
 ## Область определения
 
 Модель определена на **однокомпонентных нейтральных органических молекулах**
-массой {min_weight:.0f}–{max_weight:.0f} Da. Вне этой области она не отказывается
-отвечать сама — отказ обеспечивает вызывающий код.
+массой {min_weight:.0f}–{max_weight:.0f} Da, состоящих только из элементов
+{elements}. Сама модель вне области не отказывается — отказывает сценарий
+`PredictOdor` до её вызова, так что числа о молекуле вне области не возникает вообще.
 
 Основание: на входах вне области модель выдаёт уверенные и неверные ответы. Карбонат
 магния получает 1.000 за семь дескрипторов и 0.000 за свою единственную метку
@@ -120,7 +121,7 @@ def main() -> int:
     reloaded = OdorModel.load(directory)
     print(
         f"reload check: {len(reloaded.label_names)} labels, "
-        f"{len(reloaded.reference_smiles)} reference molecules"
+        f"{len(reloaded.reference)} reference molecules"
     )
 
     card_path = root / "docs" / "model-cards" / f"{args.name}.md"
@@ -145,6 +146,7 @@ def _render_card(outcome) -> str:
         ),
         min_weight=card.scope["min_weight"],
         max_weight=card.scope["max_weight"],
+        elements=", ".join(card.scope["allowed_elements"] or ()),
         data_source=card.data_source,
         data_sha256=card.data_sha256,
         split_strategy=card.split_strategy,

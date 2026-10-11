@@ -46,3 +46,19 @@ def data_dir() -> Path:
 def raw_data_dir() -> Path:
     """Downloads land here, byte-identical to their source. Never modified in place."""
     return data_dir() / "raw"
+
+
+MODEL_DIR_ENV = "SILLAGE_MODEL_DIR"
+DEFAULT_MODEL = "odor-baseline-v1"
+
+
+def model_dir() -> Path:
+    """The artifact the service loads. Overridable via ``$SILLAGE_MODEL_DIR``.
+
+    The override is what a container uses: there is no checkout inside it, and the
+    weights are mounted or downloaded to a path of the deployment's choosing.
+    """
+    override = os.environ.get(MODEL_DIR_ENV)
+    if override:
+        return Path(override).expanduser().resolve()
+    return project_root() / "models" / DEFAULT_MODEL

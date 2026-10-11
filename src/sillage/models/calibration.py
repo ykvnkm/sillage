@@ -23,10 +23,15 @@ the regularisation is not turned off.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import StrEnum
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression
+
+# Re-exported: the bands are the product's promise and live in the domain since
+# step 2.3, but research code and notebooks still import them from here.
+from sillage.domain.odor import BANDS, Confidence, confidence_of
+
+__all__ = ["BANDS", "CLIP", "MIN_POSITIVES", "Confidence", "PerLabelCalibrator", "confidence_of"]
 
 CLIP = 1e-6
 """Raw scores reach exactly 0 and 1, whose log-odds are infinite."""
@@ -133,61 +138,6 @@ class PerLabelCalibrator:
             base_rates=np.asarray(base_rates, dtype=np.float64),
             fitted=fitted,
         )
-
-
-class Confidence(StrEnum):
-    """Qualitative verdict for a single descriptor.
-
-    The product shows these words rather than numbers, and the band edges come from
-    measurement rather than taste. Observed frequency on the unseen test split, over
-    calibrated labels only:
-
-    ====================  =========  ==========
-    Band                  Promised   Observed
-    ====================  =========  ==========
-    ``LIKELY``   >= 0.85      0.903       0.889
-    ``PROBABLE`` 0.55-0.85    0.640       0.667
-    ``POSSIBLE`` 0.35-0.55    0.443       0.446
-    ``UNLIKELY`` 0.15-0.35    0.233       0.217
-    ====================  =========  ==========
-
-    There is no band above ``LIKELY``. Separating 0.90 from 0.97 would need far more
-    than the 99 pairs available up there, so claiming the difference would be
-    claiming something unmeasured.
-    """
-
-    LIKELY = "likely"
-    PROBABLE = "probable"
-    POSSIBLE = "possible"
-    UNLIKELY = "unlikely"
-    NEGLIGIBLE = "negligible"
-
-    UNVERIFIED = "unverified"
-    """The descriptor has too few examples to calibrate (31 of 138). The score still
-    ranks sensibly -- macro AP is unchanged for these labels -- but it is not a
-    probability, and no number should be shown for it."""
-
-
-BANDS: tuple[tuple[float, Confidence], ...] = (
-    (0.85, Confidence.LIKELY),
-    (0.55, Confidence.PROBABLE),
-    (0.35, Confidence.POSSIBLE),
-    (0.15, Confidence.UNLIKELY),
-)
-
-
-def confidence_of(probability: float, *, calibrated: bool) -> Confidence:
-    """Translate a probability into a verdict the interface can show.
-
-    An uncalibrated label returns :attr:`Confidence.UNVERIFIED` whatever its score:
-    the number is a ranking position, not a claim about frequency.
-    """
-    if not calibrated:
-        return Confidence.UNVERIFIED
-    for edge, verdict in BANDS:
-        if probability >= edge:
-            return verdict
-    return Confidence.NEGLIGIBLE
 
 
 def _log_odds(scores: np.ndarray) -> np.ndarray:

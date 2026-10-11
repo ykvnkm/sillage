@@ -13,8 +13,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from sillage.features import sets as feature_sets
 from sillage.paths import project_root
-from sillage.research import feature_sets
 from sillage.research.baseline import MODELS, SPLIT_STRATEGIES, Dataset, grid, run_grid, summarise
 
 

@@ -16,6 +16,7 @@ from dataclasses import dataclass, replace
 import numpy as np
 
 from sillage.data.sources import OPENPOM_CURATED
+from sillage.features import sets as feature_sets
 from sillage.metrics import MultilabelReport, evaluate
 from sillage.models import (
     BlockScaledLogisticRegression,
@@ -25,9 +26,9 @@ from sillage.models import (
     PrevalenceBaseline,
     element_vocabulary,
 )
-from sillage.models.artifact import OdorModel, build_card
-from sillage.research import feature_sets
+from sillage.models.artifact import OdorModel, ReferenceMolecule, build_card
 from sillage.research.baseline import Dataset
+from sillage.splits import Split
 
 DEFAULT_NAME = "odor-baseline-v1"
 DEFAULT_FEATURE_SET = "morgan-bin-r3+desc"
@@ -144,7 +145,7 @@ def train_odor_model(
         estimator=estimator,
         calibrator=calibrator,
         scope=scope,
-        reference_smiles=tuple(_canonical_smiles(data, split.train)),
+        reference=_reference_library(data, split),
     )
     return TrainingOutcome(model=model, report=report, baseline_report=baseline_report)
 
@@ -160,7 +161,24 @@ def _metrics(report: MultilabelReport) -> dict[str, float]:
     }
 
 
-def _canonical_smiles(data: Dataset, indices: np.ndarray) -> list[str]:
+def _reference_library(data: Dataset, split: Split) -> tuple[ReferenceMolecule, ...]:
+    """Every in-scope molecule with its expert labels and the part it landed in.
+
+    SMILES are written without stereochemistry, the form the service reads input
+    into, so that an exact-match lookup compares like with like.
+    """
     from rdkit import Chem
 
-    return [Chem.MolToSmiles(data.molecules[int(i)]) for i in indices]
+    part_of = np.empty(len(data.molecules), dtype=object)
+    for part, indices in split.parts().items():
+        part_of[indices] = part
+
+    names = np.asarray(data.label_names)
+    return tuple(
+        ReferenceMolecule(
+            smiles=Chem.MolToSmiles(molecule, isomericSmiles=False),
+            descriptors=tuple(names[data.labels[index] == 1]),
+            split=str(part_of[index]),
+        )
+        for index, molecule in enumerate(data.molecules)
+    )
