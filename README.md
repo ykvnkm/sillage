@@ -7,7 +7,8 @@
 **Статус:** Фазы 0–1 завершены, идёт продуктовый трек Фазы 2
 ([дорожная карта](docs/roadmap-product.md)). Модель structure → odour обучена,
 откалибрована и отдаётся через веб-интерфейс и HTTP API в Docker-контейнере;
-следующий шаг — поиск молекул по названию.
+молекулу можно искать по русскому или английскому названию; следующий шаг — карта
+запахов.
 
 ### Запустить у себя
 
@@ -81,6 +82,11 @@ L0  Молекулы       GNN structure→odor, multilabel, 135 дескрип�
 | --- | --- | --- | --- |
 | [openpom-curated-gs-lf](https://github.com/BioMachineLearning/openpom) | MIT | allowed | Curated Goodscents/Leffingwell merge: 4983 molecules, multilabel odours. |
 <!-- END PROVENANCE -->
+
+Названия молекул для поиска (`names.json` рядом с весами) собирает
+`scripts/build_names.py`: английские названия и синонимы — из
+[PubChem](https://pubchem.ncbi.nlm.nih.gov/) (public domain), русские — из
+[Wikidata](https://www.wikidata.org/) (CC0).
 
 Колонка *Redistribution* — не украшение, а рабочее ограничение: `allowed` можно
 публиковать как есть, `derived-only` разрешает публиковать только производные

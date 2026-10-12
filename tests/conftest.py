@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import numpy as np
@@ -30,6 +31,14 @@ SMILES = (
     *("CSC", "CCSCC", "CCN", "CCCN"),
 )
 LABELS = ("oxygenated", "aromatic", "sulfurous")
+
+# A small name directory in the format scripts/build_names.py writes.
+NAMES = {
+    "CCCCO": {"cid": 263, "en": "1-Butanol", "ru": "бутанол", "aliases": ["n-Butyl alcohol"]},
+    "c1ccccc1": {"cid": 241, "en": "Benzene", "ru": "бензол", "aliases": []},
+    "CCSCC": {"cid": 9609, "en": "Diethyl sulfide", "ru": None, "aliases": ["Ethyl sulfide"]},
+    "O=Cc1ccccc1": {"cid": 240, "en": "Benzaldehyde", "ru": None, "aliases": []},
+}
 
 
 def _labels(smiles: str) -> list[int]:
@@ -74,4 +83,13 @@ def artifact(tmp_path_factory: pytest.TempPathFactory) -> Path:
             for i, (s, row) in enumerate(zip(SMILES, y, strict=True))
         ),
     )
-    return model.save(tmp_path_factory.mktemp("artifact") / "mini")
+    directory = model.save(tmp_path_factory.mktemp("artifact") / "mini")
+    (directory / "names.json").write_text(json.dumps(NAMES, ensure_ascii=False), "utf-8")
+    return directory
+
+
+@pytest.fixture(autouse=True)
+def offline_names(monkeypatch: pytest.MonkeyPatch) -> None:
+    """No test may depend on PubChem being up: online name lookups are off everywhere.
+    Tests of the PubChem adapter stub the network themselves."""
+    monkeypatch.setenv("SILLAGE_ONLINE_NAMES", "0")

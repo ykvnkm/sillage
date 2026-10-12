@@ -14,6 +14,7 @@ from __future__ import annotations
 from typing import Protocol
 
 from sillage.domain.molecule import KnownMolecule, Molecule, Neighbour
+from sillage.domain.names import MoleculeNames, NameSuggestion
 from sillage.domain.odor import ModelDescription, OdorProfile
 from sillage.domain.report import Refusal
 
@@ -41,6 +42,41 @@ class OdorPredictor(Protocol):
     def predict(self, molecule: Molecule) -> OdorProfile: ...
 
     def describe(self) -> ModelDescription: ...
+
+
+class NameDirectory(Protocol):
+    """Names of known molecules, searchable offline and instantly."""
+
+    def find(self, text: str) -> tuple[str, MoleculeNames, str] | None:
+        """``(smiles, names, matched)`` for a name that matches exactly, after folding.
+
+        *matched* is the name as the directory spells it -- "Iso-E super", not the
+        70-character IUPAC title -- so the page can lead with the name the user knows.
+        """
+        ...
+
+    def names_of(self, smiles: str) -> MoleculeNames | None:
+        """Names for a canonical, stereo-free SMILES, if the molecule is known."""
+        ...
+
+    def suggest(self, text: str, limit: int) -> tuple[NameSuggestion, ...]:
+        """Names that start like *text*, best first. For autocomplete."""
+        ...
+
+
+class NameLookupUnavailable(RuntimeError):
+    """The online name service could not be reached or answered with an error."""
+
+
+class NameResolver(Protocol):
+    """Resolves names the local directory does not know, through an online service."""
+
+    def resolve(self, name: str) -> tuple[str, MoleculeNames] | None:
+        """``(smiles, names)``, None when the service has no such name.
+
+        Raises :class:`NameLookupUnavailable` when the service cannot answer.
+        """
+        ...
 
 
 class MoleculeDepicter(Protocol):

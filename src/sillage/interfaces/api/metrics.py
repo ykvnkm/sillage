@@ -82,6 +82,12 @@ class ServiceMetrics:
             buckets=(0, 1, 2, 3, 5, 8, 13),
             registry=r,
         )
+        self.queries = Counter(
+            "sillage_queries_total",
+            "Answered requests by what the input was read as: a name or a SMILES string",
+            ["kind"],
+            registry=r,
+        )
         self.known_molecules = Counter(
             "sillage_known_molecules_total",
             "Answers about molecules already in the dataset, by whether they were trained on",
@@ -97,6 +103,7 @@ class ServiceMetrics:
             return
 
         self.predictions.labels(outcome="answered").inc()
+        self.queries.labels(kind=result.query_kind).inc()
         if result.neighbours:
             self.nearest_similarity.observe(result.neighbours[0].similarity)
         confident = result.profile.confident()

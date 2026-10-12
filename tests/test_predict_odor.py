@@ -19,12 +19,15 @@ from sillage.domain import (
     InvalidMolecule,
     KnownMolecule,
     Molecule,
+    MoleculeNames,
+    NameSuggestion,
     Neighbour,
     OdorProfile,
     OdorReport,
     Refusal,
     RefusalReason,
 )
+from sillage.domain.ports import NameLookupUnavailable
 
 
 def molecule(smiles: str = "CCO", *, stereo: bool = False) -> Molecule:
@@ -39,8 +42,8 @@ def score(name: str, value: float, *, calibrated: bool = True) -> DescriptorScor
 
 class StubReader:
     def read(self, text: str) -> Molecule:
-        if text == "garbage":
-            raise InvalidMolecule("not a valid SMILES string: 'garbage'")
+        if text in {"C1(C", "garbage", "ванилин", "galaxolide"}:
+            raise InvalidMolecule(f"not a valid SMILES string: {text!r}")
         return molecule(text, stereo="@" in text)
 
 
@@ -104,7 +107,7 @@ def test_an_answer_carries_profile_neighbours_and_dataset_record(predict: Predic
     assert report.caveats == ()
 
 
-@pytest.mark.parametrize("text", ["", "   ", "x" * (MAX_INPUT_LENGTH + 1), "garbage"])
+@pytest.mark.parametrize("text", ["", "   ", "x" * (MAX_INPUT_LENGTH + 1), "C1(C"])
 def test_unreadable_input_is_refused_as_invalid(predict: PredictOdor, text: str) -> None:
     result = predict(text)
 
@@ -178,3 +181,106 @@ def test_confident_respects_the_requested_band() -> None:
 def test_unknown_descriptor_is_a_key_error() -> None:
     with pytest.raises(KeyError):
         OdorProfile.from_scores([score("a", 0.5)])["b"]
+
+
+# --- names ---------------------------------------------------------------------------
+
+VANILLIN = MoleculeNames(cid=1183, en="Vanillin", ru="ванилин")
+
+
+class StubDirectory:
+    def find(self, text: str) -> tuple[str, MoleculeNames, str] | None:
+        if text.casefold() in {"ванилин", "vanillin"}:
+            return "CCO", VANILLIN, "ванилин"
+        return None
+
+    def names_of(self, smiles: str) -> MoleculeNames | None:
+        return VANILLIN if smiles == "CCO" else None
+
+    def suggest(self, text: str, limit: int) -> tuple[NameSuggestion, ...]:
+        return ()
+
+
+@dataclass
+class StubResolver:
+    answer: tuple[str, MoleculeNames] | None = None
+    down: bool = False
+    calls: list[str] = field(default_factory=list)
+
+    def resolve(self, name: str) -> tuple[str, MoleculeNames] | None:
+        self.calls.append(name)
+        if self.down:
+            raise NameLookupUnavailable("PubChem could not be reached")
+        return self.answer
+
+
+def predict_with(resolver: StubResolver | None = None) -> PredictOdor:
+    return PredictOdor(
+        reader=StubReader(),
+        scope=StubScope(refuse={"CCBr"}),
+        predictor=StubPredictor(),
+        references=StubReferences(),
+        names=StubDirectory(),
+        resolver=resolver,
+    )
+
+
+def test_a_known_name_is_answered_from_the_directory_without_going_online() -> None:
+    resolver = StubResolver()
+    report = predict_with(resolver)("ванилин")
+
+    assert isinstance(report, OdorReport)
+    assert report.query_kind == "name"
+    assert report.names == VANILLIN
+    assert report.matched_name == "ванилин"
+    assert resolver.calls == []
+
+
+def test_a_smiles_input_still_gets_its_name() -> None:
+    report = predict_with()("CCO")
+
+    assert isinstance(report, OdorReport)
+    assert report.query_kind == "smiles"
+    assert report.names == VANILLIN
+
+
+def test_an_unknown_name_goes_online_and_prefers_the_local_names() -> None:
+    online = MoleculeNames(cid=1183, en="Vanillin", ru=None)
+    resolver = StubResolver(answer=("CCO", online))
+
+    report = predict_with(resolver)("galaxolide")
+
+    assert isinstance(report, OdorReport)
+    assert resolver.calls == ["galaxolide"]
+    assert report.names == VANILLIN  # the local directory knows the Russian name
+
+
+def test_a_name_nobody_knows_is_refused_as_unknown() -> None:
+    result = predict_with(StubResolver(answer=None))("galaxolide")
+
+    assert isinstance(result, Refusal)
+    assert result.reason is RefusalReason.UNKNOWN_NAME
+
+
+def test_an_unreachable_name_service_is_not_reported_as_an_unknown_name() -> None:
+    """ "PubChem is down" and "no such molecule" are different answers to the user."""
+    result = predict_with(StubResolver(down=True))("galaxolide")
+
+    assert isinstance(result, Refusal)
+    assert result.reason is RefusalReason.NAME_LOOKUP_UNAVAILABLE
+
+
+def test_broken_smiles_never_reaches_the_name_service() -> None:
+    resolver = StubResolver()
+    result = predict_with(resolver)("C1(C")
+
+    assert isinstance(result, Refusal)
+    assert result.reason is RefusalReason.INVALID_INPUT
+    assert resolver.calls == []
+
+
+def test_neighbours_without_a_known_name_stay_unnamed() -> None:
+    report = predict_with()("CCO", neighbours=1)
+
+    assert isinstance(report, OdorReport)
+    assert report.neighbours[0].names is None

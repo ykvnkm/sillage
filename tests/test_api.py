@@ -56,7 +56,8 @@ def test_stereo_input_is_answered_with_a_caveat(client: TestClient) -> None:
     [
         ({"smiles": "BrCCCC"}, "unseen_element"),
         ({"smiles": "[Na+].[Cl-]"}, "multiple_components"),
-        ({"smiles": "hello"}, "invalid_input"),
+        ({"smiles": "hello"}, "unknown_name"),
+        ({"query": "C1CC"}, "invalid_input"),
         # Schema-level failures land in the same shape as domain refusals.
         ({"smiles": ""}, "invalid_input"),
         ({"smiles": "C" * 501}, "invalid_input"),
@@ -173,3 +174,73 @@ def test_depict_refuses_like_predict(client: TestClient, params: dict) -> None:
     assert response.status_code == 422
     assert response.json()["refused"] is True
     assert response.json()["reason"] == "invalid_input"
+
+
+# --- names -------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("query", "kind"),
+    [
+        ("бутанол", "name"),
+        ("1-Butanol", "name"),
+        ("n-butyl alcohol", "name"),
+        ("CCCCO", "smiles"),
+        ("OCCCC", "smiles"),
+    ],
+)
+def test_a_molecule_is_found_by_any_of_its_names_or_its_structure(
+    client: TestClient, query: str, kind: str
+) -> None:
+    body = client.post("/predict", json={"query": query}).json()
+
+    assert body["molecule"]["smiles"] == "CCCCO"
+    assert body["names"]["display"] == "бутанол"
+    assert body["names"]["en"] == "1-Butanol"
+    assert body["names"]["pubchem_url"] == "https://pubchem.ncbi.nlm.nih.gov/compound/263"
+    assert body["query_kind"] == kind
+
+
+def test_a_transliterated_name_finds_the_english_one(client: TestClient) -> None:
+    """No Russian name is stored for diethyl sulfide; the folded skeleton still matches."""
+    body = client.post("/predict", json={"query": "диэтилсульфид"}).json()
+
+    assert body["molecule"]["smiles"] == "CCSCC"
+    assert body["names"]["display"] == "Diethyl sulfide"
+    assert body["matched_name"] == "Diethyl sulfide"
+
+
+def test_an_alias_is_reported_as_the_matched_name(client: TestClient) -> None:
+    """A trade name the user typed leads the page, not the systematic title."""
+    body = client.post("/predict", json={"query": "ethyl sulfide"}).json()
+
+    assert body["matched_name"] == "Ethyl sulfide"
+    assert body["names"]["en"] == "Diethyl sulfide"
+
+
+def test_neighbours_carry_their_names(client: TestClient) -> None:
+    body = client.post("/predict", json={"query": "бензол", "neighbours": 20}).json()
+
+    named = {n["smiles"]: n["names"] for n in body["neighbours"] if n["names"]}
+    assert named["O=Cc1ccccc1"]["display"] == "Benzaldehyde"
+
+
+def test_suggest_matches_russian_and_english_prefixes(client: TestClient) -> None:
+    russian = client.get("/suggest", params={"q": "бенз"}).json()
+    english = client.get("/suggest", params={"q": "benz"}).json()
+
+    assert {s["smiles"] for s in russian} == {"c1ccccc1", "O=Cc1ccccc1"}
+    assert russian == english
+    # The molecule whose primary name matches comes before one matched by an alias.
+    assert russian[0]["name"] == "бензол"
+
+
+def test_suggest_with_nothing_matching_is_empty(client: TestClient) -> None:
+    assert client.get("/suggest", params={"q": "zzzz"}).json() == []
+
+
+def test_unknown_name_offline_is_a_clear_refusal(client: TestClient) -> None:
+    response = client.post("/predict", json={"query": "galaxolide"})
+
+    assert response.status_code == 422
+    assert response.json()["reason"] == "unknown_name"

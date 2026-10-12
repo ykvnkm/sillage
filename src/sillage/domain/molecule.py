@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from sillage.domain.names import MoleculeNames
+
 
 class InvalidMolecule(ValueError):
     """The input does not describe a molecule at all."""
@@ -47,6 +49,8 @@ class Neighbour:
 
     descriptors: tuple[str, ...]
     """Expert labels from the dataset. Facts about this neighbour, not predictions."""
+
+    names: MoleculeNames | None = None
 
 
 @dataclass(frozen=True, slots=True)

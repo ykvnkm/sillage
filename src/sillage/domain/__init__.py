@@ -8,6 +8,7 @@ phase 4 -- has to produce. They must not change because a library did.
 """
 
 from sillage.domain.molecule import InvalidMolecule, KnownMolecule, Molecule, Neighbour
+from sillage.domain.names import MoleculeNames, NameSuggestion, fold, initial, looks_like_name
 from sillage.domain.odor import (
     BANDS,
     UNVERIFIED_MENTION,
@@ -29,10 +30,15 @@ __all__ = [
     "KnownMolecule",
     "ModelDescription",
     "Molecule",
+    "MoleculeNames",
+    "NameSuggestion",
     "Neighbour",
     "OdorProfile",
     "OdorReport",
     "Refusal",
     "RefusalReason",
     "confidence_of",
+    "fold",
+    "initial",
+    "looks_like_name",
 ]

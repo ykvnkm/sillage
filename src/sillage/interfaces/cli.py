@@ -26,13 +26,13 @@ CAVEAT_TEXT = {
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Predict the odour of a molecule from SMILES.")
-    parser.add_argument("smiles", help="the molecule, as a SMILES string")
+    parser = argparse.ArgumentParser(description="Predict the odour of a molecule.")
+    parser.add_argument("query", help="a molecule name (Russian or English) or a SMILES string")
     parser.add_argument("--neighbours", type=int, default=5, help="known molecules to show")
     parser.add_argument("--json", action="store_true", help="machine-readable output")
     args = parser.parse_args(argv)
 
-    result = build_predict_odor()(args.smiles, neighbours=args.neighbours)
+    result = build_predict_odor()(args.query, neighbours=args.neighbours)
 
     if args.json:
         print(json.dumps(to_dict(result), indent=2, ensure_ascii=False))
@@ -46,8 +46,12 @@ def render(result: OdorReport | Refusal) -> str:
         return f"refused ({result.reason}): {result.detail}"
 
     molecule = result.molecule
+    names = result.names
     lines = [
-        f"molecule   {molecule.smiles}   {molecule.formula}, {molecule.weight:.1f} Da",
+        f"name       {names.display}" + (f" / {names.en}" if names.ru and names.en else "")
+        if names
+        else "name       (not known)",
+        f"molecule   {molecule.smiles}   {molecule.formula}, {molecule.weight:.1f} g/mol",
         f"model      {result.model_name}",
         "",
         "predicted",
@@ -76,7 +80,8 @@ def render(result: OdorReport | Refusal) -> str:
 
     lines += ["", "nearest known molecules"]
     for neighbour in result.neighbours:
-        lines.append(f"  {neighbour.similarity:.2f}  {neighbour.smiles:<32} ")
+        label = neighbour.names.display if neighbour.names else neighbour.smiles
+        lines.append(f"  {neighbour.similarity:.2f}  {label:<32} ")
         lines[-1] += ", ".join(neighbour.descriptors[:6])
 
     if result.caveats:

@@ -18,9 +18,11 @@ import json
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 VANILLIN = "COc1cc(C=O)ccc1O"
+VANILLIN_FLAT = "COc1cc(C=O)ccc1O"  # canonical, as the name directory stores it
 
 
 def main() -> int:
@@ -35,7 +37,9 @@ def main() -> int:
     checks = [
         ("web page", lambda: "query-form" in get(f"{base}/")[1]),
         ("drawing", lambda: get(f"{base}/depict?smiles=CCO")[1].lstrip().startswith("<svg")),
-        ("vanillin smells of vanilla", lambda: predicts_vanilla(base)),
+        ("vanillin smells of vanilla", lambda: predicts_vanilla(base, VANILLIN)),
+        ("found by its Russian name", lambda: predicts_vanilla(base, "ванилин")),
+        ("names suggested while typing", lambda: suggests(base, "ван", VANILLIN_FLAT)),
         ("bromine is refused", lambda: refuses(base, "BrCCCCCC=O", "unseen_element")),
         ("model description", lambda: json.loads(get(f"{base}/model")[1])["descriptors"]),
     ]
@@ -66,10 +70,15 @@ def wait_for_health(base: str, seconds: int) -> None:
         time.sleep(10)
 
 
-def predicts_vanilla(base: str) -> bool:
-    status, body = post(f"{base}/predict", {"smiles": VANILLIN})
+def predicts_vanilla(base: str, query: str) -> bool:
+    status, body = post(f"{base}/predict", {"query": query})
     names = [d["descriptor"] for d in json.loads(body)["predicted"]]
     return status == 200 and names[:1] == ["vanilla"]
+
+
+def suggests(base: str, prefix: str, smiles: str) -> bool:
+    query = urllib.parse.urlencode({"q": prefix})
+    return smiles in [s["smiles"] for s in json.loads(get(f"{base}/suggest?{query}")[1])]
 
 
 def refuses(base: str, smiles: str, reason: str) -> bool:

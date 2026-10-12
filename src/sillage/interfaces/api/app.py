@@ -10,6 +10,7 @@ Endpoints:
   validation or fell outside the model's scope. A caller handles one error format.
 - ``GET /`` -- the web interface (static HTML, CSS and JS; no build step).
 - ``GET /depict?smiles=...`` -- the molecule drawn as SVG.
+- ``GET /suggest?q=...`` -- known molecule names starting like the typed text.
 - ``GET /model`` -- what model answers, its scope, metrics and their floor.
 - ``GET /health`` -- liveness, for the container healthcheck.
 - ``GET /metrics`` -- Prometheus exposition.
@@ -41,9 +42,11 @@ from sillage.interfaces.api.schemas import (
     PredictRequest,
     RefusalOut,
     ReportOut,
+    SuggestionOut,
     model_out,
     refusal_out,
     report_out,
+    suggestion_out,
 )
 from sillage.interfaces.composition import Services
 
@@ -66,6 +69,7 @@ def create_app(load: Callable[[], Services] | None = None) -> FastAPI:
             services = load()
         app.state.predict = services.predict
         app.state.depict = services.depict
+        app.state.names = services.names
         app.state.metrics = ServiceMetrics(services.predict.predictor.name)
         yield
 
@@ -112,7 +116,7 @@ def create_app(load: Callable[[], Services] | None = None) -> FastAPI:
         # A plain `def`: prediction is CPU-bound, and FastAPI runs sync handlers in a
         # thread pool instead of blocking the event loop that serves other requests.
         started = time.perf_counter()
-        result = request.app.state.predict(body.smiles, neighbours=body.neighbours)
+        result = request.app.state.predict(body.query, neighbours=body.neighbours)
         request.app.state.metrics.observe(result, time.perf_counter() - started)
 
         if isinstance(result, Refusal):
@@ -143,6 +147,22 @@ def create_app(load: Callable[[], Services] | None = None) -> FastAPI:
             body = RefusalOut(reason="invalid_input", detail=str(error))
             return JSONResponse(body.model_dump(), status_code=REFUSAL_STATUS)
         return Response(svg, media_type="image/svg+xml", headers={"Cache-Control": DRAWING_CACHE})
+
+    @app.get("/suggest", response_model=list[SuggestionOut])
+    def suggest(
+        request: Request,
+        q: str = Query(min_length=1, max_length=100),
+        limit: int = Query(default=8, ge=1, le=20),
+    ) -> list[SuggestionOut]:
+        """Known molecules whose name starts like *q*, Russian or English, best first.
+
+        Answered from the local directory only: autocomplete fires on every keystroke
+        and must never wait for an external service.
+        """
+        names = request.app.state.names
+        if names is None:
+            return []
+        return [suggestion_out(s) for s in names.suggest(q, limit)]
 
     @app.get("/model", response_model=ModelOut)
     def model(request: Request) -> ModelOut:

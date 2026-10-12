@@ -34,6 +34,8 @@ from sillage.models.artifact import (
 from sillage.paths import DEFAULT_MODEL, project_root
 
 ARTIFACT_FILES = (CARD_FILE, ESTIMATOR_FILE, CALIBRATOR_FILE, REFERENCE_FILE)
+NAMES_FILE = "names.json"
+"""Optional: the name directory from scripts/build_names.py. Published when present."""
 GITHUB_URL = "https://github.com/ykvnkm/sillage"
 
 FRONT_MATTER = """---
@@ -64,7 +66,9 @@ from a revision you trust, and check them against the sha256 values pinned in th
 project's `deploy/hub.json`.
 
 Data: Goodscents/Leffingwell merge curated by
-[OpenPOM](https://github.com/BioMachineLearning/openpom), MIT.
+[OpenPOM](https://github.com/BioMachineLearning/openpom), MIT. Molecule names in
+`names.json`: [PubChem](https://pubchem.ncbi.nlm.nih.gov/) (public domain) and
+[Wikidata](https://www.wikidata.org/) (CC0).
 
 ---
 
@@ -91,9 +95,11 @@ def main() -> int:
 
     api.create_repo(repo_id, repo_type="model", exist_ok=True)
 
+    files = [*ARTIFACT_FILES, *([NAMES_FILE] if (artifact / NAMES_FILE).exists() else [])]
+
     with tempfile.TemporaryDirectory() as staging_dir:
         staging = Path(staging_dir)
-        for name in ARTIFACT_FILES:
+        for name in files:
             shutil.copy2(artifact / name, staging / name)
         readme = FRONT_MATTER.format(name=args.name, github=GITHUB_URL)
         (staging / "README.md").write_text(readme + card_md.read_text("utf-8"), "utf-8")
@@ -110,7 +116,7 @@ def main() -> int:
             "name": args.name,
             "repo": repo_id,
             "revision": commit.oid,
-            "files": {name: sha256(artifact / name) for name in ARTIFACT_FILES},
+            "files": {name: sha256(artifact / name) for name in files},
         },
     }
     manifest_path = root / "deploy" / "hub.json"
