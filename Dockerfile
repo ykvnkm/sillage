@@ -56,6 +56,14 @@ RUN useradd --create-home --uid 1000 sillage
 COPY --from=build --chown=sillage:sillage /app/.venv /app/.venv
 COPY --from=model --chown=sillage:sillage /model /app/model
 
+# One BLAS/OpenMP thread per process. The model multiplies one row by a 2264x138
+# matrix; a thread pool sized to every core only spins between tiny jobs. Measured
+# under the same load: 230-360% CPU and 25 ms median with the default pool, 6-15%
+# and 11 ms with one thread (journal E-017). Scale with processes, not threads.
+ENV OPENBLAS_NUM_THREADS=1 \
+    OMP_NUM_THREADS=1 \
+    MKL_NUM_THREADS=1
+
 ENV PATH=/app/.venv/bin:$PATH \
     PYTHONUNBUFFERED=1 \
     SILLAGE_MODEL_DIR=/app/model \

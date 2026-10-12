@@ -36,6 +36,9 @@ class Services:
     depict: MoleculeDepicter
     names: NameDirectory | None
     odor_map: OdorMap | None
+    similarity_baseline: dict[float, float]
+    """Quantiles of nearest-known-molecule similarity for ordinary inputs; the
+    reference line drift monitoring compares live traffic against."""
 
 
 def build_predict_odor(directory: Path | None = None, *, online: bool | None = None) -> PredictOdor:
@@ -68,6 +71,16 @@ def build_predict_odor(directory: Path | None = None, *, online: bool | None = N
 
 def build_services(directory: Path | None = None, *, online: bool | None = None) -> Services:
     predict = build_predict_odor(directory, online=online)
+    references = predict.references
+    baseline = (
+        references.similarity_baseline()
+        if isinstance(references, FingerprintReferenceLibrary)
+        else {}
+    )
     return Services(
-        predict=predict, depict=RdkitDepicter(), names=predict.names, odor_map=predict.odor_map
+        predict=predict,
+        depict=RdkitDepicter(),
+        names=predict.names,
+        odor_map=predict.odor_map,
+        similarity_baseline=baseline,
     )

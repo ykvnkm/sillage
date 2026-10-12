@@ -84,7 +84,9 @@ def create_app(load: Callable[[], Services] | None = None) -> FastAPI:
                 return found.display if found is not None else None
 
             app.state.map_json = map_out(services.odor_map.points(), name_of).model_dump_json()
-        app.state.metrics = ServiceMetrics(services.predict.predictor.name)
+        app.state.metrics = ServiceMetrics(
+            services.predict.predictor.name, services.similarity_baseline
+        )
         yield
 
     app = FastAPI(

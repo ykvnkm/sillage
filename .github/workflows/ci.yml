@@ -78,3 +78,24 @@ jobs:
           docker run -d --name sillage -p 8000:8000 sillage:ci
           python3 scripts/smoke_test.py http://localhost:8000 --wait 90 \
             || { docker logs sillage; exit 1; }
+
+  # Alert rules are code: an alert nobody has seen fire is an alert nobody can trust.
+  # promtool checks the syntax and runs rules.test.yml, which makes every alert fire
+  # on synthetic series and stay quiet where it must.
+  monitoring:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Check and test the Prometheus rules
+        working-directory: deploy/observability/prometheus
+        run: |
+          docker run --rm -v "$PWD":/rules -w /rules --entrypoint promtool \
+            prom/prometheus:v3.4.1 check rules rules.yml
+          docker run --rm -v "$PWD":/rules -w /rules --entrypoint promtool \
+            prom/prometheus:v3.4.1 test rules rules.test.yml
+
+      - name: Check the compose file and the dashboard
+        run: |
+          docker compose -f deploy/observability/compose.yml config --quiet
+          python3 -c "import json; json.load(open('deploy/observability/grafana/dashboards/sillage.json'))"

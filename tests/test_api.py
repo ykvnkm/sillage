@@ -244,3 +244,10 @@ def test_unknown_name_offline_is_a_clear_refusal(client: TestClient) -> None:
 
     assert response.status_code == 422
     assert response.json()["reason"] == "unknown_name"
+
+
+def test_metrics_publish_the_similarity_baseline_for_drift(client: TestClient) -> None:
+    text = client.get("/metrics").text
+
+    for quantile in ("0.1", "0.25", "0.5"):
+        assert f'sillage_baseline_nearest_similarity{{quantile="{quantile}"}}' in text

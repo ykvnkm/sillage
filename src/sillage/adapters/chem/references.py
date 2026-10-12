@@ -37,6 +37,26 @@ class FingerprintReferenceLibrary:
         entry = self._entries[index]
         return KnownMolecule(descriptors=entry.descriptors, seen_in_training=entry.split == "train")
 
+    def similarity_baseline(
+        self, quantiles: tuple[float, ...] = (0.1, 0.25, 0.5), *, sample: int = 500
+    ) -> dict[float, float]:
+        """How similar an ordinary input is to its nearest known molecule.
+
+        Drift monitoring watches the live distribution of exactly this number, and a
+        live median of 0.45 means nothing without knowing that a dataset molecule's
+        own nearest neighbour sits at, say, 0.55. Computed on a fixed sample of the
+        library, each molecule excluded from its own neighbours as live lookups do.
+        """
+        n = len(self._entries)
+        if n < 2:
+            return {}
+        rng = np.random.default_rng(0)
+        rows = rng.choice(n, size=min(sample, n), replace=False)
+        similarity = tanimoto_similarity(self._fingerprints[rows], self._fingerprints)
+        similarity[np.arange(rows.size), rows] = -1.0
+        nearest = similarity.max(axis=1)
+        return {q: float(np.quantile(nearest, q)) for q in quantiles}
+
     def nearest(self, molecule: Molecule, k: int) -> tuple[Neighbour, ...]:
         if k <= 0 or not self._entries:
             return ()
