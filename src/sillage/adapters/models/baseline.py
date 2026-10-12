@@ -61,6 +61,16 @@ class ArtifactOdorPredictor:
             for index, name in enumerate(self._model.label_names)
         )
 
+    def embed(self, molecule: Molecule) -> tuple[float, ...]:
+        """Raw predicted probabilities, before calibration: the model's own scale,
+        and exactly what scripts/build_map.py embedded the reference molecules with."""
+        features = feature_sets.build(self._model.card.feature_set, [to_rdkit(molecule)])
+        if self._scorer is not None:
+            raw = self._scorer.predict_proba(features.values)[0]
+        else:
+            raw = self._model.raw_scores(features.values)[0]
+        return tuple(float(v) for v in raw)
+
     def describe(self) -> ModelDescription:
         card = self._model.card
         labels = np.asarray(card.label_names)

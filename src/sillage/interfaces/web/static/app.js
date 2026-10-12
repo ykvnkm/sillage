@@ -165,7 +165,12 @@ async function predict(query, { push = true } = {}) {
     });
     const body = await response.json().catch(() => null);
     if (body && body.refused) render(renderRefusal(body));
-    else if (response.ok && body) render(renderReport(body));
+    else if (response.ok && body) {
+      render(renderReport(body));
+      const mapSection = document.getElementById("odor-map");
+      if (mapSection && body.map_position) OdorMapView.show(mapSection, body);
+      else mapSection?.remove();
+    }
     else render(renderProblem(`Сервис ответил кодом ${response.status}. Попробуйте ещё раз через минуту.`));
   } catch (error) {
     if (error.name === "AbortError") return;
@@ -289,7 +294,9 @@ function renderReport(report) {
       )
     : null;
 
-  return [label, readout, neighbours].filter(Boolean);
+  const map = h("section", { class: "odor-map", id: "odor-map", "aria-labelledby": "map-title" });
+
+  return [label, readout, neighbours, map].filter(Boolean);
 }
 
 function knownLine(known) {

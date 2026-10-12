@@ -35,7 +35,9 @@ from sillage.paths import DEFAULT_MODEL, project_root
 
 ARTIFACT_FILES = (CARD_FILE, ESTIMATOR_FILE, CALIBRATOR_FILE, REFERENCE_FILE)
 NAMES_FILE = "names.json"
-"""Optional: the name directory from scripts/build_names.py. Published when present."""
+MAP_FILE = "map.npz"
+OPTIONAL_FILES = (NAMES_FILE, MAP_FILE)
+"""Built by scripts/build_names.py and scripts/build_map.py. Published when present."""
 GITHUB_URL = "https://github.com/ykvnkm/sillage"
 
 FRONT_MATTER = """---
@@ -95,7 +97,7 @@ def main() -> int:
 
     api.create_repo(repo_id, repo_type="model", exist_ok=True)
 
-    files = [*ARTIFACT_FILES, *([NAMES_FILE] if (artifact / NAMES_FILE).exists() else [])]
+    files = [*ARTIFACT_FILES, *(f for f in OPTIONAL_FILES if (artifact / f).exists())]
 
     with tempfile.TemporaryDirectory() as staging_dir:
         staging = Path(staging_dir)

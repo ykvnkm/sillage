@@ -11,6 +11,7 @@ Endpoints:
 - ``GET /`` -- the web interface (static HTML, CSS and JS; no build step).
 - ``GET /depict?smiles=...`` -- the molecule drawn as SVG.
 - ``GET /suggest?q=...`` -- known molecule names starting like the typed text.
+- ``GET /map`` -- every reference molecule on the odour map, with its family.
 - ``GET /model`` -- what model answers, its scope, metrics and their floor.
 - ``GET /health`` -- liveness, for the container healthcheck.
 - ``GET /metrics`` -- Prometheus exposition.
@@ -29,6 +30,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
@@ -38,11 +40,13 @@ from sillage.application import MAX_INPUT_LENGTH
 from sillage.domain import InvalidMolecule, Refusal
 from sillage.interfaces.api.metrics import ServiceMetrics
 from sillage.interfaces.api.schemas import (
+    MapOut,
     ModelOut,
     PredictRequest,
     RefusalOut,
     ReportOut,
     SuggestionOut,
+    map_out,
     model_out,
     refusal_out,
     report_out,
@@ -70,6 +74,16 @@ def create_app(load: Callable[[], Services] | None = None) -> FastAPI:
         app.state.predict = services.predict
         app.state.depict = services.depict
         app.state.names = services.names
+        # The map never changes while the process runs: serialise it once.
+        app.state.map_json = None
+        if services.odor_map is not None:
+            names = services.names
+
+            def name_of(smiles: str) -> str | None:
+                found = names.names_of(smiles) if names is not None else None
+                return found.display if found is not None else None
+
+            app.state.map_json = map_out(services.odor_map.points(), name_of).model_dump_json()
         app.state.metrics = ServiceMetrics(services.predict.predictor.name)
         yield
 
@@ -79,6 +93,9 @@ def create_app(load: Callable[[], Services] | None = None) -> FastAPI:
         summary="Predicts what a molecule smells of, and says how sure it is.",
         lifespan=lifespan,
     )
+
+    # The map is ~300 KB of JSON and compresses about fourfold.
+    app.add_middleware(GZipMiddleware, minimum_size=1024)
 
     @app.middleware("http")
     async def record(request: Request, call_next: Callable[[Request], Awaitable[Response]]):
@@ -163,6 +180,20 @@ def create_app(load: Callable[[], Services] | None = None) -> FastAPI:
         if names is None:
             return []
         return [suggestion_out(s) for s in names.suggest(q, limit)]
+
+    @app.get("/map", response_model=MapOut, responses={404: {"description": "No map shipped"}})
+    def odor_map(request: Request) -> Response:
+        """Every reference molecule placed by how the model thinks it smells.
+
+        Positions come from the model, families from experts' labels; see journal E-016.
+        """
+        if request.app.state.map_json is None:
+            return JSONResponse({"detail": "this model ships without a map"}, status_code=404)
+        return Response(
+            request.app.state.map_json,
+            media_type="application/json",
+            headers={"Cache-Control": "public, max-age=3600"},
+        )
 
     @app.get("/model", response_model=ModelOut)
     def model(request: Request) -> ModelOut:

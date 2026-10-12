@@ -85,7 +85,27 @@ def artifact(tmp_path_factory: pytest.TempPathFactory) -> Path:
     )
     directory = model.save(tmp_path_factory.mktemp("artifact") / "mini")
     (directory / "names.json").write_text(json.dumps(NAMES, ensure_ascii=False), "utf-8")
+    write_map(directory, model, features.values)
     return directory
+
+
+def write_map(directory: Path, model: OdorModel, features: np.ndarray) -> None:
+    """A map in the format scripts/build_map.py writes. Positions are arbitrary here --
+    UMAP's layout is not under test -- but embeddings are the model's real ones, so
+    placing a new molecule exercises the same arithmetic as the service."""
+    from sillage.domain.families import Family
+    from sillage.models.compiled import LinearMultilabel
+
+    embeddings = LinearMultilabel.from_classifier(model.estimator).predict_proba(features)
+    rng = np.random.default_rng(0)
+    np.savez_compressed(
+        directory / "map.npz",
+        smiles=np.array([r.smiles for r in model.reference]),
+        coords=rng.random((len(model.reference), 2)).astype(np.float32),
+        embeddings=embeddings.astype(np.float16),
+        families=np.array([i % 3 for i in range(len(model.reference))], dtype=np.int8),
+        family_order=np.array([f.value for f in Family]),
+    )
 
 
 @pytest.fixture(autouse=True)

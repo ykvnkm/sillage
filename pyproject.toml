@@ -40,6 +40,7 @@ dev = [
     "pre-commit>=4.6.2",
     "pytest>=8.0",
     "ruff>=0.14",
+    "umap-learn>=0.5.12",
 ]
 
 [build-system]
