@@ -79,3 +79,19 @@ with the systematic name under it in the band's secondary colour.
 Known detector false positive: `cramped-padding` on `.query__field` -- the
 `.combobox` wrapper touches the field's edge, but the text sits 16px inside it through
 the input's own padding.
+
+## Odour map
+
+A canvas scatter of the 4777 reference molecules, positions from the model's
+embedding (UMAP, offline), families from experts' labels. **One family is highlighted
+at a time** (`#a6581a`, validated: lightness, chroma, >= 3:1 on the paper surface);
+everything else is recessive grey `#c9c9c1`. Eight coloured families at once would
+break the scatter-plot rule of at most three categorical colours distinguishable
+under colour-vision deficiency. Family chips act as the legend and the selector;
+the default is the family of the molecule's most probable note.
+
+The current molecule is a shape, not a colour: an ink ring with a surface halo and a
+direct label; its nearest known molecules get small ink rings. Hover shows name and
+family; click predicts for that molecule. Dot radius scales with map width
+(1.1-2.3 px); map height follows the layout's own aspect ratio. On phones the family
+chips become one horizontally scrolling row.

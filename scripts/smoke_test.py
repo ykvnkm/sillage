@@ -42,6 +42,7 @@ def main() -> int:
         ("names suggested while typing", lambda: suggests(base, "ван", VANILLIN_FLAT)),
         ("bromine is refused", lambda: refuses(base, "BrCCCCCC=O", "unseen_element")),
         ("model description", lambda: json.loads(get(f"{base}/model")[1])["descriptors"]),
+        ("odour map", lambda: map_is_complete(base)),
     ]
     failed = 0
     for name, check in checks:
@@ -74,6 +75,12 @@ def predicts_vanilla(base: str, query: str) -> bool:
     status, body = post(f"{base}/predict", {"query": query})
     names = [d["descriptor"] for d in json.loads(body)["predicted"]]
     return status == 200 and names[:1] == ["vanilla"]
+
+
+def map_is_complete(base: str) -> bool:
+    points = json.loads(get(f"{base}/map")[1])["points"]
+    status, body = post(f"{base}/predict", {"query": VANILLIN})
+    return status == 200 and len(points["x"]) > 4000 and json.loads(body)["map_position"]
 
 
 def suggests(base: str, prefix: str, smiles: str) -> bool:

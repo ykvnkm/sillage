@@ -7,6 +7,7 @@ API returns and what every future model -- the GNN of phase 2, the mixture model
 phase 4 -- has to produce. They must not change because a library did.
 """
 
+from sillage.domain.families import FAMILY_NAMES_RU, FAMILY_OF, Family
 from sillage.domain.molecule import InvalidMolecule, KnownMolecule, Molecule, Neighbour
 from sillage.domain.names import MoleculeNames, NameSuggestion, fold, initial, looks_like_name
 from sillage.domain.odor import (
@@ -18,16 +19,22 @@ from sillage.domain.odor import (
     OdorProfile,
     confidence_of,
 )
+from sillage.domain.odor_map import MapPoint, MapPosition
 from sillage.domain.report import Caveat, OdorReport, Refusal, RefusalReason
 
 __all__ = [
     "BANDS",
+    "FAMILY_NAMES_RU",
+    "FAMILY_OF",
     "UNVERIFIED_MENTION",
     "Caveat",
     "Confidence",
     "DescriptorScore",
+    "Family",
     "InvalidMolecule",
     "KnownMolecule",
+    "MapPoint",
+    "MapPosition",
     "ModelDescription",
     "Molecule",
     "MoleculeNames",

@@ -16,6 +16,7 @@ from typing import Protocol
 from sillage.domain.molecule import KnownMolecule, Molecule, Neighbour
 from sillage.domain.names import MoleculeNames, NameSuggestion
 from sillage.domain.odor import ModelDescription, OdorProfile
+from sillage.domain.odor_map import MapPoint, MapPosition
 from sillage.domain.report import Refusal
 
 
@@ -41,7 +42,23 @@ class OdorPredictor(Protocol):
 
     def predict(self, molecule: Molecule) -> OdorProfile: ...
 
+    def embed(self, molecule: Molecule) -> tuple[float, ...]:
+        """The model's internal representation of the molecule's smell.
+
+        For the baseline: its 138 predicted descriptor probabilities. For a neural
+        model: its penultimate layer. Whatever it is, the odour map is built from it.
+        """
+        ...
+
     def describe(self) -> ModelDescription: ...
+
+
+class OdorMap(Protocol):
+    """Molecules laid out by how the model thinks they smell."""
+
+    def locate(self, embedding: tuple[float, ...]) -> MapPosition: ...
+
+    def points(self) -> tuple[MapPoint, ...]: ...
 
 
 class NameDirectory(Protocol):

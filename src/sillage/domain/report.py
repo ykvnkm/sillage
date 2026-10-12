@@ -8,6 +8,7 @@ from enum import StrEnum
 from sillage.domain.molecule import KnownMolecule, Molecule, Neighbour
 from sillage.domain.names import MoleculeNames
 from sillage.domain.odor import OdorProfile
+from sillage.domain.odor_map import MapPosition
 
 
 class RefusalReason(StrEnum):
@@ -70,3 +71,6 @@ class OdorReport:
 
     matched_name: str | None = None
     """The name the input matched, as the directory spells it, when it was a name."""
+
+    map_position: MapPosition | None = None
+    """Where the molecule lands on the odour map, when the model ships with one."""

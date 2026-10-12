@@ -576,6 +576,74 @@ main { width: var(--page); margin-inline: auto; }
 }
 .specimen__notes { margin: 8px 12px 12px; font-size: 0.9rem; color: var(--ink); }
 
+/* ---- odour map ------------------------------------------------------------- */
+
+.odor-map {
+  grid-column: 1 / -1;
+  margin-top: 26px;
+  padding: 22px clamp(18px, 3vw, 28px) 20px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.odor-map:empty { display: none; }
+.odor-map h2 { font-size: 1.9rem; }
+.map__lede { margin: 6px 0 16px; color: var(--ink-2); font-size: 0.95rem; max-width: 72ch; }
+
+.map__families { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.map__family { display: inline-flex; align-items: baseline; gap: 8px; }
+.map__family[aria-pressed="true"] {
+  background: #a6581a;
+  border-color: #a6581a;
+  color: #fff7ea;
+}
+.map__count { font-size: 0.78rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.map__family[aria-pressed="true"] .map__count { color: #fbe6c8; }
+
+.map__frame { position: relative; }
+.map__canvas {
+  display: block;
+  width: 100%;
+  border-radius: var(--radius-s);
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--rule);
+}
+
+.map__tooltip {
+  position: absolute;
+  z-index: 5;
+  display: grid;
+  gap: 2px;
+  max-width: 220px;
+  padding: 8px 10px;
+  background: var(--amber-900);
+  color: var(--on-shell);
+  border-radius: var(--radius-s);
+  font-size: 0.88rem;
+  pointer-events: none;
+  box-shadow: 0 2px 6px rgb(43 23 9 / 0.2);
+}
+.map__tooltip[hidden] { display: none; }
+.map__tooltip strong { font-family: var(--font-label); font-weight: 600; font-size: 1rem; }
+.map__tooltip-family { color: var(--on-shell-2); font-size: 0.82rem; }
+.map__tooltip code { font: 0.78rem/1.3 var(--mono); color: var(--on-shell-2); overflow-wrap: anywhere; }
+
+.map__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 12px 0 0;
+  color: var(--ink-3);
+  font-size: 0.85rem;
+}
+.map__legend span { display: inline-flex; align-items: center; gap: 7px; }
+.map__key { display: inline-block; flex: none; border-radius: 50%; }
+.map__key--family { width: 8px; height: 8px; background: #a6581a; }
+.map__key--rest { width: 7px; height: 7px; background: #c9c9c1; }
+.map__key--query { width: 14px; height: 14px; box-shadow: inset 0 0 0 2.5px var(--ink); background: radial-gradient(circle, var(--ink) 0 2px, transparent 2.5px); }
+.map__key--near { width: 10px; height: 10px; box-shadow: inset 0 0 0 1.5px var(--ink); }
+
 /* ---- refusal -------------------------------------------------------------- */
 
 .refusal {
@@ -707,6 +775,14 @@ main { width: var(--page); margin-inline: auto; }
   .query__field { flex-direction: column; }
   .button { margin: 0 6px 6px; }
   .neighbours__list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .map__families {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline: calc(-1 * clamp(18px, 3vw, 28px));
+    padding: 2px clamp(18px, 3vw, 28px) 6px;
+    scrollbar-width: thin;
+  }
+  .map__family { flex: none; }
 }
 
 @keyframes spin { to { transform: rotate(1turn); } }

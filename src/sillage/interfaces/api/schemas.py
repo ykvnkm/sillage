@@ -13,7 +13,11 @@ from pydantic import AliasChoices, BaseModel, Field
 
 from sillage.application.predict_odor import DEFAULT_NEIGHBOURS, MAX_INPUT_LENGTH
 from sillage.domain import (
+    FAMILY_NAMES_RU,
+    FAMILY_OF,
     DescriptorScore,
+    Family,
+    MapPoint,
     ModelDescription,
     MoleculeNames,
     NameSuggestion,
@@ -72,6 +76,35 @@ class NamesOut(BaseModel):
     pubchem_url: str | None
 
 
+class PositionOut(BaseModel):
+    x: float
+    y: float
+
+
+class FamilyOut(BaseModel):
+    id: str
+    name: str = Field(description="Russian name of the odour family.")
+    count: int
+
+
+class MapPointsOut(BaseModel):
+    """Columns rather than one object per point: 4777 points, a third of the bytes."""
+
+    x: list[float]
+    y: list[float]
+    family: list[int] = Field(description="Index into `families`.")
+    smiles: list[str]
+    name: list[str | None]
+
+
+class MapOut(BaseModel):
+    families: list[FamilyOut]
+    descriptor_family: dict[str, int] = Field(
+        description="Odour descriptor -> index into `families`."
+    )
+    points: MapPointsOut
+
+
 class NeighbourOut(BaseModel):
     smiles: str
     similarity: float = Field(description="Tanimoto on ECFP4. Orientation, not confidence.")
@@ -103,6 +136,9 @@ class ReportOut(BaseModel):
     known: KnownOut | None
     neighbours: list[NeighbourOut]
     caveats: list[str]
+    map_position: PositionOut | None = Field(
+        default=None, description="Where the molecule lands on the odour map (GET /map)."
+    )
 
 
 class RefusalOut(BaseModel):
@@ -149,6 +185,11 @@ def report_out(report: OdorReport) -> ReportOut:
             for n in report.neighbours
         ],
         caveats=[str(c) for c in report.caveats],
+        map_position=(
+            None
+            if report.map_position is None
+            else PositionOut(x=round(report.map_position.x, 4), y=round(report.map_position.y, 4))
+        ),
     )
 
 
@@ -177,6 +218,29 @@ def model_out(description: ModelDescription) -> ModelOut:
         unverified=list(description.unverified),
         metrics=description.metrics,
         floor=description.floor,
+    )
+
+
+def map_out(points: tuple[MapPoint, ...], name_of) -> MapOut:
+    """The whole map in columns. *name_of* gives a display name for a SMILES, or None."""
+    order = list(Family)
+    return MapOut(
+        families=[
+            FamilyOut(
+                id=f.value,
+                name=FAMILY_NAMES_RU[f],
+                count=sum(1 for p in points if p.family is f),
+            )
+            for f in order
+        ],
+        descriptor_family={d: order.index(f) for d, f in sorted(FAMILY_OF.items())},
+        points=MapPointsOut(
+            x=[round(p.position.x, 4) for p in points],
+            y=[round(p.position.y, 4) for p in points],
+            family=[order.index(p.family) for p in points],
+            smiles=[p.smiles for p in points],
+            name=[name_of(p.smiles) for p in points],
+        ),
     )
 
 

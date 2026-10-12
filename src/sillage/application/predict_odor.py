@@ -31,6 +31,7 @@ from sillage.domain.ports import (
     NameDirectory,
     NameLookupUnavailable,
     NameResolver,
+    OdorMap,
     OdorPredictor,
     ReferenceLibrary,
     ScopePolicy,
@@ -60,6 +61,7 @@ class PredictOdor:
     references: ReferenceLibrary
     names: NameDirectory | None = None
     resolver: NameResolver | None = None
+    odor_map: OdorMap | None = None
 
     def __call__(self, text: str, *, neighbours: int = DEFAULT_NEIGHBOURS) -> OdorReport | Refusal:
         text = text.strip()
@@ -94,6 +96,11 @@ class PredictOdor:
             names=resolved.names,
             query_kind=resolved.kind,
             matched_name=resolved.matched,
+            map_position=(
+                None
+                if self.odor_map is None
+                else self.odor_map.locate(self.predictor.embed(molecule))
+            ),
         )
 
     def _resolve(self, text: str) -> _Resolved | Refusal:
