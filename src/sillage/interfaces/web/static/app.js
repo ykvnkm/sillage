@@ -2,9 +2,17 @@
 // same FastAPI app that answers /predict, and every string from the API is placed
 // with textContent, never as HTML.
 
-const DEFAULT_SMILES = "COc1cc(C=O)ccc1O";
+const DEFAULT_QUERY = "ванилин";
 
 const REFUSALS = {
+  unknown_name: {
+    title: "Не нашли вещество с таким названием.",
+    body: "Попробуйте английское название или структуру в SMILES. Русские названия известны не для всех веществ; редкого названия может не быть и в PubChem.",
+  },
+  name_lookup_unavailable: {
+    title: "Сейчас не получается проверить название.",
+    body: "Справочник PubChem не ответил. Попробуйте ещё раз через минуту или вставьте структуру в SMILES.",
+  },
   invalid_input: {
     title: "Эту строку не получается прочитать как структуру.",
     body: "Проверьте SMILES на опечатки, незакрытые циклы и скобки. Надёжнее всего скопировать строку из поля «Isomeric SMILES» на PubChem.",
@@ -39,7 +47,8 @@ const GRADE_LABEL = {
 };
 
 const form = document.getElementById("query-form");
-const input = document.getElementById("smiles");
+const input = document.getElementById("query");
+const listbox = document.getElementById("suggestions");
 const submit = document.getElementById("submit");
 const result = document.getElementById("result");
 
@@ -79,6 +88,10 @@ function formula(text) {
 
 // Rounded down, never to nearest: 0.846 is "probable", and showing it as 85% would
 // put the number on the "likely" side of an edge the word sits below.
+function capitalize(text) {
+  return text ? text.charAt(0).toLocaleUpperCase("ru-RU") + text.slice(1) : text;
+}
+
 function percent(p) {
   return `${Math.floor(p * 100 + 1e-9)}%`;
 }
@@ -111,6 +124,10 @@ function refusalDetail(refusal) {
       return "В структуре нет ни одного атома углерода.";
     case "charged":
       return "У атомов в структуре есть формальный заряд.";
+    case "unknown_name":
+      return "Ни в справочнике известных молекул, ни в PubChem такого названия нет.";
+    case "name_lookup_unavailable":
+      return "PubChem не ответил вовремя.";
     default:
       if (/not a valid SMILES/.test(detail)) return "Химическая библиотека RDKit не смогла разобрать эту строку.";
       if (/at most|too long|characters long/.test(detail)) return "Строка длиннее 500 символов.";
@@ -120,17 +137,19 @@ function refusalDetail(refusal) {
 
 // ---- request -----------------------------------------------------------------
 
-async function predict(smiles, { push = true } = {}) {
-  smiles = smiles.trim();
-  if (!smiles) {
+async function predict(query, { push = true } = {}) {
+  query = query.trim();
+  closeSuggestions();
+  if (!query) {
     input.focus();
     return;
   }
-  input.value = smiles;
+  input.value = query;
   if (push) {
     const url = new URL(location.href);
-    url.searchParams.set("smiles", smiles);
-    history.pushState({ smiles }, "", url);
+    url.searchParams.delete("smiles");
+    url.searchParams.set("q", query);
+    history.pushState({ query }, "", url);
   }
 
   controller?.abort();
@@ -141,7 +160,7 @@ async function predict(smiles, { push = true } = {}) {
     const response = await fetch("/predict", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ smiles, neighbours: 5 }),
+      body: JSON.stringify({ query, neighbours: 5 }),
       signal: controller.signal,
     });
     const body = await response.json().catch(() => null);
@@ -171,6 +190,25 @@ function render(content) {
 
 // ---- report ------------------------------------------------------------------
 
+function nameHeading(report) {
+  const names = report.names;
+  if (!names) return null;
+  // Lead with the name the user typed when it is an alias ("Iso-E super"), with the
+  // directory's own name under it; otherwise lead with the directory's name.
+  const matched = report.matched_name;
+  const isAlias = matched && matched !== names.ru && matched !== names.en;
+  const lead = capitalize(isAlias ? matched : names.display);
+  const others = [isAlias ? names.display : null, names.ru && names.en ? names.en : null]
+    .filter((n) => n && n !== lead)
+    .map(capitalize);
+  return h(
+    "div",
+    { class: "label__names" },
+    h("h2", { class: "label__name" }, lead),
+    others.length > 0 && h("p", { class: "label__aka", lang: "en" }, others.join(" · ")),
+  );
+}
+
 function renderReport(report) {
   const m = report.molecule;
   const known = report.known;
@@ -179,7 +217,12 @@ function renderReport(report) {
   const label = h(
     "article",
     { class: "label", "aria-label": "Молекула" },
-    h("div", { class: "label__band" }, formula(m.formula), h("span", { class: "label__weight" }, `масса ${molarMass(m.weight)}`)),
+    h(
+      "div",
+      { class: "label__band" },
+      nameHeading(report),
+      h("div", { class: "label__meta" }, formula(m.formula), h("span", { class: "label__weight" }, `масса ${molarMass(m.weight)}`)),
+    ),
     h("figure", { class: "label__structure" }, drawing(m.smiles, 480, 360, `Структура ${m.formula}`)),
     h(
       "dl",
@@ -188,6 +231,13 @@ function renderReport(report) {
       m.input_smiles !== m.smiles &&
         h("div", {}, h("dt", {}, "Введено"), h("dd", {}, h("code", { lang: "en" }, m.input_smiles))),
       h("div", {}, h("dt", {}, "В данных"), h("dd", {}, knownLine(known))),
+      report.names?.pubchem_url &&
+        h(
+          "div",
+          {},
+          h("dt", {}, "PubChem"),
+          h("dd", {}, h("a", { href: report.names.pubchem_url, rel: "noopener", target: "_blank" }, `запись ${report.names.cid}`)),
+        ),
     ),
     report.caveats.includes("stereo_discarded") &&
       h(
@@ -306,14 +356,15 @@ function specimen(n) {
       {
         type: "button",
         class: "specimen",
-        "aria-label": `Предсказать для ${n.smiles}: сходство ${percent(n.similarity)}, эксперты: ${notes}`,
+        "aria-label": `Предсказать для ${n.names?.display || n.smiles}: сходство ${percent(n.similarity)}, эксперты: ${notes}`,
         onclick: () => {
-          predict(n.smiles);
+          predict(n.names?.display || n.smiles);
           document.getElementById("query-title").scrollIntoView({ behavior: "smooth" });
         },
       },
       h("span", { class: "specimen__band" }, h("strong", {}, percent(n.similarity)), "сходство"),
       h("span", { class: "specimen__structure" }, drawing(n.smiles, 300, 225, "")),
+      n.names?.display && h("span", { class: "specimen__name" }, capitalize(n.names.display)),
       h("code", { class: "specimen__smiles", lang: "en" }, n.smiles),
       h("span", { class: "specimen__notes" }, notes),
     ),
@@ -340,7 +391,11 @@ function renderRefusal(refusal) {
       h(
         "article",
         { class: "label", "aria-label": "Молекула" },
-        h("div", { class: "label__band" }, formula(m.formula), h("span", { class: "label__weight" }, `масса ${molarMass(m.weight)}`)),
+        h(
+          "div",
+          { class: "label__band" },
+          h("div", { class: "label__meta" }, formula(m.formula), h("span", { class: "label__weight" }, `масса ${molarMass(m.weight)}`)),
+        ),
         h("figure", { class: "label__structure" }, drawing(m.smiles, 480, 360, `Структура ${m.formula}`)),
       ),
   );
@@ -374,6 +429,97 @@ async function loadModelFacts() {
   }
 }
 
+// ---- suggestions -------------------------------------------------------------
+// A combobox in the WAI-ARIA pattern: focus stays in the input, arrow keys move an
+// active option announced through aria-activedescendant, Enter takes it, Escape closes.
+
+let suggestions = [];
+let active = -1;
+let suggestSeq = 0;
+let suggestTimer = null;
+
+async function updateSuggestions() {
+  const text = input.value.trim();
+  const seq = ++suggestSeq;
+  if (text.length < 2) return closeSuggestions();
+  try {
+    const response = await fetch(`/suggest?${new URLSearchParams({ q: text, limit: 8 })}`);
+    const items = response.ok ? await response.json() : [];
+    if (seq !== suggestSeq) return; // a newer keystroke already asked
+    showSuggestions(items);
+  } catch {
+    closeSuggestions();
+  }
+}
+
+function showSuggestions(items) {
+  suggestions = items;
+  active = -1;
+  if (!items.length) return closeSuggestions();
+  listbox.replaceChildren(
+    ...items.map((item, i) =>
+      h(
+        "li",
+        {
+          id: `suggestion-${i}`,
+          role: "option",
+          class: "suggestions__option",
+          "aria-selected": "false",
+          onmousedown: (event) => event.preventDefault(), // keep focus in the input
+          onclick: () => predict(item.name),
+        },
+        h("span", { class: "suggestions__name" }, capitalize(item.name)),
+        item.matched !== item.name && h("span", { class: "suggestions__matched", lang: "en" }, item.matched),
+      ),
+    ),
+  );
+  listbox.hidden = false;
+  input.setAttribute("aria-expanded", "true");
+}
+
+function closeSuggestions() {
+  suggestSeq++;
+  suggestions = [];
+  active = -1;
+  listbox.hidden = true;
+  listbox.replaceChildren();
+  input.setAttribute("aria-expanded", "false");
+  input.removeAttribute("aria-activedescendant");
+}
+
+function moveActive(step) {
+  if (!suggestions.length) return;
+  active = (active + step + suggestions.length) % suggestions.length;
+  listbox.querySelectorAll('[role="option"]').forEach((option, i) => {
+    option.setAttribute("aria-selected", String(i === active));
+    if (i === active) option.scrollIntoView({ block: "nearest" });
+  });
+  input.setAttribute("aria-activedescendant", `suggestion-${active}`);
+}
+
+input.addEventListener("input", () => {
+  clearTimeout(suggestTimer);
+  suggestTimer = setTimeout(updateSuggestions, 120);
+});
+
+input.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    if (listbox.hidden) updateSuggestions();
+    else moveActive(1);
+  } else if (event.key === "ArrowUp") {
+    event.preventDefault();
+    moveActive(-1);
+  } else if (event.key === "Escape") {
+    closeSuggestions();
+  } else if (event.key === "Enter" && active >= 0) {
+    event.preventDefault();
+    predict(suggestions[active].name);
+  }
+});
+
+input.addEventListener("blur", () => setTimeout(closeSuggestions, 100));
+
 // ---- wiring ------------------------------------------------------------------
 
 form.addEventListener("submit", (event) => {
@@ -382,13 +528,19 @@ form.addEventListener("submit", (event) => {
 });
 
 document.querySelectorAll(".chip").forEach((chip) =>
-  chip.addEventListener("click", () => predict(chip.dataset.smiles)),
+  chip.addEventListener("click", () => predict(chip.dataset.query)),
 );
 
 window.addEventListener("popstate", () => {
-  const smiles = new URL(location.href).searchParams.get("smiles");
-  if (smiles) predict(smiles, { push: false });
+  const query = queryFromUrl();
+  if (query) predict(query, { push: false });
 });
 
 loadModelFacts();
-predict(new URL(location.href).searchParams.get("smiles") || DEFAULT_SMILES, { push: false });
+// ?q= since step 2.7; ?smiles= links shared before it keep working.
+function queryFromUrl() {
+  const params = new URL(location.href).searchParams;
+  return params.get("q") || params.get("smiles");
+}
+
+predict(queryFromUrl() || DEFAULT_QUERY, { push: false });

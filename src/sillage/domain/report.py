@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 from sillage.domain.molecule import KnownMolecule, Molecule, Neighbour
+from sillage.domain.names import MoleculeNames
 from sillage.domain.odor import OdorProfile
 
 
@@ -14,6 +15,10 @@ class RefusalReason(StrEnum):
     exported for drift monitoring both key on these values."""
 
     INVALID_INPUT = "invalid_input"
+    UNKNOWN_NAME = "unknown_name"
+    NAME_LOOKUP_UNAVAILABLE = "name_lookup_unavailable"
+    """The name is not in the local directory and PubChem could not be reached. Not
+    the user's fault, and not a statement that the name does not exist."""
     MULTIPLE_COMPONENTS = "multiple_components"
     INORGANIC = "inorganic"
     CHARGED = "charged"
@@ -59,3 +64,9 @@ class OdorReport:
 
     caveats: tuple[Caveat, ...]
     model_name: str
+    names: MoleculeNames | None = None
+    query_kind: str = "smiles"
+    """``name`` when the user typed a name, ``smiles`` when a structure."""
+
+    matched_name: str | None = None
+    """The name the input matched, as the directory spells it, when it was a name."""

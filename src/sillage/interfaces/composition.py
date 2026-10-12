@@ -6,6 +6,7 @@ nowhere else. Swapping the baseline for the GNN is a change to this file.
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -14,11 +15,16 @@ from sillage.adapters.chem import (
     RdkitDepicter,
     RdkitMoleculeReader,
 )
+from sillage.adapters.chem.names import NAMES_FILE, NameIndex
 from sillage.adapters.models import ArtifactOdorPredictor, ArtifactScopePolicy
+from sillage.adapters.pubchem import PubChemResolver
 from sillage.application import PredictOdor
-from sillage.domain.ports import MoleculeDepicter
+from sillage.domain.ports import MoleculeDepicter, NameDirectory
 from sillage.models.artifact import OdorModel
 from sillage.paths import model_dir
+
+ONLINE_NAMES_ENV = "SILLAGE_ONLINE_NAMES"
+"""Set to ``0`` to answer only from the local name directory, never calling PubChem."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -27,22 +33,34 @@ class Services:
 
     predict: PredictOdor
     depict: MoleculeDepicter
+    names: NameDirectory | None
 
 
-def build_predict_odor(directory: Path | None = None) -> PredictOdor:
+def build_predict_odor(directory: Path | None = None, *, online: bool | None = None) -> PredictOdor:
     """Load an artifact and wire the prediction use case around it.
 
     Takes about a second, most of it fingerprinting the reference library. Call it
     once at startup, not per request.
+
+    *online* enables PubChem for names the local directory lacks; by default it
+    follows ``$SILLAGE_ONLINE_NAMES`` and is on.
     """
-    model = OdorModel.load(directory if directory is not None else model_dir())
+    directory = directory if directory is not None else model_dir()
+    model = OdorModel.load(directory)
+    if online is None:
+        online = os.environ.get(ONLINE_NAMES_ENV, "1") != "0"
+    names_file = directory / NAMES_FILE
     return PredictOdor(
         reader=RdkitMoleculeReader(),
         scope=ArtifactScopePolicy(model.scope),
         predictor=ArtifactOdorPredictor(model),
         references=FingerprintReferenceLibrary(model.reference),
+        # Optional: a model published before step 2.7 has no names.
+        names=NameIndex.from_file(names_file) if names_file.exists() else None,
+        resolver=PubChemResolver() if online else None,
     )
 
 
-def build_services(directory: Path | None = None) -> Services:
-    return Services(predict=build_predict_odor(directory), depict=RdkitDepicter())
+def build_services(directory: Path | None = None, *, online: bool | None = None) -> Services:
+    predict = build_predict_odor(directory, online=online)
+    return Services(predict=predict, depict=RdkitDepicter(), names=predict.names)

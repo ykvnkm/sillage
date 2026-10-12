@@ -36,38 +36,42 @@
     <section class="query" aria-labelledby="query-title">
       <h1 id="query-title">Чем пахнет эта молекула?</h1>
       <p class="query__lede">
-        Вставьте структуру в формате SMILES. Модель ответит словами, точность которых
-        измерена на молекулах, которых она никогда не видела, и прямо скажет, когда
-        не знает.
+        Введите название вещества или его структуру в SMILES. Модель ответит словами,
+        точность которых измерена на молекулах, которых она никогда не видела, и прямо
+        скажет, когда не знает.
       </p>
 
       <form class="query__form" id="query-form" novalidate>
-        <label class="query__label" for="smiles">SMILES</label>
+        <label class="query__label" for="query">Название или SMILES</label>
         <div class="query__field">
-          <input id="smiles" name="smiles" type="text" inputmode="text" lang="en"
-                 autocomplete="off" autocapitalize="off" spellcheck="false"
-                 maxlength="500" placeholder="COc1cc(C=O)ccc1O"
-                 aria-describedby="query-hint">
+          <div class="combobox">
+            <input id="query" name="query" type="text" inputmode="text"
+                   autocomplete="off" autocapitalize="off" spellcheck="false"
+                   maxlength="500" placeholder="ванилин, гедион или COc1cc(C=O)ccc1O"
+                   role="combobox" aria-autocomplete="list" aria-expanded="false"
+                   aria-controls="suggestions" aria-describedby="query-hint">
+            <ul class="suggestions" id="suggestions" role="listbox" aria-label="Подсказки" hidden></ul>
+          </div>
           <button class="button" type="submit" id="submit">
             <span class="button__text">Предсказать</span>
           </button>
         </div>
         <p class="query__hint" id="query-hint">
-          Одна нейтральная органическая молекула массой до 400&nbsp;г/моль из атомов C,&nbsp;N,&nbsp;O
-          и&nbsp;S. Поиск по названию скоро появится.
+          Русское или английское название, либо структура в SMILES. Одна нейтральная
+          органическая молекула массой до <span class="nowrap">400 г/моль</span> из атомов C,&nbsp;N,&nbsp;O и&nbsp;S.
         </p>
       </form>
 
       <div class="examples">
         <span class="examples__label" id="examples-label">Примеры</span>
         <ul class="examples__list" aria-labelledby="examples-label">
-          <li><button type="button" class="chip" data-smiles="COc1cc(C=O)ccc1O">Ванилин</button></li>
-          <li><button type="button" class="chip" data-smiles="CCCC(=O)OCC">Этилбутират</button></li>
-          <li><button type="button" class="chip" data-smiles="CCCCCC1C(CC(=O)OC)CCC1=O">Гедион</button></li>
-          <li><button type="button" class="chip" data-smiles="CC1(C)CCCC2(C)C1CCC1(C)OCCC12">Амброксид</button></li>
-          <li><button type="button" class="chip" data-smiles="CC1=CC[C@@H](CC1=O)C(C)=C">(R)-карвон</button></li>
-          <li><button type="button" class="chip" data-smiles="CC(C)(C=O)Cc1ccccc1">Модель её не видела</button></li>
-          <li><button type="button" class="chip chip--quiet" data-smiles="BrCCCCCC=O">Вне области модели</button></li>
+          <li><button type="button" class="chip" data-query="ванилин">Ванилин</button></li>
+          <li><button type="button" class="chip" data-query="этилбутират">Этилбутират</button></li>
+          <li><button type="button" class="chip" data-query="гедион">Гедион</button></li>
+          <li><button type="button" class="chip" data-query="линалоол">Линалоол</button></li>
+          <li><button type="button" class="chip" data-query="CC1=CC[C@@H](CC1=O)C(C)=C">(R)-карвон</button></li>
+          <li><button type="button" class="chip" data-query="CC(C)(C=O)Cc1ccccc1">Модель её не видела</button></li>
+          <li><button type="button" class="chip chip--quiet" data-query="BrCCCCCC=O">Вне области модели</button></li>
         </ul>
       </div>
     </section>

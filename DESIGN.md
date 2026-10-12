@@ -67,3 +67,15 @@ beyond hover and the button's busy spinner. `prefers-reduced-motion` disables it
 Percentages are rounded **down**. Band edges are whole percentages, so flooring
 keeps number and word consistent: 0.846 is «Вероятно 84%», never «Вероятно 85%»
 next to an «Очень вероятно from 85%» table.
+
+## Search
+
+One field takes a name or a SMILES string. Suggestions open under it as a WAI-ARIA
+combobox (arrow keys, Enter, Escape; focus never leaves the input); each option shows
+the name to display and, in tertiary ink, the synonym that matched. The label band
+leads with the name the user typed when it is a trade name or synonym ("Iso-E super"),
+with the systematic name under it in the band's secondary colour.
+
+Known detector false positive: `cramped-padding` on `.query__field` -- the
+`.combobox` wrapper touches the field's edge, but the text sits 16px inside it through
+the input's own padding.

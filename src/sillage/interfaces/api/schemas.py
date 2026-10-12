@@ -9,12 +9,14 @@ ranking position, and the only number a caller receives is ``probability``.
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import AliasChoices, BaseModel, Field
 
 from sillage.application.predict_odor import DEFAULT_NEIGHBOURS, MAX_INPUT_LENGTH
 from sillage.domain import (
     DescriptorScore,
     ModelDescription,
+    MoleculeNames,
+    NameSuggestion,
     OdorReport,
     Refusal,
 )
@@ -23,11 +25,15 @@ MAX_NEIGHBOURS = 20
 
 
 class PredictRequest(BaseModel):
-    smiles: str = Field(
+    query: str = Field(
         min_length=1,
         max_length=MAX_INPUT_LENGTH,
-        examples=["COc1cc(C=O)ccc1O"],
-        description="The molecule, as a SMILES string. Stereochemistry is accepted and dropped.",
+        validation_alias=AliasChoices("query", "smiles"),
+        examples=["ванилин", "hedione", "COc1cc(C=O)ccc1O"],
+        description=(
+            "A molecule name (Russian or English) or a SMILES string. Stereochemistry is "
+            "accepted and dropped. `smiles` is accepted as the field name too."
+        ),
     )
     neighbours: int = Field(default=DEFAULT_NEIGHBOURS, ge=0, le=MAX_NEIGHBOURS)
 
@@ -58,15 +64,35 @@ class KnownOut(BaseModel):
     )
 
 
+class NamesOut(BaseModel):
+    display: str | None = Field(description="Russian name when known, English otherwise.")
+    ru: str | None
+    en: str | None
+    cid: int | None = Field(description="PubChem compound id.")
+    pubchem_url: str | None
+
+
 class NeighbourOut(BaseModel):
     smiles: str
     similarity: float = Field(description="Tanimoto on ECFP4. Orientation, not confidence.")
     descriptors: list[str]
+    names: NamesOut | None = None
+
+
+class SuggestionOut(BaseModel):
+    name: str = Field(description="The name to show.")
+    matched: str = Field(description="The name that matched the typed text.")
+    smiles: str
 
 
 class ReportOut(BaseModel):
     refused: bool = False
     model: str
+    query_kind: str = Field(description="name or smiles: what the input was read as.")
+    matched_name: str | None = Field(
+        default=None, description="The name the input matched, as the directory spells it."
+    )
+    names: NamesOut | None
     molecule: MoleculeOut
     predicted: list[DescriptorOut] = Field(
         description="Calibrated descriptors at 'possible' or above, most probable first."
@@ -99,6 +125,9 @@ class ModelOut(BaseModel):
 def report_out(report: OdorReport) -> ReportOut:
     return ReportOut(
         model=report.model_name,
+        query_kind=report.query_kind,
+        matched_name=report.matched_name,
+        names=names_out(report.names),
         molecule=MoleculeOut.model_validate(report.molecule, from_attributes=True),
         predicted=[_descriptor(s) for s in report.profile.confident()],
         unverified=[_descriptor(s) for s in report.profile.unverified()],
@@ -111,7 +140,12 @@ def report_out(report: OdorReport) -> ReportOut:
             )
         ),
         neighbours=[
-            NeighbourOut(smiles=n.smiles, similarity=n.similarity, descriptors=list(n.descriptors))
+            NeighbourOut(
+                smiles=n.smiles,
+                similarity=n.similarity,
+                descriptors=list(n.descriptors),
+                names=names_out(n.names),
+            )
             for n in report.neighbours
         ],
         caveats=[str(c) for c in report.caveats],
@@ -143,6 +177,26 @@ def model_out(description: ModelDescription) -> ModelOut:
         unverified=list(description.unverified),
         metrics=description.metrics,
         floor=description.floor,
+    )
+
+
+def names_out(names: MoleculeNames | None) -> NamesOut | None:
+    if names is None:
+        return None
+    return NamesOut(
+        display=names.display,
+        ru=names.ru,
+        en=names.en,
+        cid=names.cid,
+        pubchem_url=(
+            f"https://pubchem.ncbi.nlm.nih.gov/compound/{names.cid}" if names.cid else None
+        ),
+    )
+
+
+def suggestion_out(suggestion: NameSuggestion) -> SuggestionOut:
+    return SuggestionOut(
+        name=suggestion.display, matched=suggestion.matched, smiles=suggestion.smiles
     )
 
 
