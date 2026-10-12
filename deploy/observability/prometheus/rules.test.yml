@@ -1,0 +1,104 @@
+# promtool test rules deploy/observability/prometheus/rules.test.yml
+#
+# Each alert is shown firing on synthetic series, and shown staying quiet where it
+# must: typos are not "out of scope", familiar inputs are not "drift".
+
+rule_files:
+  - rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  # 40% of requests refused for an unseen element: out of scope, for long enough.
+  - interval: 1m
+    input_series:
+      - series: 'sillage_predictions_total{outcome="answered"}'
+        values: "0+6x40"
+      - series: 'sillage_predictions_total{outcome="refused"}'
+        values: "0+4x40"
+      - series: 'sillage_refusals_total{reason="unseen_element"}'
+        values: "0+4x40"
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: SillageOutOfScopeShareHigh
+        exp_alerts: []
+      - eval_time: 25m
+        alertname: SillageOutOfScopeShareHigh
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: "40% of requests fall outside the model's scope."
+
+  # The same volume of refusals, but for unreadable input: not a coverage problem.
+  - interval: 1m
+    input_series:
+      - series: 'sillage_predictions_total{outcome="answered"}'
+        values: "0+6x40"
+      - series: 'sillage_predictions_total{outcome="refused"}'
+        values: "0+4x40"
+      - series: 'sillage_refusals_total{reason="invalid_input"}'
+        values: "0+4x40"
+    alert_rule_test:
+      - eval_time: 25m
+        alertname: SillageOutOfScopeShareHigh
+        exp_alerts: []
+
+  # Every answered input sits at similarity 0.1-0.3: far below the baseline quartile.
+  - interval: 1m
+    input_series:
+      - series: 'sillage_baseline_nearest_similarity{quantile="0.25"}'
+        values: "0.53x40"
+      - series: 'sillage_nearest_similarity_bucket{le="0.1"}'
+        values: "0+0x40"
+      - series: 'sillage_nearest_similarity_bucket{le="0.2"}'
+        values: "0+5x40"
+      - series: 'sillage_nearest_similarity_bucket{le="0.3"}'
+        values: "0+10x40"
+      - series: 'sillage_nearest_similarity_bucket{le="0.5"}'
+        values: "0+10x40"
+      - series: 'sillage_nearest_similarity_bucket{le="1.0"}'
+        values: "0+10x40"
+      - series: 'sillage_nearest_similarity_bucket{le="+Inf"}'
+        values: "0+10x40"
+    alert_rule_test:
+      - eval_time: 25m
+        alertname: SillageInputDrift
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: "Median similarity to the nearest known molecule fell to 0.20."
+
+  # Inputs as familiar as the dataset's own molecules: no drift.
+  - interval: 1m
+    input_series:
+      - series: 'sillage_baseline_nearest_similarity{quantile="0.25"}'
+        values: "0.53x40"
+      - series: 'sillage_nearest_similarity_bucket{le="0.5"}'
+        values: "0+0x40"
+      - series: 'sillage_nearest_similarity_bucket{le="0.7"}'
+        values: "0+10x40"
+      - series: 'sillage_nearest_similarity_bucket{le="1.0"}'
+        values: "0+10x40"
+      - series: 'sillage_nearest_similarity_bucket{le="+Inf"}'
+        values: "0+10x40"
+    alert_rule_test:
+      - eval_time: 25m
+        alertname: SillageInputDrift
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'up{job="sillage", instance="sillage:8000"}'
+        values: "0x10"
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: SillageDown
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              job: sillage
+              instance: "sillage:8000"
+            exp_annotations:
+              summary: The service does not answer Prometheus scrapes.

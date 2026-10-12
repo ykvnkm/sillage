@@ -1,0 +1,77 @@
+# Recording rules turn raw counters into the few numbers worth watching; alerts say
+# when one of them is wrong. Every alert here is covered by rules.test.yml, which CI
+# runs with promtool: an alert nobody has seen fire is an alert nobody can trust.
+
+groups:
+  - name: sillage-recording
+    rules:
+      - record: sillage:predictions:rate5m
+        expr: sum(rate(sillage_predictions_total[5m]))
+
+      # Refused because the molecule is outside the model's declared scope -- not
+      # because the input was unreadable or the name unknown. Those say something
+      # about the users' typing; this says something about the model's coverage.
+      - record: sillage:out_of_scope:ratio5m
+        expr: |
+          sum(rate(sillage_refusals_total{reason=~"multiple_components|inorganic|charged|unseen_element|weight_out_of_range"}[5m]))
+            / sillage:predictions:rate5m
+
+      - record: sillage:nearest_similarity:p50_5m
+        expr: histogram_quantile(0.5, sum by (le) (rate(sillage_nearest_similarity_bucket[5m])))
+
+      - record: sillage:nearest_similarity:p10_5m
+        expr: histogram_quantile(0.1, sum by (le) (rate(sillage_nearest_similarity_bucket[5m])))
+
+      - record: sillage:predict_latency:p95_5m
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(sillage_http_request_duration_seconds_bucket{route="/predict"}[5m])))
+
+  - name: sillage-alerts
+    rules:
+      - alert: SillageDown
+        expr: up{job="sillage"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: The service does not answer Prometheus scrapes.
+
+      # The roadmap's question, as an alert: if a third of what people ask is
+      # outside the model's scope, the narrow element vocabulary stops being a note
+      # in the model card and becomes the main problem (journal E-010).
+      - alert: SillageOutOfScopeShareHigh
+        expr: sillage:out_of_scope:ratio5m > 0.3
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $value | humanizePercentage }} of requests fall outside the model's scope."
+
+      # Input drift: the typical answered molecule is now less like anything known
+      # than three quarters of the dataset's own molecules are.
+      - alert: SillageInputDrift
+        expr: |
+          sillage:nearest_similarity:p50_5m
+            < on() sillage_baseline_nearest_similarity{quantile="0.25"}
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Median similarity to the nearest known molecule fell to {{ $value | printf \"%.2f\" }}."
+
+      - alert: SillageSlowPredictions
+        expr: sillage:predict_latency:p95_5m > 0.5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "p95 /predict latency is {{ $value | humanizeDuration }}."
+
+      - alert: SillageServerErrors
+        expr: sum(rate(sillage_http_requests_total{status=~"5.."}[5m])) > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: The service is answering with server errors.

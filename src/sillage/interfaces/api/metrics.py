@@ -25,12 +25,24 @@ PROBABILITY_BUCKETS = (*sorted(edge for edge, _ in BANDS), 1.0)
 
 
 class ServiceMetrics:
-    def __init__(self, model_name: str) -> None:
+    def __init__(
+        self, model_name: str, similarity_baseline: dict[float, float] | None = None
+    ) -> None:
         self.registry = CollectorRegistry()
         r = self.registry
 
         model = Gauge("sillage_model_info", "The model being served", ["model"], registry=r)
         model.labels(model=model_name).set(1)
+
+        baseline = Gauge(
+            "sillage_baseline_nearest_similarity",
+            "Nearest-known-molecule similarity of ordinary inputs (dataset molecules, "
+            "each excluded from its own neighbours): the line live drift is judged against",
+            ["quantile"],
+            registry=r,
+        )
+        for quantile, value in (similarity_baseline or {}).items():
+            baseline.labels(quantile=f"{quantile:g}").set(value)
 
         self.http_requests = Counter(
             "sillage_http_requests_total",

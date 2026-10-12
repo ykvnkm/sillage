@@ -1,0 +1,59 @@
+# The service with its monitoring, on one machine.
+#
+#   docker compose -f deploy/observability/compose.yml up --build -d
+#   uv run python scripts/simulate_traffic.py          # optional: something to look at
+#
+#   http://localhost:8000   the service
+#   http://localhost:3000   Grafana, dashboard "sillage" opens by default
+#   http://localhost:9090   Prometheus: targets, alerts, raw queries
+#
+# Ports bind to 127.0.0.1 only: Grafana here runs with anonymous read access and
+# Prometheus has no authentication at all, which is fine on a laptop and nowhere else.
+
+name: sillage
+
+services:
+  sillage:
+    build:
+      context: ../..
+    ports:
+      - "127.0.0.1:8000:8000"
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v3.4.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=7d
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules.yml:/etc/prometheus/rules.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+    depends_on:
+      - sillage
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:12.0.2
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_USERS_DEFAULT_THEME: light
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/sillage.json
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana/data
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  prometheus-data:
+  grafana-data:
