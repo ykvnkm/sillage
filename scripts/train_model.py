@@ -69,27 +69,28 @@ micro AUC начинается с 0.78 просто от ранжировани�
 | macro AUC | {macro_auc:.4f} | {macro_auc_floor:.4f} | — |
 | micro AP | {micro_ap:.4f} | {micro_ap_floor:.4f} | ×{micro_ap_lift:.1f} |
 | micro AUC | {micro_auc:.4f} | {micro_auc_floor:.4f} | — |
-
+{consensus_row}
 Измерено по {labels_scored:.0f} из {labels_total:.0f} дескрипторов. Основная метрика
 проекта — **macro AP**: только у неё пол честно низкий.
 
 ## Калибровка
 
-Выход **откалиброван** по каждой метке (Platt scaling на валидационном сплите,
-[ADR-0011](../adr/0011-calibration-is-per-label-and-refuses-weak-labels.md)).
-Откалибровано {n_calibrated} меток из {n_labels}; у остальных {n_uncalibrated}
-слишком мало примеров, и по ним выдаётся не вероятность, а только порядок — продукт
-обязан показывать по ним пометку «оценка ненадёжна».
+Выход **откалиброван** по каждой метке: Platt scaling на предсказаниях для молекул,
+которых модель при обучении не видела
+([ADR-0011](../adr/0011-calibration-is-per-label-and-refuses-weak-labels.md)).
+Откалибровано {n_calibrated} меток из {n_labels}. Для остальных ({n_uncalibrated})
+слишком мало примеров: по ним выдаётся не вероятность, а только порядок, и продукт
+показывает пометку «без проверки».
 
-Проверено на тестовом сплите: в диапазоне 0.85–1.00 модель обещает 0.903 и
-оказывается права в 0.889 случаев. До калибровки обещала 0.942 при реальных 0.826.
+{calibration_check}
 
 {ceiling}## Известные ограничения
 
 1. **По {n_uncalibrated} дескрипторам вероятности нет** — только ранжирование.
-2. **Стереохимия отсутствует в данных.** Колонка источника называется
-   `nonStereoSMILES`. Зеркальные изомеры пахнут по-разному (карвон: тмин против
-   мяты), и модель их не различает в принципе.
+2. **Стереоизомеры не различаются.** Зеркальные изомеры пахнут по-разному (карвон:
+   тмин против мяты), но признаки модели их не различают. Учёт хиральности в
+   отпечатке Моргана роста не дал (журнал E-019): различить их сможет только
+   представление, которое видит граф молекулы целиком.
 3. **Разметка субъективна.** Дескрипторы — мнение экспертов, не измерение, и на
    расплывчатых словах (`fresh`, `sweet`, `warm`, `sharp`) эксперты двух баз
    согласны друг с другом слабо. Там слабее и модель.
@@ -101,9 +102,9 @@ micro AUC начинается с 0.78 просто от ранжировани�
 
 CEILING_TEMPLATE = """## Потолок: насколько согласны сами эксперты
 
-Метки обучения — объединение двух независимых экспертных баз, Goodscents и
-Leffingwell. На {molecules} молекулах, описанных обеими и не виденных моделью ни при
-обучении, ни при калибровке, по {descriptors} нотам с достаточным числом примеров
+Метки обучения взяты из двух независимых экспертных баз, Goodscents и Leffingwell.
+На {molecules} молекулах, описанных обеими и не виденных моделью ни при обучении,
+ни при калибровке, по {descriptors} нотам с достаточным числом примеров
 (каппа Коэна: 0 — случайное совпадение, 1 — полное):
 
 | Кто с кем | Каппа |
@@ -115,7 +116,7 @@ Leffingwell. На {molecules} молекулах, описанных обеим�
 Модель согласна с одной базой примерно на {share:.0%} того, насколько с ней согласна
 другая база экспертов. По отдельным нотам качество модели следует за согласием
 экспертов (ранговая корреляция {spearman:.2f}): где эксперты расходятся, модели не на
-что опереться. Подробности — журнал E-018, `results/annotator_ceiling.csv`.
+что опереться. Подробности — журнал E-018, `results/annotator_ceiling_{model}.csv`.
 """
 
 
@@ -125,14 +126,46 @@ def main() -> int:
     parser.add_argument("--feature-set", default=DEFAULT_FEATURE_SET)
     parser.add_argument("--split", default=DEFAULT_SPLIT)
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
+    parser.add_argument(
+        "--dataset",
+        choices=("openpom", "v2"),
+        default="openpom",
+        help="v2: the two expert collections rebuilt with soft, masked labels (E-019)",
+    )
+    parser.add_argument(
+        "--card-only",
+        action="store_true",
+        help="re-render docs/model-cards/<name>.md from the saved artifact, no training",
+    )
     args = parser.parse_args()
 
-    outcome = train_odor_model(
-        name=args.name,
-        feature_set=args.feature_set,
-        split_strategy=args.split,
-        seed=args.seed,
-    )
+    if args.card_only:
+        root = project_root()
+        name = (
+            args.name
+            if args.name != DEFAULT_NAME or args.dataset == "openpom"
+            else "odor-baseline-v2"
+        )
+        model = OdorModel.load(root / "models" / name)
+        card_path = root / "docs" / "model-cards" / f"{name}.md"
+        card_path.write_text(_render_card(_Saved(model)), encoding="utf-8")
+        print(f"wrote {card_path.relative_to(root)}")
+        return 0
+
+    if args.dataset == "v2":
+        from sillage.research.train_model_v2 import DEFAULT_NAME as V2_NAME
+        from sillage.research.train_model_v2 import train_odor_model_v2
+
+        name = V2_NAME if args.name == DEFAULT_NAME else args.name
+        outcome = train_odor_model_v2(name=name, feature_set=args.feature_set, seed=args.seed)
+        args.name = name
+    else:
+        outcome = train_odor_model(
+            name=args.name,
+            feature_set=args.feature_set,
+            split_strategy=args.split,
+            seed=args.seed,
+        )
     print(outcome.summary())
 
     root = project_root()
@@ -154,9 +187,16 @@ def main() -> int:
     return 0
 
 
+class _Saved:
+    """A loaded artifact in the shape _render_card expects from a training outcome."""
+
+    def __init__(self, model: OdorModel) -> None:
+        self.model = model
+
+
 def _render_ceiling(model_name: str) -> str:
     """The ceiling section, only if it was measured for this very model."""
-    path = project_root() / "results" / "annotator_ceiling_summary.json"
+    path = project_root() / "results" / f"annotator_ceiling_{model_name}.json"
     if not path.exists():
         return ""
     summary = json.loads(path.read_text("utf-8"))
@@ -164,6 +204,7 @@ def _render_ceiling(model_name: str) -> str:
         return ""
     return (
         CEILING_TEMPLATE.format(
+            model=model_name,
             molecules=summary["molecules"],
             descriptors=summary["descriptors"],
             experts=summary["experts"],
@@ -179,7 +220,28 @@ def _render_ceiling(model_name: str) -> str:
 def _render_card(outcome) -> str:
     card = outcome.model.card
     metrics, floor = card.metrics, card.baseline_metrics
+    if "calibration_likely_promised" in metrics:
+        calibration_check = (
+            "Проверено на тестовом сплите: в диапазоне 0.85–1.00 модель обещает "
+            f"{metrics['calibration_likely_promised']:.3f} и оказывается права в "
+            f"{metrics['calibration_likely_observed']:.3f} случаев "
+            f"({metrics['calibration_likely_cells']:.0f} пар «молекула–нота»)."
+        )
+    else:  # odor-baseline-v1, measured by hand in journal E-011
+        calibration_check = (
+            "Проверено на тестовом сплите: в диапазоне 0.85–1.00 модель обещает 0.903 и\n"
+            "оказывается права в 0.889 случаев. До калибровки обещала 0.942 при реальных 0.826."
+        )
+    consensus_row = ""
+    if "consensus_macro_average_precision" in metrics:
+        consensus_row = (
+            f"| macro AP, консенсус экспертов ({metrics['consensus_labels_scored']:.0f} нот) | "
+            f"**{metrics['consensus_macro_average_precision']:.4f}** | "
+            f"{floor['consensus_macro_average_precision']:.4f} | — |\n"
+        )
     return CARD_TEMPLATE.format(
+        calibration_check=calibration_check,
+        consensus_row=consensus_row,
         ceiling=_render_ceiling(card.name),
         name=card.name,
         n_labels=len(card.label_names),

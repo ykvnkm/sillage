@@ -1,0 +1,76 @@
+variant,seed,truth,macro_ap,macro_auc,descriptors
+A merge rules,0,consensus,0.5755,0.9192,26
+A merge rules,0,goodscents,0.3274,0.8425,96
+A merge rules,0,leffingwell,0.4453,0.8997,71
+B + not asked is missing,0,consensus,0.5755,0.9192,26
+B + not asked is missing,0,goodscents,0.3256,0.8432,96
+B + not asked is missing,0,leffingwell,0.4453,0.8997,71
+C + disagreement is 0.5,0,consensus,0.5895,0.9225,26
+C + disagreement is 0.5,0,goodscents,0.3254,0.8432,96
+C + disagreement is 0.5,0,leffingwell,0.4564,0.9009,71
+D + stereo-aware features,0,consensus,0.5899,0.9193,26
+D + stereo-aware features,0,goodscents,0.3263,0.8434,96
+D + stereo-aware features,0,leffingwell,0.4558,0.9007,71
+E OpenPOM merge,0,consensus,0.5762,0.9218,26
+E OpenPOM merge,0,goodscents,0.3167,0.8396,96
+E OpenPOM merge,0,leffingwell,0.4415,0.8998,71
+A merge rules,1,consensus,0.6338,0.9229,23
+A merge rules,1,goodscents,0.3237,0.8421,89
+A merge rules,1,leffingwell,0.4410,0.8933,71
+B + not asked is missing,1,consensus,0.6338,0.9229,23
+B + not asked is missing,1,goodscents,0.3238,0.8414,89
+B + not asked is missing,1,leffingwell,0.4410,0.8933,71
+C + disagreement is 0.5,1,consensus,0.6374,0.9249,23
+C + disagreement is 0.5,1,goodscents,0.3291,0.8416,89
+C + disagreement is 0.5,1,leffingwell,0.4510,0.8936,71
+D + stereo-aware features,1,consensus,0.6362,0.9238,23
+D + stereo-aware features,1,goodscents,0.3274,0.8407,89
+D + stereo-aware features,1,leffingwell,0.4486,0.8937,71
+E OpenPOM merge,1,consensus,0.6332,0.9210,23
+E OpenPOM merge,1,goodscents,0.3226,0.8407,89
+E OpenPOM merge,1,leffingwell,0.4365,0.8932,71
+A merge rules,2,consensus,0.5885,0.9216,24
+A merge rules,2,goodscents,0.3374,0.8530,90
+A merge rules,2,leffingwell,0.4287,0.8937,66
+B + not asked is missing,2,consensus,0.5885,0.9216,24
+B + not asked is missing,2,goodscents,0.3386,0.8533,90
+B + not asked is missing,2,leffingwell,0.4287,0.8937,66
+C + disagreement is 0.5,2,consensus,0.5918,0.9257,24
+C + disagreement is 0.5,2,goodscents,0.3327,0.8538,90
+C + disagreement is 0.5,2,leffingwell,0.4325,0.8953,66
+D + stereo-aware features,2,consensus,0.5971,0.9257,24
+D + stereo-aware features,2,goodscents,0.3277,0.8534,90
+D + stereo-aware features,2,leffingwell,0.4307,0.8938,66
+E OpenPOM merge,2,consensus,0.5849,0.9238,24
+E OpenPOM merge,2,goodscents,0.3402,0.8519,90
+E OpenPOM merge,2,leffingwell,0.4300,0.8935,66
+A merge rules,3,consensus,0.5897,0.9111,25
+A merge rules,3,goodscents,0.3265,0.8258,89
+A merge rules,3,leffingwell,0.4413,0.8858,66
+B + not asked is missing,3,consensus,0.5897,0.9111,25
+B + not asked is missing,3,goodscents,0.3293,0.8254,89
+B + not asked is missing,3,leffingwell,0.4413,0.8858,66
+C + disagreement is 0.5,3,consensus,0.6051,0.9116,25
+C + disagreement is 0.5,3,goodscents,0.3317,0.8263,89
+C + disagreement is 0.5,3,leffingwell,0.4571,0.8874,66
+D + stereo-aware features,3,consensus,0.6038,0.9095,25
+D + stereo-aware features,3,goodscents,0.3294,0.8247,89
+D + stereo-aware features,3,leffingwell,0.4608,0.8882,66
+E OpenPOM merge,3,consensus,0.5895,0.9081,25
+E OpenPOM merge,3,goodscents,0.3274,0.8253,89
+E OpenPOM merge,3,leffingwell,0.4375,0.8854,66
+A merge rules,4,consensus,0.6500,0.9272,25
+A merge rules,4,goodscents,0.3418,0.8607,89
+A merge rules,4,leffingwell,0.4653,0.9085,64
+B + not asked is missing,4,consensus,0.6500,0.9272,25
+B + not asked is missing,4,goodscents,0.3413,0.8599,89
+B + not asked is missing,4,leffingwell,0.4653,0.9085,64
+C + disagreement is 0.5,4,consensus,0.6595,0.9296,25
+C + disagreement is 0.5,4,goodscents,0.3430,0.8604,89
+C + disagreement is 0.5,4,leffingwell,0.4772,0.9084,64
+D + stereo-aware features,4,consensus,0.6606,0.9287,25
+D + stereo-aware features,4,goodscents,0.3433,0.8595,89
+D + stereo-aware features,4,leffingwell,0.4719,0.9072,64
+E OpenPOM merge,4,consensus,0.6471,0.9257,25
+E OpenPOM merge,4,goodscents,0.3377,0.8589,89
+E OpenPOM merge,4,leffingwell,0.4688,0.9093,64

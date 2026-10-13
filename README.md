@@ -15,7 +15,7 @@
 ### Запустить у себя
 
 Нужен только Docker. Образ сам скачает опубликованную модель с
-[HF Hub](https://huggingface.co/ykvnkm/sillage-odor-baseline-v1) и сверит её по
+[HF Hub](https://huggingface.co/ykvnkm/sillage-odor-baseline-v2) и сверит её по
 контрольным суммам:
 
 ```bash
@@ -70,7 +70,7 @@ _Трафик синтетический: сначала известные мо
 Ответ — дескрипторы со словом уверенности («очень вероятно» сбывается в 89% случаев),
 отдельный список неоткалиброванных меток без чисел, метки экспертов, если молекула
 известна, и пять ближайших известных молекул. Вне области определения — отказ с
-кодом причины. Model card: [`docs/model-cards/odor-baseline-v1.md`](docs/model-cards/odor-baseline-v1.md),
+кодом причины. Model card: [`docs/model-cards/odor-baseline-v2.md`](docs/model-cards/odor-baseline-v2.md),
 дизайн интерфейса: [`DESIGN.md`](DESIGN.md).
 
 ## Архитектура

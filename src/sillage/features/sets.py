@@ -29,9 +29,13 @@ def _fingerprints(radius: int, counts: bool) -> FeatureSetBuilder:
     return build
 
 
-def _fingerprints_with_descriptors(radius: int, counts: bool) -> FeatureSetBuilder:
+def _fingerprints_with_descriptors(
+    radius: int, counts: bool, chirality: bool = False
+) -> FeatureSetBuilder:
     def build(molecules: Sequence[Mol]) -> FeatureMatrix:
-        fingerprints = morgan_fingerprints(molecules, radius=radius, counts=counts)
+        fingerprints = morgan_fingerprints(
+            molecules, radius=radius, counts=counts, chirality=chirality
+        )
         return fingerprints.hstack(rdkit_descriptors(molecules))
 
     return build
@@ -50,6 +54,8 @@ FEATURE_SETS: dict[str, FeatureSetBuilder] = {
     "morgan-cnt-r2+desc": _fingerprints_with_descriptors(2, counts=True),
     "morgan-bin-r3+desc": _fingerprints_with_descriptors(3, counts=False),
     "morgan-cnt-r3+desc": _fingerprints_with_descriptors(3, counts=True),
+    # Stereo-aware: needs isomeric input, which only dataset v2 has (E-019).
+    "morgan-bin-r3-chiral+desc": _fingerprints_with_descriptors(3, counts=False, chirality=True),
 }
 
 

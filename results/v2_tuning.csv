@@ -1,0 +1,106 @@
+variant,seed,truth,chosen_c,macro_ap,macro_auc,descriptors
+LR C=0.03,0,consensus,,0.5813,0.9185,26
+LR C=0.03,0,leffingwell,,0.4430,0.9005,71
+LR C=0.03,0,goodscents,,0.3157,0.8453,96
+LR C=0.1,0,consensus,,0.5895,0.9225,26
+LR C=0.1,0,leffingwell,,0.4564,0.9009,71
+LR C=0.1,0,goodscents,,0.3254,0.8432,96
+LR C=0.3,0,consensus,,0.5756,0.9210,26
+LR C=0.3,0,leffingwell,,0.4563,0.8957,71
+LR C=0.3,0,goodscents,,0.3247,0.8363,96
+LR C=1.0,0,consensus,,0.5446,0.9103,26
+LR C=1.0,0,leffingwell,,0.4333,0.8841,71
+LR C=1.0,0,goodscents,,0.3063,0.8250,96
+LR best-val,0,consensus,0.1000,0.5895,0.9225,26
+LR best-val,0,leffingwell,0.1000,0.4564,0.9009,71
+LR best-val,0,goodscents,0.1000,0.3254,0.8432,96
+GB desc,0,consensus,,0.5278,0.9050,26
+GB desc,0,leffingwell,,0.4257,0.8793,71
+GB desc,0,goodscents,,0.3081,0.8308,96
+LR best-val + GB,0,consensus,0.1000,0.5866,0.9225,26
+LR best-val + GB,0,leffingwell,0.1000,0.4768,0.9036,71
+LR best-val + GB,0,goodscents,0.1000,0.3328,0.8448,96
+LR C=0.03,1,consensus,,0.6324,0.9225,23
+LR C=0.03,1,leffingwell,,0.4399,0.8932,71
+LR C=0.03,1,goodscents,,0.3147,0.8401,89
+LR C=0.1,1,consensus,,0.6374,0.9249,23
+LR C=0.1,1,leffingwell,,0.4510,0.8936,71
+LR C=0.1,1,goodscents,,0.3291,0.8416,89
+LR C=0.3,1,consensus,,0.6205,0.9178,23
+LR C=0.3,1,leffingwell,,0.4410,0.8905,71
+LR C=0.3,1,goodscents,,0.3179,0.8366,89
+LR C=1.0,1,consensus,,0.6013,0.9027,23
+LR C=1.0,1,leffingwell,,0.4154,0.8818,71
+LR C=1.0,1,goodscents,,0.2956,0.8295,89
+LR best-val,1,consensus,0.3000,0.6205,0.9178,23
+LR best-val,1,leffingwell,0.3000,0.4410,0.8905,71
+LR best-val,1,goodscents,0.3000,0.3179,0.8366,89
+GB desc,1,consensus,,0.6419,0.9152,23
+GB desc,1,leffingwell,,0.4395,0.8799,71
+GB desc,1,goodscents,,0.3135,0.8246,89
+LR best-val + GB,1,consensus,0.3000,0.6670,0.9240,23
+LR best-val + GB,1,leffingwell,0.3000,0.4699,0.8968,71
+LR best-val + GB,1,goodscents,0.3000,0.3326,0.8399,89
+LR C=0.03,2,consensus,,0.5900,0.9252,24
+LR C=0.03,2,leffingwell,,0.4260,0.8941,66
+LR C=0.03,2,goodscents,,0.3221,0.8529,90
+LR C=0.1,2,consensus,,0.5918,0.9257,24
+LR C=0.1,2,leffingwell,,0.4325,0.8953,66
+LR C=0.1,2,goodscents,,0.3327,0.8538,90
+LR C=0.3,2,consensus,,0.5823,0.9235,24
+LR C=0.3,2,leffingwell,,0.4269,0.8914,66
+LR C=0.3,2,goodscents,,0.3307,0.8501,90
+LR C=1.0,2,consensus,,0.5537,0.9162,24
+LR C=1.0,2,leffingwell,,0.4126,0.8823,66
+LR C=1.0,2,goodscents,,0.3223,0.8427,90
+LR best-val,2,consensus,0.1000,0.5918,0.9257,24
+LR best-val,2,leffingwell,0.1000,0.4325,0.8953,66
+LR best-val,2,goodscents,0.1000,0.3327,0.8538,90
+GB desc,2,consensus,,0.5573,0.9097,24
+GB desc,2,leffingwell,,0.4045,0.8763,66
+GB desc,2,goodscents,,0.3164,0.8223,90
+LR best-val + GB,2,consensus,0.1000,0.6169,0.9296,24
+LR best-val + GB,2,leffingwell,0.1000,0.4496,0.8987,66
+LR best-val + GB,2,goodscents,0.1000,0.3439,0.8561,90
+LR C=0.03,3,consensus,,0.5797,0.9097,25
+LR C=0.03,3,leffingwell,,0.4439,0.8869,66
+LR C=0.03,3,goodscents,,0.3208,0.8263,89
+LR C=0.1,3,consensus,,0.6051,0.9116,25
+LR C=0.1,3,leffingwell,,0.4571,0.8874,66
+LR C=0.1,3,goodscents,,0.3317,0.8263,89
+LR C=0.3,3,consensus,,0.5978,0.9106,25
+LR C=0.3,3,leffingwell,,0.4519,0.8830,66
+LR C=0.3,3,goodscents,,0.3222,0.8213,89
+LR C=1.0,3,consensus,,0.5717,0.9024,25
+LR C=1.0,3,leffingwell,,0.4343,0.8746,66
+LR C=1.0,3,goodscents,,0.3099,0.8120,89
+LR best-val,3,consensus,0.1000,0.6051,0.9116,25
+LR best-val,3,leffingwell,0.1000,0.4571,0.8874,66
+LR best-val,3,goodscents,0.1000,0.3317,0.8263,89
+GB desc,3,consensus,,0.5776,0.9102,25
+GB desc,3,leffingwell,,0.4332,0.8705,66
+GB desc,3,goodscents,,0.3079,0.8106,89
+LR best-val + GB,3,consensus,0.1000,0.6094,0.9195,25
+LR best-val + GB,3,leffingwell,0.1000,0.4699,0.8913,66
+LR best-val + GB,3,goodscents,0.1000,0.3439,0.8290,89
+LR C=0.03,4,consensus,,0.6626,0.9297,25
+LR C=0.03,4,leffingwell,,0.4747,0.9075,64
+LR C=0.03,4,goodscents,,0.3418,0.8589,89
+LR C=0.1,4,consensus,,0.6595,0.9296,25
+LR C=0.1,4,leffingwell,,0.4772,0.9084,64
+LR C=0.1,4,goodscents,,0.3430,0.8604,89
+LR C=0.3,4,consensus,,0.6479,0.9241,25
+LR C=0.3,4,leffingwell,,0.4678,0.9042,64
+LR C=0.3,4,goodscents,,0.3363,0.8554,89
+LR C=1.0,4,consensus,,0.6028,0.9118,25
+LR C=1.0,4,leffingwell,,0.4555,0.8954,64
+LR C=1.0,4,goodscents,,0.3263,0.8473,89
+LR best-val,4,consensus,0.1000,0.6595,0.9296,25
+LR best-val,4,leffingwell,0.1000,0.4772,0.9084,64
+LR best-val,4,goodscents,0.1000,0.3430,0.8604,89
+GB desc,4,consensus,,0.6162,0.9176,25
+GB desc,4,leffingwell,,0.4394,0.8955,64
+GB desc,4,goodscents,,0.3151,0.8280,89
+LR best-val + GB,4,consensus,0.1000,0.6613,0.9345,25
+LR best-val + GB,4,leffingwell,0.1000,0.4718,0.9115,64
+LR best-val + GB,4,goodscents,0.1000,0.3474,0.8624,89

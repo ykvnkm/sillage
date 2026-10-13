@@ -32,6 +32,7 @@ def morgan_fingerprints(
     radius: int = DEFAULT_RADIUS,
     n_bits: int = DEFAULT_N_BITS,
     counts: bool = False,
+    chirality: bool = False,
 ) -> FeatureMatrix:
     """Encode molecules as Morgan fingerprints.
 
@@ -41,12 +42,17 @@ def morgan_fingerprints(
         n_bits: width of the vector. Larger means fewer hash collisions.
         counts: store how many times a fragment occurs instead of merely whether
             it occurs. Occasionally helps, and costs nothing to try.
+        chirality: let a fragment's bit depend on the configuration of its
+            stereocentres, so (R)- and (S)-carvone stop being the same vector. Only
+            meaningful when the input SMILES carry stereo (dataset v2, E-019).
 
     Returns:
         A matrix of shape ``(len(molecules), n_bits)``. Columns are named by bit
         index: a Morgan bit has no human-readable meaning, only an identity.
     """
-    generator = rdFingerprintGenerator.GetMorganGenerator(radius=radius, fpSize=n_bits)
+    generator = rdFingerprintGenerator.GetMorganGenerator(
+        radius=radius, fpSize=n_bits, includeChirality=chirality
+    )
     encode = generator.GetCountFingerprintAsNumPy if counts else generator.GetFingerprintAsNumPy
 
     if not molecules:
