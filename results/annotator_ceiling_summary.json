@@ -1,0 +1,9 @@
+{
+  "model": "odor-baseline-v1",
+  "descriptors": 40,
+  "molecules": 233,
+  "experts": 0.481,
+  "model_vs_leffingwell": 0.388,
+  "model_vs_goodscents": 0.333,
+  "spearman_experts_vs_model_ap": 0.45
+}
