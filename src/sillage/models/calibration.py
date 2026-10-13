@@ -115,12 +115,23 @@ class PerLabelCalibrator:
         fitted = np.zeros(n_labels, dtype=bool)
 
         for index in range(n_labels):
-            column = truth[:, index]
-            positives = int(column.sum())
-            if positives < MIN_POSITIVES or positives == column.size:
+            # NaN is "nobody was asked about this label for this molecule" (dataset v2,
+            # E-019): no evidence either way, so the row is left out, never read as 0.
+            column = truth[:, index].astype(np.float64)
+            known = ~np.isnan(column)
+            column, x = column[known], logits[known, index]
+            positives = int(np.floor(column.sum()))
+            if positives < MIN_POSITIVES or column.min() == 1.0:
                 continue  # left uncalibrated; transform passes the raw score through
 
-            model = LogisticRegression(C=c).fit(logits[:, index].reshape(-1, 1), column)
+            # A soft target t (experts split) is a positive row of weight t plus a
+            # negative of weight 1 - t: the calibrated output then estimates the share
+            # of experts who would use the word.
+            hard = (column == 0) | (column == 1)
+            x_all = np.concatenate([x[hard], x[~hard], x[~hard]]).reshape(-1, 1)
+            y_all = np.concatenate([column[hard], np.ones((~hard).sum()), np.zeros((~hard).sum())])
+            w_all = np.concatenate([np.ones(hard.sum()), column[~hard], 1 - column[~hard]])
+            model = LogisticRegression(C=c).fit(x_all, y_all.astype(int), sample_weight=w_all)
             slope = float(model.coef_[0, 0])
             # A negative slope means validation says this label's scores are inverted.
             # With a handful of positives that is noise, not signal, and accepting it

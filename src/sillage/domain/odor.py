@@ -18,16 +18,17 @@ class Confidence(StrEnum):
 
     The product shows these words rather than numbers, and the band edges come from
     measurement rather than taste. Observed frequency on the unseen test split, over
-    calibrated labels only (journal E-011):
+    calibrated labels only (odor-baseline-v1: journal E-011; odor-baseline-v2: E-019,
+    where the truth is the share of experts who used the word):
 
-    ====================  =========  ==========
-    Band                  Promised   Observed
-    ====================  =========  ==========
-    ``LIKELY``   >= 0.85      0.903       0.889
-    ``PROBABLE`` 0.55-0.85    0.640       0.667
-    ``POSSIBLE`` 0.35-0.55    0.443       0.446
-    ``UNLIKELY`` 0.15-0.35    0.233       0.217
-    ====================  =========  ==========
+    ====================  =================  =================
+    Band                  v1 promised/seen   v2 promised/seen
+    ====================  =================  =================
+    ``LIKELY``   >= 0.85      0.903 / 0.889      0.897 / 0.884
+    ``PROBABLE`` 0.55-0.85    0.640 / 0.667      0.679 / 0.696
+    ``POSSIBLE`` 0.35-0.55    0.443 / 0.446      0.435 / 0.449
+    ``UNLIKELY`` 0.15-0.35    0.233 / 0.217      0.230 / 0.225
+    ====================  =================  =================
 
     There is no band above ``LIKELY``. Separating 0.90 from 0.97 would need far more
     than the 99 pairs available up there, so claiming the difference would be

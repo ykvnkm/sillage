@@ -71,7 +71,7 @@
           <li><button type="button" class="chip" data-query="гедион">Гедион</button></li>
           <li><button type="button" class="chip" data-query="линалоол">Линалоол</button></li>
           <li><button type="button" class="chip" data-query="CC1=CC[C@@H](CC1=O)C(C)=C">(R)-карвон</button></li>
-          <li><button type="button" class="chip" data-query="CC(C)(C=O)Cc1ccccc1">Модель её не видела</button></li>
+          <li><button type="button" class="chip" data-query="мускон">Мускон: модель его не видела</button></li>
           <li><button type="button" class="chip chip--quiet" data-query="BrCCCCCC=O">Вне области модели</button></li>
         </ul>
       </div>
@@ -95,8 +95,8 @@
               <tr><th scope="col">Слово</th><th scope="col">Диапазон</th><th scope="col">Обещано</th><th scope="col">Сбылось</th></tr>
             </thead>
             <tbody>
-              <tr><th scope="row"><span class="grade grade--likely">Очень вероятно</span></th><td>85–100%</td><td>90%</td><td>89%</td></tr>
-              <tr><th scope="row"><span class="grade grade--probable">Вероятно</span></th><td>55–85%</td><td>64%</td><td>67%</td></tr>
+              <tr><th scope="row"><span class="grade grade--likely">Очень вероятно</span></th><td>85–100%</td><td>90%</td><td>88%</td></tr>
+              <tr><th scope="row"><span class="grade grade--probable">Вероятно</span></th><td>55–85%</td><td>68%</td><td>70%</td></tr>
               <tr><th scope="row"><span class="grade grade--possible">Возможно</span></th><td>35–55%</td><td>44%</td><td>45%</td></tr>
             </tbody>
           </table>
@@ -115,18 +115,18 @@
           </p>
           <h3>Без проверки</h3>
           <p>
-            <span id="unverified-count">31</span> нот встречаются в данных слишком
-            редко, чтобы измерить на них модель. Они появляются, только когда модель
-            склоняется к ним, и никогда не показываются с числом.
+            Нот, которые встречаются в данных слишком редко, чтобы измерить на них
+            модель: <span id="unverified-count">1</span>. Такие ноты появляются, только
+            когда модель склоняется к ним, и никогда не показываются с числом.
           </p>
         </div>
 
         <div class="how__block">
           <h3>На чём обучена</h3>
           <dl class="facts" id="model-facts">
-            <div><dt>Модель</dt><dd data-fact="name">odor-baseline-v1</dd></div>
-            <div><dt>Обучена на</dt><dd data-fact="trained_on">3 824 молекулах</dd></div>
-            <div><dt>Качество</dt><dd data-fact="quality">macro AP 0,355 против 0,037 у угадывания по частотам</dd></div>
+            <div><dt>Модель</dt><dd data-fact="name">odor-baseline-v2</dd></div>
+            <div><dt>Обучена на</dt><dd data-fact="trained_on">5 021 молекуле</dd></div>
+            <div><dt>Качество</dt><dd data-fact="quality">macro AP 0,368 против 0,038 у угадывания по частотам</dd></div>
             <div><dt>Отвечает для</dt><dd>однокомпонентных нейтральных органических молекул массой 30–400&nbsp;г/моль из атомов C,&nbsp;N,&nbsp;O,&nbsp;S</dd></div>
           </dl>
           <p class="how__limits">

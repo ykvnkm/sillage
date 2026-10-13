@@ -251,3 +251,22 @@ def test_a_threshold_nobody_reaches_returns_no_number() -> None:
     assert pairs == 0
     assert np.isnan(promised)
     assert np.isnan(observed)
+
+
+def test_unknown_labels_are_not_read_as_negatives() -> None:
+    """NaN means nobody was asked (dataset v2). Treating it as 0 would drag the
+    calibrated probability down for every molecule the label was never asked about."""
+    rng = np.random.default_rng(3)
+    scores = rng.uniform(0.05, 0.95, size=(400, 1))
+    labels = (rng.uniform(size=(400, 1)) < scores).astype(float)
+    with_unknown = labels.copy()
+    with_unknown[200:] = np.nan  # half the rows: never asked
+
+    as_negative = np.where(np.isnan(with_unknown), 0.0, with_unknown)
+    base = np.array([0.5])
+    skipped = PerLabelCalibrator.fit(scores, with_unknown, base_rates=base).transform(scores)
+    zeroed = PerLabelCalibrator.fit(scores, as_negative, base_rates=base).transform(scores)
+    truth = PerLabelCalibrator.fit(scores[:200], labels[:200], base_rates=base).transform(scores)
+
+    np.testing.assert_allclose(skipped, truth)
+    assert zeroed.mean() < skipped.mean() - 0.1

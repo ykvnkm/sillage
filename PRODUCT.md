@@ -54,7 +54,8 @@ outside the declared chemistry are refused with a reason instead of answered.
 ## Evidence on Hand
 
 - Real model output via `POST /predict`; model card at
-  `docs/model-cards/odor-baseline-v1.md` (macro AP 0.355 vs floor 0.037).
+  `docs/model-cards/odor-baseline-v2.md` (macro AP 0.368 vs floor 0.038; 137 of 138
+  descriptors calibrated).
 - 4777 dataset molecules with expert labels (reference library).
 - No testimonials, users, or usage numbers exist. Do not fabricate them.
 

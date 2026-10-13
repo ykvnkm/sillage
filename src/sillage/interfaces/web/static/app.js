@@ -414,6 +414,11 @@ function renderProblem(message) {
 
 // ---- model facts -------------------------------------------------------------
 
+// "на 1 молекуле", "на 21 молекуле", but "на 5 021 молекуле" and "на 3 824 молекулах".
+function onMolecules(n) {
+  return n % 10 === 1 && n % 100 !== 11 ? "молекуле" : "молекулах";
+}
+
 async function loadModelFacts() {
   try {
     const response = await fetch("/model");
@@ -423,7 +428,7 @@ async function loadModelFacts() {
     const floor = model.floor.macro_average_precision;
     const facts = {
       name: model.name,
-      trained_on: `${model.trained_on.toLocaleString("ru-RU")} молекулах`,
+      trained_on: `${model.trained_on.toLocaleString("ru-RU")} ${onMolecules(model.trained_on)}`,
       quality: `macro AP ${decimal(ap, 3)} против ${decimal(floor, 3)} у угадывания по частотам: в ${decimal(ap / floor, 1)} раза лучше`,
     };
     for (const [key, value] of Object.entries(facts)) {

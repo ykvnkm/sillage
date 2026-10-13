@@ -1,7 +1,8 @@
 """Measure the annotator-agreement ceiling and where the model sits under it.
 
     uv run sillage-data fetch                      # Pyrfume collections, pinned
-    uv run python scripts/run_ceiling.py           # writes results/annotator_ceiling.csv
+    uv run python scripts/run_ceiling.py           # results/annotator_ceiling_<model>.{csv,json}
+    SILLAGE_MODEL_DIR=models/odor-baseline-v1 uv run python scripts/run_ceiling.py
 
 See sillage.research.ceiling for the method and journal E-018 for the reading.
 """
@@ -59,7 +60,7 @@ def main() -> int:
             "positives_lf_all": lf_all.sum(axis=0),
         }
     )
-    out = project_root() / "results" / "annotator_ceiling.csv"
+    out = project_root() / "results" / f"annotator_ceiling_{model.card.name}.csv"
     table.to_csv(out, index=False, float_format="%.4f")
 
     usable = (table.positives_gs_unseen >= MIN_POSITIVES) & (
@@ -118,7 +119,7 @@ def main() -> int:
         "model_vs_goodscents": round(float(u.model_vs_goodscents.mean()), 3),
         "spearman_experts_vs_model_ap": round(float(rho_ap), 2),
     }
-    summary_path = project_root() / "results" / "annotator_ceiling_summary.json"
+    summary_path = project_root() / "results" / f"annotator_ceiling_{model.card.name}.json"
     summary_path.write_text(json.dumps(summary, indent=2) + "\n", "utf-8")
     print(f"\nwrote {out.relative_to(project_root())}, {summary_path.relative_to(project_root())}")
     return 0
