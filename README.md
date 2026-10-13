@@ -101,6 +101,12 @@ L0  Молекулы       GNN structure→odor, multilabel, 135 дескрип�
 | Source | Licence | Redistribution | Description |
 | --- | --- | --- | --- |
 | [openpom-curated-gs-lf](https://github.com/BioMachineLearning/openpom) | MIT | allowed | Curated Goodscents/Leffingwell merge: 4983 molecules, multilabel odours. |
+| [pyrfume-goodscents-behavior](https://github.com/pyrfume/pyrfume-data/tree/8054ea98ed675005ec10e67359902f500e4911b0/goodscents) | no licence file; source terms apply | derived-only | Goodscents: free-text odour descriptors. |
+| [pyrfume-goodscents-molecules](https://github.com/pyrfume/pyrfume-data/tree/8054ea98ed675005ec10e67359902f500e4911b0/goodscents) | no licence file; source terms apply | derived-only | Goodscents: isomeric structures by PubChem id. |
+| [pyrfume-goodscents-stimuli](https://github.com/pyrfume/pyrfume-data/tree/8054ea98ed675005ec10e67359902f500e4911b0/goodscents) | no licence file; source terms apply | derived-only | Goodscents: record to PubChem id. |
+| [pyrfume-leffingwell-behavior](https://github.com/pyrfume/pyrfume-data/tree/8054ea98ed675005ec10e67359902f500e4911b0/leffingwell) | no licence file; source terms apply | derived-only | Leffingwell: 113 binary odour labels. |
+| [pyrfume-leffingwell-molecules](https://github.com/pyrfume/pyrfume-data/tree/8054ea98ed675005ec10e67359902f500e4911b0/leffingwell) | no licence file; source terms apply | derived-only | Leffingwell: structures by stimulus id. |
+| [pyrfume-leffingwell-stimuli](https://github.com/pyrfume/pyrfume-data/tree/8054ea98ed675005ec10e67359902f500e4911b0/leffingwell) | no licence file; source terms apply | derived-only | Leffingwell: stimulus to PubChem id. |
 <!-- END PROVENANCE -->
 
 Названия молекул для поиска (`names.json` рядом с весами) собирает

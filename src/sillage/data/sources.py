@@ -75,7 +75,74 @@ OPENPOM_CURATED = DataSource(
 )
 
 
-REGISTRY: dict[str, DataSource] = {source.name: source for source in (OPENPOM_CURATED,)}
+# The two expert collections OpenPOM merged, before the merge: same molecules, labels
+# kept apart. Used to measure how far the experts agree with each other -- the
+# ceiling any model of their labels can reach (journal E-018) -- and later to recover
+# the stereochemistry the merge dropped (E-015).
+#
+# Pyrfume ships no licence file for either. Goodscents is a scrape of a commercial
+# website, Leffingwell's terms sit in a PDF under "use restrictions". Treated the way
+# CONCEPT treats scraped data: download and measure locally, publish only derived
+# aggregates, never the records.
+_PYRFUME_COMMIT = "8054ea98ed675005ec10e67359902f500e4911b0"
+_PYRFUME_BASE = f"https://raw.githubusercontent.com/pyrfume/pyrfume-data/{_PYRFUME_COMMIT}"
+
+
+def _pyrfume(collection: str, table: str, sha256: str, description: str) -> DataSource:
+    return DataSource(
+        name=f"pyrfume-{collection}-{table}",
+        url=f"{_PYRFUME_BASE}/{collection}/{table}.csv",
+        filename=f"pyrfume_{collection}_{table}.csv",
+        sha256=sha256,
+        licence="no licence file; source terms apply",
+        homepage=f"https://github.com/pyrfume/pyrfume-data/tree/{_PYRFUME_COMMIT}/{collection}",
+        redistribution=Redistribution.DERIVED_ONLY,
+        description=description,
+    )
+
+
+PYRFUME_SOURCES = (
+    _pyrfume(
+        "leffingwell",
+        "molecules",
+        "a06841a275c35b9db9253a24ac913ad97bf39f2c778e4f8a5c4df641e7dc0fa6",
+        "Leffingwell: structures by stimulus id.",
+    ),
+    _pyrfume(
+        "leffingwell",
+        "behavior",
+        "afe0846b159ac00691ba4c07074829f7ff262b80fa32a3280661457153e70c41",
+        "Leffingwell: 113 binary odour labels.",
+    ),
+    _pyrfume(
+        "leffingwell",
+        "stimuli",
+        "ff4be9ba6a66523bc5a165ded09eee125ccb79d4988090d682b323d9331a44c8",
+        "Leffingwell: stimulus to PubChem id.",
+    ),
+    _pyrfume(
+        "goodscents",
+        "molecules",
+        "0d9bd38c54a40a051ae7b771d51f11ac1fcf021e0369fc53583e5f634e6e8bb4",
+        "Goodscents: isomeric structures by PubChem id.",
+    ),
+    _pyrfume(
+        "goodscents",
+        "behavior",
+        "18968aa66cab974ee2f942ad0abd0875ccf2bcc9501c1cb306a54bd639a22219",
+        "Goodscents: free-text odour descriptors.",
+    ),
+    _pyrfume(
+        "goodscents",
+        "stimuli",
+        "356cdd74a859ab1e8e061952dbb21587afc8981bb460cc670481d688afac923f",
+        "Goodscents: record to PubChem id.",
+    ),
+)
+
+REGISTRY: dict[str, DataSource] = {
+    source.name: source for source in (OPENPOM_CURATED, *PYRFUME_SOURCES)
+}
 
 
 def get(name: str) -> DataSource:

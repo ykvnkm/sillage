@@ -10,6 +10,7 @@ even by someone who never downloads it.
 from __future__ import annotations
 
 import argparse
+import json
 
 from sillage.models.artifact import OdorModel
 from sillage.paths import project_root
@@ -83,18 +84,38 @@ micro AUC начинается с 0.78 просто от ранжировани�
 Проверено на тестовом сплите: в диапазоне 0.85–1.00 модель обещает 0.903 и
 оказывается права в 0.889 случаев. До калибровки обещала 0.942 при реальных 0.826.
 
-## Известные ограничения
+{ceiling}## Известные ограничения
 
 1. **По {n_uncalibrated} дескрипторам вероятности нет** — только ранжирование.
 2. **Стереохимия отсутствует в данных.** Колонка источника называется
    `nonStereoSMILES`. Зеркальные изомеры пахнут по-разному (карвон: тмин против
    мяты), и модель их не различает в принципе.
-3. **Разметка субъективна.** Дескрипторы — мнение экспертов, не измерение. Потолок
-   согласия между независимыми источниками пока не измерен, поэтому неизвестно,
-   какую долю достижимого модель берёт.
-4. **Качество сильно зависит от дескриптора.** Узкие химические семейства
-   (`clove`, `popcorn`) предсказываются в 100+ раз лучше случайного; зонтичные
-   термины (`fresh`, `sweet`, `green`) — едва в 2 раза.
+3. **Разметка субъективна.** Дескрипторы — мнение экспертов, не измерение, и на
+   расплывчатых словах (`fresh`, `sweet`, `warm`, `sharp`) эксперты двух баз
+   согласны друг с другом слабо. Там слабее и модель.
+4. **«Во сколько раз лучше случайного» обманчиво для частых нот.** Этот множитель
+   ограничен сверху единицей, делённой на частоту ноты: у `fruity` (40% молекул)
+   потолок — 2.5, и модель с её 2.0 берёт 80% возможного, при AP 0.79. Сравнивать
+   ноты по нему нельзя; по AP и по согласию экспертов — можно.
+"""
+
+CEILING_TEMPLATE = """## Потолок: насколько согласны сами эксперты
+
+Метки обучения — объединение двух независимых экспертных баз, Goodscents и
+Leffingwell. На {molecules} молекулах, описанных обеими и не виденных моделью ни при
+обучении, ни при калибровке, по {descriptors} нотам с достаточным числом примеров
+(каппа Коэна: 0 — случайное совпадение, 1 — полное):
+
+| Кто с кем | Каппа |
+| --- | --- |
+| эксперты Goodscents ↔ эксперты Leffingwell | **{experts:.2f}** |
+| модель ↔ Leffingwell | {model_vs_leffingwell:.2f} |
+| модель ↔ Goodscents | {model_vs_goodscents:.2f} |
+
+Модель согласна с одной базой примерно на {share:.0%} того, насколько с ней согласна
+другая база экспертов. По отдельным нотам качество модели следует за согласием
+экспертов (ранговая корреляция {spearman:.2f}): где эксперты расходятся, модели не на
+что опереться. Подробности — журнал E-018, `results/annotator_ceiling.csv`.
 """
 
 
@@ -133,10 +154,33 @@ def main() -> int:
     return 0
 
 
+def _render_ceiling(model_name: str) -> str:
+    """The ceiling section, only if it was measured for this very model."""
+    path = project_root() / "results" / "annotator_ceiling_summary.json"
+    if not path.exists():
+        return ""
+    summary = json.loads(path.read_text("utf-8"))
+    if summary.get("model") != model_name:
+        return ""
+    return (
+        CEILING_TEMPLATE.format(
+            molecules=summary["molecules"],
+            descriptors=summary["descriptors"],
+            experts=summary["experts"],
+            model_vs_leffingwell=summary["model_vs_leffingwell"],
+            model_vs_goodscents=summary["model_vs_goodscents"],
+            share=summary["model_vs_leffingwell"] / summary["experts"],
+            spearman=summary["spearman_experts_vs_model_ap"],
+        )
+        + "\n"
+    )
+
+
 def _render_card(outcome) -> str:
     card = outcome.model.card
     metrics, floor = card.metrics, card.baseline_metrics
     return CARD_TEMPLATE.format(
+        ceiling=_render_ceiling(card.name),
         name=card.name,
         n_labels=len(card.label_names),
         n_calibrated=outcome.model.calibrator.n_fitted if outcome.model.calibrator else 0,
