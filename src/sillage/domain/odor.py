@@ -18,17 +18,22 @@ class Confidence(StrEnum):
 
     The product shows these words rather than numbers, and the band edges come from
     measurement rather than taste. Observed frequency on the unseen test split, over
-    calibrated labels only (odor-baseline-v1: journal E-011; odor-baseline-v2: E-019,
-    where the truth is the share of experts who used the word):
+    calibrated labels only (odor-baseline-v1: journal E-011; odor-baseline-v2: E-019;
+    odor-ensemble-v3: E-020; from v2 on the truth is the share of experts who used
+    the word):
 
-    ====================  =================  =================
-    Band                  v1 promised/seen   v2 promised/seen
-    ====================  =================  =================
-    ``LIKELY``   >= 0.85      0.903 / 0.889      0.897 / 0.884
-    ``PROBABLE`` 0.55-0.85    0.640 / 0.667      0.679 / 0.696
-    ``POSSIBLE`` 0.35-0.55    0.443 / 0.446      0.435 / 0.449
-    ``UNLIKELY`` 0.15-0.35    0.233 / 0.217      0.230 / 0.225
-    ====================  =================  =================
+    ====================  =================  =================  =================
+    Band                  v1 promised/seen   v2 promised/seen   v3 promised/seen
+    ====================  =================  =================  =================
+    ``LIKELY``   >= 0.85      0.903 / 0.889      0.897 / 0.884      0.902 / 0.851
+    ``PROBABLE`` 0.55-0.85    0.640 / 0.667      0.679 / 0.696      0.688 / 0.669
+    ``POSSIBLE`` 0.35-0.55    0.443 / 0.446      0.435 / 0.449      0.435 / 0.453
+    ``UNLIKELY`` 0.15-0.35    0.233 / 0.217      0.230 / 0.225      0.228 / 0.206
+    ====================  =================  =================  =================
+
+    v3 promises a little more than it delivers at the top (0.902 against 0.851 on 104
+    pairs, about 1.5 standard errors), yet every band still holds what its name says:
+    "likely" comes true at least 85% of the time.
 
     There is no band above ``LIKELY``. Separating 0.90 from 0.97 would need far more
     than the 99 pairs available up there, so claiming the difference would be

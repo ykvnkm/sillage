@@ -87,17 +87,27 @@ micro AUC начинается с 0.78 просто от ранжировани�
 {ceiling}## Известные ограничения
 
 1. **По {n_uncalibrated} дескрипторам вероятности нет** — только ранжирование.
-2. **Стереоизомеры не различаются.** Зеркальные изомеры пахнут по-разному (карвон:
-   тмин против мяты), но признаки модели их не различают. Учёт хиральности в
-   отпечатке Моргана роста не дал (журнал E-019): различить их сможет только
-   представление, которое видит граф молекулы целиком.
-3. **Разметка субъективна.** Дескрипторы — мнение экспертов, не измерение, и на
+{stereo_limitation}3. **Разметка субъективна.** Дескрипторы — мнение экспертов, не измерение, и на
    расплывчатых словах (`fresh`, `sweet`, `warm`, `sharp`) эксперты двух баз
    согласны друг с другом слабо. Там слабее и модель.
 4. **«Во сколько раз лучше случайного» обманчиво для частых нот.** Этот множитель
    ограничен сверху единицей, делённой на частоту ноты: у `fruity` (40% молекул)
    потолок — 2.5, и модель с её 2.0 берёт 80% возможного, при AP 0.79. Сравнивать
    ноты по нему нельзя; по AP и по согласию экспертов — можно.
+"""
+
+STEREO_BLIND = """2. **Стереоизомеры не различаются.** Зеркальные изомеры пахнут по-разному (карвон:
+   тмин против мяты), но признаки модели их не различают. Учёт хиральности в
+   отпечатке Моргана роста не дал (журнал E-019): различить их сможет только
+   представление, которое видит граф молекулы целиком.
+"""
+
+STEREO_SEEN = """2. **Разница между стереоизомерами ненадёжна.** Графовые сети видят R/S и E/Z и
+   дают изомерам разные ответы, но в паре изомеров, которых эксперты описали
+   по-разному, модель отдаёт ноту нужному в 52–57% случаев. Это предел данных,
+   а не модели: вторая база экспертов на тех же парах угадывает первую в 53%
+   случаев (журнал E-020). Продукт показывает это предупреждение при каждом
+   вводе со стереохимией.
 """
 
 CEILING_TEMPLATE = """## Потолок: насколько согласны сами эксперты
@@ -128,9 +138,12 @@ def main() -> int:
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
     parser.add_argument(
         "--dataset",
-        choices=("openpom", "v2"),
+        choices=("openpom", "v2", "ensemble"),
         default="openpom",
-        help="v2: the two expert collections rebuilt with soft, masked labels (E-019)",
+        help=(
+            "v2: the two expert collections rebuilt with soft, masked labels (E-019); "
+            "ensemble: graph networks + fingerprints + descriptors on v2 (E-020, ~40 min)"
+        ),
     )
     parser.add_argument(
         "--card-only",
@@ -144,7 +157,7 @@ def main() -> int:
         name = (
             args.name
             if args.name != DEFAULT_NAME or args.dataset == "openpom"
-            else "odor-baseline-v2"
+            else {"v2": "odor-baseline-v2", "ensemble": "odor-ensemble-v3"}[args.dataset]
         )
         model = OdorModel.load(root / "models" / name)
         card_path = root / "docs" / "model-cards" / f"{name}.md"
@@ -152,7 +165,14 @@ def main() -> int:
         print(f"wrote {card_path.relative_to(root)}")
         return 0
 
-    if args.dataset == "v2":
+    if args.dataset == "ensemble":
+        from sillage.research.train_model_v3 import DEFAULT_NAME as V3_NAME
+        from sillage.research.train_model_v3 import train_odor_ensemble
+
+        name = V3_NAME if args.name == DEFAULT_NAME else args.name
+        outcome = train_odor_ensemble(name=name, seed=args.seed)
+        args.name = name
+    elif args.dataset == "v2":
         from sillage.research.train_model_v2 import DEFAULT_NAME as V2_NAME
         from sillage.research.train_model_v2 import train_odor_model_v2
 
@@ -241,6 +261,7 @@ def _render_card(outcome) -> str:
         )
     return CARD_TEMPLATE.format(
         calibration_check=calibration_check,
+        stereo_limitation=STEREO_SEEN if "graph" in card.components else STEREO_BLIND,
         consensus_row=consensus_row,
         ceiling=_render_ceiling(card.name),
         name=card.name,

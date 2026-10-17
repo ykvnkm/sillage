@@ -9,8 +9,10 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from rdkit import Chem
 
 from sillage.adapters.chem import FingerprintReferenceLibrary, RdkitMoleculeReader
+from sillage.adapters.chem.reader import to_rdkit
 from sillage.adapters.models import ArtifactOdorPredictor, ArtifactScopePolicy
 from sillage.domain import (
     Caveat,
@@ -32,19 +34,31 @@ from sillage.models.artifact import ArtifactError, OdorModel, ReferenceMolecule
 # --- reader ----------------------------------------------------------------------
 
 
-def test_reader_canonicalises_and_drops_stereo() -> None:
+def test_reader_canonicalises_and_keeps_stereo_apart_from_identity() -> None:
     left = RdkitMoleculeReader().read("C[C@H](O)CC")
     right = RdkitMoleculeReader().read("CC[C@@H](C)O")
 
-    assert left.smiles == right.smiles == "CCC(C)O"
-    assert left.stereo_discarded and right.stereo_discarded
+    assert left.smiles == right.smiles == "CCC(C)O"  # one identity for lookups
+    assert left.isomeric_smiles == "CC[C@H](C)O"  # mirror images: what a model reads
+    assert right.isomeric_smiles == "CC[C@@H](C)O"
+    assert left.has_stereo and right.has_stereo
     assert left.input_smiles == "C[C@H](O)CC"
     assert left.formula == "C4H10O"
     assert left.weight == pytest.approx(74.12, abs=0.01)
 
 
 def test_reader_does_not_invent_stereo_caveats() -> None:
-    assert not RdkitMoleculeReader().read("OCC").stereo_discarded
+    read = RdkitMoleculeReader().read("OCC")
+
+    assert not read.has_stereo
+    assert read.isomeric_smiles == read.smiles == "CCO"
+
+
+def test_the_model_reads_the_stereo_the_input_gave() -> None:
+    molecule = RdkitMoleculeReader().read("CC1=CC[C@@H](CC1=O)C(C)=C")
+
+    assert Chem.MolToSmiles(to_rdkit(molecule)) == molecule.isomeric_smiles
+    assert "@" in molecule.isomeric_smiles
 
 
 @pytest.mark.parametrize("text", ["hello", "C1CC", "C(C"])

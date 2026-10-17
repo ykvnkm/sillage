@@ -31,8 +31,9 @@ from sillage.domain.ports import NameLookupUnavailable
 
 
 def molecule(smiles: str = "CCO", *, stereo: bool = False) -> Molecule:
+    flat = smiles.replace("@", "")
     return Molecule(
-        smiles=smiles, input_smiles=smiles, formula="C2H6O", weight=46.1, stereo_discarded=stereo
+        smiles=flat, input_smiles=smiles, formula="C2H6O", weight=46.1, isomeric_smiles=smiles
     )
 
 
@@ -60,6 +61,7 @@ class StubScope:
 @dataclass
 class StubPredictor:
     calls: list[str] = field(default_factory=list)
+    sees_stereo: bool = False
 
     @property
     def name(self) -> str:
@@ -133,6 +135,24 @@ def test_discarded_stereo_is_reported_as_a_caveat(predict: PredictOdor) -> None:
 
     assert isinstance(report, OdorReport)
     assert report.caveats == (Caveat.STEREO_DISCARDED,)
+
+
+def test_stereo_a_model_used_is_reported_as_unreliable(predict: PredictOdor) -> None:
+    predict.predictor.sees_stereo = True
+
+    report = predict("C[C@H](N)O")
+
+    assert isinstance(report, OdorReport)
+    assert report.caveats == (Caveat.STEREO_UNRELIABLE,)
+
+
+def test_no_stereo_no_caveat(predict: PredictOdor) -> None:
+    predict.predictor.sees_stereo = True
+
+    report = predict("CCO")
+
+    assert isinstance(report, OdorReport)
+    assert report.caveats == ()
 
 
 def test_surrounding_whitespace_is_not_part_of_the_molecule(predict: PredictOdor) -> None:

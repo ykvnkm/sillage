@@ -49,6 +49,11 @@ class Caveat(StrEnum):
     STEREO_DISCARDED = "stereo_discarded"
     """The input specified stereochemistry; the model cannot see it."""
 
+    STEREO_UNRELIABLE = "stereo_unreliable"
+    """The input specified stereochemistry and the model used it -- but on pairs of
+    isomers it ranks a note no better than a second expert collection does, which is
+    barely above a coin: the training data's isomer descriptions disagree (E-020)."""
+
 
 @dataclass(frozen=True, slots=True)
 class OdorReport:

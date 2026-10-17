@@ -25,9 +25,11 @@ from pathlib import Path
 from huggingface_hub import HfApi
 
 from sillage.models.artifact import (
+    BOOSTING_FILE,
     CALIBRATOR_FILE,
     CARD_FILE,
     ESTIMATOR_FILE,
+    GRAPH_FILE,
     REFERENCE_FILE,
     OdorModel,
 )
@@ -36,8 +38,9 @@ from sillage.paths import DEFAULT_MODEL, project_root
 ARTIFACT_FILES = (CARD_FILE, ESTIMATOR_FILE, CALIBRATOR_FILE, REFERENCE_FILE)
 NAMES_FILE = "names.json"
 MAP_FILE = "map.npz"
-OPTIONAL_FILES = (NAMES_FILE, MAP_FILE)
-"""Built by scripts/build_names.py and scripts/build_map.py. Published when present."""
+OPTIONAL_FILES = (BOOSTING_FILE, GRAPH_FILE, NAMES_FILE, MAP_FILE)
+"""The ensemble's other components (journal E-020), then what scripts/build_names.py
+and scripts/build_map.py add. Published when present."""
 GITHUB_URL = "https://github.com/ykvnkm/sillage"
 
 FRONT_MATTER = """---
@@ -62,12 +65,15 @@ per-label calibrated probabilities. Trained and served by
 [sillage]({github}), which also serves it through a web interface and an HTTP API.
 
 Load it with the project code (`OdorModel.load`), not with a bare `joblib.load`:
-the artifact carries its feature set, calibrator and chemical scope, and outputs are
-only meaningful together with them. Files are scikit-learn pickles; load them only
-from a revision you trust, and check them against the sha256 values pinned in the
-project's `deploy/hub.json`.
+the artifact carries its feature sets, components, calibrator and chemical scope,
+and outputs are only meaningful together with them. The `.joblib` files are
+scikit-learn pickles; load them only from a revision you trust, and check them
+against the sha256 values pinned in the project's `deploy/hub.json`. `graph.npz`
+holds plain arrays and is read without pickle.
 
-Data: Goodscents/Leffingwell merge curated by
+Data: the model learnt from the Goodscents and Leffingwell collections as archived
+by [Pyrfume](https://pyrfume.org); their records are not redistributed here, only
+weights derived from them. `reference.json` comes from the merge curated by
 [OpenPOM](https://github.com/BioMachineLearning/openpom), MIT. Molecule names in
 `names.json`: [PubChem](https://pubchem.ncbi.nlm.nih.gov/) (public domain) and
 [Wikidata](https://www.wikidata.org/) (CC0).

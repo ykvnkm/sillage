@@ -1,9 +1,9 @@
 """Ports implemented over a saved :class:`OdorModel` artifact.
 
-Nothing here is specific to logistic regression: the artifact records its own
-feature set, calibrator and scope, and these adapters only replay them. A GNN
-artifact will need its own predictor -- graphs instead of a feature matrix -- but
-will reuse the scope policy unchanged.
+Nothing here is specific to one model family: the artifact records its feature
+sets, components, calibrator and scope, and these adapters only replay them. A model
+with graph networks reads the molecule with its stereochemistry; one without cannot,
+and says so (:attr:`ArtifactOdorPredictor.sees_stereo`).
 """
 
 from __future__ import annotations
@@ -12,14 +12,12 @@ import numpy as np
 
 from sillage.adapters.chem.reader import to_rdkit
 from sillage.domain import DescriptorScore, ModelDescription, Molecule, OdorProfile, Refusal
-from sillage.features import sets as feature_sets
 from sillage.models.applicability import ChemicalScope
 from sillage.models.artifact import ArtifactError, OdorModel
-from sillage.models.compiled import LinearMultilabel, NotCompilable
 
 
 class ArtifactOdorPredictor:
-    """``OdorPredictor`` backed by a fingerprint-and-descriptor model artifact."""
+    """``OdorPredictor`` backed by a saved model artifact, whatever its components."""
 
     def __init__(self, model: OdorModel) -> None:
         if model.calibrator is None:
@@ -32,13 +30,7 @@ class ArtifactOdorPredictor:
         self._calibrated = model.is_calibrated()
         self._base_rates = model.calibrator.base_rates
 
-        # 0.06 ms instead of 124 ms per molecule, identical answers (journal E-013).
-        # A model that is not a stack of linear pipelines -- boosting -- falls back
-        # to calling its estimators one by one.
-        try:
-            self._scorer = LinearMultilabel.from_classifier(model.estimator)
-        except NotCompilable:
-            self._scorer = None
+        self._scorer = model.scorer()
 
     @property
     def name(self) -> str:
@@ -46,11 +38,14 @@ class ArtifactOdorPredictor:
 
     @property
     def compiled(self) -> bool:
-        return self._scorer is not None
+        return not hasattr(self._scorer.linear, "estimators_")
+
+    @property
+    def sees_stereo(self) -> bool:
+        return self._scorer.sees_stereo
 
     def predict(self, molecule: Molecule) -> OdorProfile:
-        features = feature_sets.build(self._model.card.feature_set, [to_rdkit(molecule)])
-        scores = self._probabilities(features.values)[0]
+        scores = self._calibrator.transform(self._scorer.raw([to_rdkit(molecule)]))[0]
         return OdorProfile.from_scores(
             DescriptorScore(
                 name=name,
@@ -64,12 +59,7 @@ class ArtifactOdorPredictor:
     def embed(self, molecule: Molecule) -> tuple[float, ...]:
         """Raw predicted probabilities, before calibration: the model's own scale,
         and exactly what scripts/build_map.py embedded the reference molecules with."""
-        features = feature_sets.build(self._model.card.feature_set, [to_rdkit(molecule)])
-        if self._scorer is not None:
-            raw = self._scorer.predict_proba(features.values)[0]
-        else:
-            raw = self._model.raw_scores(features.values)[0]
-        return tuple(float(v) for v in raw)
+        return tuple(float(v) for v in self._scorer.raw([to_rdkit(molecule)])[0])
 
     def describe(self) -> ModelDescription:
         card = self._model.card
@@ -83,16 +73,6 @@ class ArtifactOdorPredictor:
             metrics=dict(card.metrics),
             floor=dict(card.baseline_metrics),
         )
-
-    def _probabilities(self, features: np.ndarray) -> np.ndarray:
-        if self._scorer is None:
-            return self._model.probabilities(features)
-        if features.shape[1] != self._scorer.n_features_in_:
-            raise ArtifactError(
-                f"Model {self.name!r} expects {self._scorer.n_features_in_} features, "
-                f"got {features.shape[1]}"
-            )
-        return self._calibrator.transform(self._scorer.predict_proba(features))
 
 
 class ArtifactScopePolicy:

@@ -49,7 +49,7 @@ def raw_data_dir() -> Path:
 
 
 MODEL_DIR_ENV = "SILLAGE_MODEL_DIR"
-DEFAULT_MODEL = "odor-baseline-v2"
+DEFAULT_MODEL = "odor-ensemble-v3"
 
 
 def model_dir() -> Path:

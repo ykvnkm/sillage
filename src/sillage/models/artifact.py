@@ -12,8 +12,14 @@ Layout on disk::
 
     models/<name>/
         card.json        metadata, metrics, label names, data provenance
-        estimator.joblib the fitted one-vs-rest classifier
+        estimator.joblib the fitted one-vs-rest linear classifier
+        boosting.joblib  optional: boosting on descriptors (journal E-020)
+        graph.npz        optional: graph networks, plain arrays (journal E-020)
+        calibrator.joblib per-label calibration of the components' mean
         reference.json   every in-scope dataset molecule with its expert labels
+
+When several components are present, the model's raw score is their plain mean;
+the calibrator is fitted on that mean.
 
 Weights are not committed: `/models/` is excluded in `.gitignore`, and the card is
 reproduced as a human-readable model card under `docs/`.
@@ -21,6 +27,7 @@ reproduced as a human-readable model card under `docs/`.
 
 from __future__ import annotations
 
+import contextlib
 import json
 from collections.abc import Sequence
 from dataclasses import asdict, dataclass
@@ -33,18 +40,29 @@ import numpy as np
 from rdkit.Chem import Mol
 
 from sillage.features import parse_smiles
+from sillage.features import sets as feature_sets
+from sillage.features.graphs import molecular_graph
 from sillage.models.applicability import ChemicalScope
 from sillage.models.calibration import PerLabelCalibrator
+from sillage.models.compiled import BoostedMultilabel, LinearMultilabel, NotCompilable
+from sillage.models.graph_network import GraphEnsemble
 from sillage.models.multilabel import MultilabelClassifier
 
-ARTIFACT_VERSION = 3
+ARTIFACT_VERSION = 4
 """Bumped whenever the on-disk layout changes. A mismatch refuses to load rather
 than silently misreading an old directory."""
+
+READABLE_VERSIONS = frozenset({3, ARTIFACT_VERSION})
+"""Version 3 is version 4 with the linear component only, so it reads as exactly that.
+The reverse is what the bump guards: code that knows only version 3 would open a
+version-4 ensemble and silently serve its linear part."""
 
 CARD_FILE = "card.json"
 CALIBRATOR_FILE = "calibrator.joblib"
 ESTIMATOR_FILE = "estimator.joblib"
 REFERENCE_FILE = "reference.json"
+BOOSTING_FILE = "boosting.joblib"
+GRAPH_FILE = "graph.npz"
 
 
 class ArtifactError(RuntimeError):
@@ -100,15 +118,22 @@ class ModelCard:
 
     scope: dict[str, Any]
 
+    components: tuple[str, ...] = ("linear",)
+    """Which parts the raw score averages: ``linear``, ``boosting``, ``graph``."""
+
+    boosting_feature_set: str | None = None
+
     def to_dict(self) -> dict[str, Any]:
         payload = asdict(self)
         payload["label_names"] = list(self.label_names)
+        payload["components"] = list(self.components)
         return payload
 
     @classmethod
     def from_dict(cls, payload: dict[str, Any]) -> ModelCard:
         data = dict(payload)
         data["label_names"] = tuple(data["label_names"])
+        data["components"] = tuple(data.get("components", ("linear",)))
         return cls(**data)
 
 
@@ -129,12 +154,21 @@ class OdorModel:
     stored: it takes under a second and removes a second thing that can fall out of
     sync."""
 
+    boosting: MultilabelClassifier | None = None
+    graph: GraphEnsemble | None = None
+
     @property
     def label_names(self) -> tuple[str, ...]:
         return self.card.label_names
 
+    def scorer(self) -> EnsembleScorer:
+        """What the service calls: every component, from RDKit molecules to raw scores."""
+        return EnsembleScorer.from_model(self)
+
     def raw_scores(self, features: np.ndarray) -> np.ndarray:
-        """Uncalibrated per-label scores for an already-built feature matrix.
+        """Uncalibrated per-label scores of the **linear component**, for an
+        already-built feature matrix. A model with other components is scored with
+        :meth:`scorer` instead.
 
         Deliberately low-level and deliberately named *raw*: these numbers are not
         probabilities. The product must never show them to a user unmediated.
@@ -192,6 +226,10 @@ class OdorModel:
         )
         joblib.dump(self.estimator, directory / ESTIMATOR_FILE, compress=3)
         joblib.dump(self.calibrator, directory / CALIBRATOR_FILE, compress=3)
+        if self.boosting is not None:
+            joblib.dump(self.boosting, directory / BOOSTING_FILE, compress=3)
+        if self.graph is not None:
+            self.graph.save(directory / GRAPH_FILE)
         return directory
 
     @classmethod
@@ -214,15 +252,25 @@ class OdorModel:
             )
 
         card = ModelCard.from_dict(json.loads((directory / CARD_FILE).read_text(encoding="utf-8")))
-        if card.artifact_version != ARTIFACT_VERSION:
+        if card.artifact_version not in READABLE_VERSIONS:
             raise ArtifactError(
-                f"{directory} has artifact version {card.artifact_version}, "
-                f"this code reads version {ARTIFACT_VERSION}. Retrain rather than guess."
+                f"{directory} has artifact version {card.artifact_version}, this code "
+                f"reads versions {sorted(READABLE_VERSIONS)}. Retrain rather than guess."
             )
+
+        for component, file in (("boosting", BOOSTING_FILE), ("graph", GRAPH_FILE)):
+            if component in card.components and not (directory / file).exists():
+                raise ArtifactError(f"{directory}: the card lists {component}, {file} is missing")
 
         return cls(
             card=card,
             estimator=joblib.load(directory / ESTIMATOR_FILE),
+            boosting=(
+                joblib.load(directory / BOOSTING_FILE) if "boosting" in card.components else None
+            ),
+            graph=(
+                GraphEnsemble.load(directory / GRAPH_FILE) if "graph" in card.components else None
+            ),
             calibrator=joblib.load(directory / CALIBRATOR_FILE),
             scope=_scope_from_card(card),
             reference=tuple(
@@ -260,6 +308,8 @@ def build_card(
     metrics: dict[str, float],
     baseline_metrics: dict[str, float],
     scope: ChemicalScope,
+    components: Sequence[str] = ("linear",),
+    boosting_feature_set: str | None = None,
 ) -> ModelCard:
     """Assemble a card, stamping the version and the creation time."""
     return ModelCard(
@@ -278,4 +328,53 @@ def build_card(
         metrics=metrics,
         baseline_metrics=baseline_metrics,
         scope=asdict(scope),
+        components=tuple(components),
+        boosting_feature_set=boosting_feature_set,
     )
+
+
+@dataclass(frozen=True, slots=True)
+class EnsembleScorer:
+    """Raw scores for RDKit molecules: the mean of whichever components the model has.
+
+    The linear part is compiled to one matrix product (journal E-013); boosting and
+    the graph networks are called as they are.
+    """
+
+    feature_set: str
+    linear: LinearMultilabel | MultilabelClassifier
+    boosting: BoostedMultilabel | MultilabelClassifier | None = None
+    boosting_feature_set: str | None = None
+    graph: GraphEnsemble | None = None
+
+    @classmethod
+    def from_model(cls, model: OdorModel) -> EnsembleScorer:
+        try:
+            linear = LinearMultilabel.from_classifier(model.estimator)
+        except NotCompilable:
+            linear = model.estimator
+        boosting = model.boosting
+        if boosting is not None:
+            # 60 ms -> a few ms per molecule, identical answers (journal E-020).
+            with contextlib.suppress(NotCompilable):
+                boosting = BoostedMultilabel.from_classifier(boosting)
+        return cls(
+            feature_set=model.card.feature_set,
+            linear=linear,
+            boosting=boosting,
+            boosting_feature_set=model.card.boosting_feature_set,
+            graph=model.graph,
+        )
+
+    @property
+    def sees_stereo(self) -> bool:
+        return self.graph is not None
+
+    def raw(self, molecules: Sequence[Mol]) -> np.ndarray:
+        parts = [self.linear.predict_proba(feature_sets.build(self.feature_set, molecules).values)]
+        if self.boosting is not None:
+            features = feature_sets.build(self.boosting_feature_set, molecules).values
+            parts.append(self.boosting.predict_proba(features))
+        if self.graph is not None:
+            parts.append(np.stack([self.graph.predict(molecular_graph(m)) for m in molecules]))
+        return np.mean(parts, axis=0)

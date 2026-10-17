@@ -82,7 +82,11 @@ class PredictOdor:
         if refusal is not None:
             return refusal
 
-        caveats = (Caveat.STEREO_DISCARDED,) if molecule.stereo_discarded else ()
+        caveats = ()
+        if molecule.has_stereo:
+            caveats = (
+                Caveat.STEREO_UNRELIABLE if self.predictor.sees_stereo else Caveat.STEREO_DISCARDED,
+            )
         return OdorReport(
             molecule=molecule,
             profile=self.predictor.predict(molecule),
