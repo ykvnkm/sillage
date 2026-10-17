@@ -52,6 +52,11 @@ class OdorPredictor(Protocol):
 
     def describe(self) -> ModelDescription: ...
 
+    @property
+    def sees_stereo(self) -> bool:
+        """Whether two stereoisomers can get different answers from this model."""
+        ...
+
 
 class OdorMap(Protocol):
     """Molecules laid out by how the model thinks they smell."""

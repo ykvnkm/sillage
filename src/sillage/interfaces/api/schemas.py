@@ -44,10 +44,10 @@ class PredictRequest(BaseModel):
 
 class MoleculeOut(BaseModel):
     smiles: str = Field(description="Canonical SMILES without stereochemistry.")
+    isomeric_smiles: str = Field(description="Canonical SMILES with the input's stereo.")
     input_smiles: str
     formula: str
     weight: float = Field(description="Average molecular weight, Da.")
-    stereo_discarded: bool
 
 
 class DescriptorOut(BaseModel):

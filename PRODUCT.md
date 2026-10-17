@@ -47,14 +47,16 @@ outside the declared chemistry are refused with a reason instead of answered.
 
 - Scope: single-component, neutral, organic molecules, 30-400 Da, elements C, N, O, S.
 - 107 of 138 descriptors calibrated; 31 rank only and never carry a number.
-- Stereochemistry is dropped; the UI must say so when the input had it.
+- Stereochemistry is seen by the model's graph networks, but differences between
+  isomers are unreliable: the experts it learnt from describe isomers
+  inconsistently (journal E-020). The UI says so whenever the input has stereo.
 - Nearest-neighbour similarity is orientation, not a confidence signal (journal E-008).
 - Not yet available: molecule names, odour map, mixtures. Do not imply them.
 
 ## Evidence on Hand
 
 - Real model output via `POST /predict`; model card at
-  `docs/model-cards/odor-baseline-v2.md` (macro AP 0.368 vs floor 0.038; 137 of 138
+  `docs/model-cards/odor-ensemble-v3.md` (macro AP 0.402 vs floor 0.038; 137 of 138
   descriptors calibrated).
 - 4777 dataset molecules with expert labels (reference library).
 - No testimonials, users, or usage numbers exist. Do not fabricate them.

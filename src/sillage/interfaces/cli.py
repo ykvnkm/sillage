@@ -22,6 +22,10 @@ CAVEAT_TEXT = {
         "stereochemistry in the input was discarded: the model cannot tell mirror "
         "isomers apart (carvone is caraway on one side and mint on the other)"
     ),
+    Caveat.STEREO_UNRELIABLE: (
+        "stereochemistry was used, but the experts the model learnt from describe "
+        "isomers inconsistently: differences between two isomers' answers are unreliable"
+    ),
 }
 
 
@@ -51,7 +55,7 @@ def render(result: OdorReport | Refusal) -> str:
         f"name       {names.display}" + (f" / {names.en}" if names.ru and names.en else "")
         if names
         else "name       (not known)",
-        f"molecule   {molecule.smiles}   {molecule.formula}, {molecule.weight:.1f} g/mol",
+        f"molecule   {molecule.model_smiles}   {molecule.formula}, {molecule.weight:.1f} g/mol",
         f"model      {result.model_name}",
         "",
         "predicted",

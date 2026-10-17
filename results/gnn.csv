@@ -1,0 +1,136 @@
+variant,seed,truth,macro_ap,macro_auc,descriptors
+LR,0,consensus,0.5895,0.9225,26
+LR,0,leffingwell,0.4564,0.9009,71
+LR,0,goodscents,0.3254,0.8432,96
+GB,0,consensus,0.5278,0.9050,26
+GB,0,leffingwell,0.4257,0.8793,71
+GB,0,goodscents,0.3081,0.8308,96
+GNN x5,0,consensus,0.6055,0.9263,26
+GNN x5,0,leffingwell,0.4776,0.9120,71
+GNN x5,0,goodscents,0.3470,0.8598,96
+GNN,0,consensus,0.5955,0.9225,26
+GNN,0,leffingwell,0.4640,0.9049,71
+GNN,0,goodscents,0.3283,0.8522,96
+GNN x5 flat,0,consensus,0.5893,0.9232,26
+GNN x5 flat,0,leffingwell,0.4737,0.9123,71
+GNN x5 flat,0,goodscents,0.3471,0.8587,96
+LR + GB,0,consensus,0.5866,0.9225,26
+LR + GB,0,leffingwell,0.4768,0.9036,71
+LR + GB,0,goodscents,0.3328,0.8448,96
+GNN x5 + LR,0,consensus,0.6115,0.9295,26
+GNN x5 + LR,0,leffingwell,0.4880,0.9154,71
+GNN x5 + LR,0,goodscents,0.3554,0.8601,96
+GNN x5 + LR + GB,0,consensus,0.6090,0.9291,26
+GNN x5 + LR + GB,0,leffingwell,0.4958,0.9161,71
+GNN x5 + LR + GB,0,goodscents,0.3541,0.8605,96
+GNN x5 flat + LR + GB,0,consensus,0.6089,0.9291,26
+GNN x5 flat + LR + GB,0,leffingwell,0.4916,0.9166,71
+GNN x5 flat + LR + GB,0,goodscents,0.3527,0.8598,96
+LR,1,consensus,0.6374,0.9249,23
+LR,1,leffingwell,0.4510,0.8936,71
+LR,1,goodscents,0.3291,0.8416,89
+GB,1,consensus,0.6419,0.9152,23
+GB,1,leffingwell,0.4395,0.8799,71
+GB,1,goodscents,0.3135,0.8246,89
+GNN x5,1,consensus,0.6758,0.9353,23
+GNN x5,1,leffingwell,0.4791,0.9152,71
+GNN x5,1,goodscents,0.3522,0.8597,89
+GNN,1,consensus,0.6769,0.9311,23
+GNN,1,leffingwell,0.4571,0.9070,71
+GNN,1,goodscents,0.3305,0.8502,89
+GNN x5 flat,1,consensus,0.6718,0.9368,23
+GNN x5 flat,1,leffingwell,0.4789,0.9120,71
+GNN x5 flat,1,goodscents,0.3350,0.8602,89
+LR + GB,1,consensus,0.6694,0.9272,23
+LR + GB,1,leffingwell,0.4682,0.8978,71
+LR + GB,1,goodscents,0.3360,0.8435,89
+GNN x5 + LR,1,consensus,0.6728,0.9371,23
+GNN x5 + LR,1,leffingwell,0.4815,0.9136,71
+GNN x5 + LR,1,goodscents,0.3480,0.8621,89
+GNN x5 + LR + GB,1,consensus,0.6839,0.9367,23
+GNN x5 + LR + GB,1,leffingwell,0.4936,0.9148,71
+GNN x5 + LR + GB,1,goodscents,0.3537,0.8625,89
+GNN x5 flat + LR + GB,1,consensus,0.6867,0.9375,23
+GNN x5 flat + LR + GB,1,leffingwell,0.4894,0.9141,71
+GNN x5 flat + LR + GB,1,goodscents,0.3513,0.8631,89
+LR,2,consensus,0.5918,0.9257,24
+LR,2,leffingwell,0.4325,0.8953,66
+LR,2,goodscents,0.3327,0.8538,90
+GB,2,consensus,0.5573,0.9097,24
+GB,2,leffingwell,0.4045,0.8763,66
+GB,2,goodscents,0.3164,0.8223,90
+GNN x5,2,consensus,0.6159,0.9235,24
+GNN x5,2,leffingwell,0.4589,0.9022,66
+GNN x5,2,goodscents,0.3648,0.8578,90
+GNN,2,consensus,0.5978,0.9170,24
+GNN,2,leffingwell,0.4271,0.8940,66
+GNN,2,goodscents,0.3415,0.8466,90
+GNN x5 flat,2,consensus,0.6062,0.9282,24
+GNN x5 flat,2,leffingwell,0.4627,0.9004,66
+GNN x5 flat,2,goodscents,0.3640,0.8617,90
+LR + GB,2,consensus,0.6169,0.9296,24
+LR + GB,2,leffingwell,0.4496,0.8987,66
+LR + GB,2,goodscents,0.3439,0.8561,90
+GNN x5 + LR,2,consensus,0.6192,0.9333,24
+GNN x5 + LR,2,leffingwell,0.4667,0.9097,66
+GNN x5 + LR,2,goodscents,0.3704,0.8669,90
+GNN x5 + LR + GB,2,consensus,0.6221,0.9336,24
+GNN x5 + LR + GB,2,leffingwell,0.4674,0.9107,66
+GNN x5 + LR + GB,2,goodscents,0.3654,0.8672,90
+GNN x5 flat + LR + GB,2,consensus,0.6230,0.9342,24
+GNN x5 flat + LR + GB,2,leffingwell,0.4668,0.9104,66
+GNN x5 flat + LR + GB,2,goodscents,0.3673,0.8681,90
+LR,3,consensus,0.6051,0.9116,25
+LR,3,leffingwell,0.4571,0.8874,66
+LR,3,goodscents,0.3317,0.8263,89
+GB,3,consensus,0.5776,0.9102,25
+GB,3,leffingwell,0.4332,0.8705,66
+GB,3,goodscents,0.3079,0.8106,89
+GNN x5,3,consensus,0.6208,0.9255,25
+GNN x5,3,leffingwell,0.4777,0.9022,66
+GNN x5,3,goodscents,0.3577,0.8456,89
+GNN,3,consensus,0.6019,0.9138,25
+GNN,3,leffingwell,0.4711,0.8900,66
+GNN,3,goodscents,0.3323,0.8262,89
+GNN x5 flat,3,consensus,0.6264,0.9233,25
+GNN x5 flat,3,leffingwell,0.4695,0.9036,66
+GNN x5 flat,3,goodscents,0.3490,0.8467,89
+LR + GB,3,consensus,0.6094,0.9195,25
+LR + GB,3,leffingwell,0.4699,0.8913,66
+LR + GB,3,goodscents,0.3439,0.8290,89
+GNN x5 + LR,3,consensus,0.6274,0.9272,25
+GNN x5 + LR,3,leffingwell,0.4875,0.9034,66
+GNN x5 + LR,3,goodscents,0.3563,0.8437,89
+GNN x5 + LR + GB,3,consensus,0.6264,0.9277,25
+GNN x5 + LR + GB,3,leffingwell,0.4921,0.9040,66
+GNN x5 + LR + GB,3,goodscents,0.3611,0.8440,89
+GNN x5 flat + LR + GB,3,consensus,0.6258,0.9278,25
+GNN x5 flat + LR + GB,3,leffingwell,0.4873,0.9042,66
+GNN x5 flat + LR + GB,3,goodscents,0.3600,0.8451,89
+LR,4,consensus,0.6595,0.9296,25
+LR,4,leffingwell,0.4772,0.9084,64
+LR,4,goodscents,0.3430,0.8604,89
+GB,4,consensus,0.6162,0.9176,25
+GB,4,leffingwell,0.4394,0.8955,64
+GB,4,goodscents,0.3151,0.8280,89
+GNN x5,4,consensus,0.6672,0.9372,25
+GNN x5,4,leffingwell,0.4983,0.9203,64
+GNN x5,4,goodscents,0.3787,0.8718,89
+GNN,4,consensus,0.6665,0.9335,25
+GNN,4,leffingwell,0.4783,0.9144,64
+GNN,4,goodscents,0.3692,0.8646,89
+GNN x5 flat,4,consensus,0.6764,0.9387,25
+GNN x5 flat,4,leffingwell,0.4972,0.9205,64
+GNN x5 flat,4,goodscents,0.3756,0.8730,89
+LR + GB,4,consensus,0.6613,0.9345,25
+LR + GB,4,leffingwell,0.4718,0.9115,64
+LR + GB,4,goodscents,0.3474,0.8624,89
+GNN x5 + LR,4,consensus,0.6862,0.9406,25
+GNN x5 + LR,4,leffingwell,0.4997,0.9221,64
+GNN x5 + LR,4,goodscents,0.3761,0.8743,89
+GNN x5 + LR + GB,4,consensus,0.6843,0.9414,25
+GNN x5 + LR + GB,4,leffingwell,0.4975,0.9226,64
+GNN x5 + LR + GB,4,goodscents,0.3767,0.8747,89
+GNN x5 flat + LR + GB,4,consensus,0.6856,0.9413,25
+GNN x5 flat + LR + GB,4,leffingwell,0.4949,0.9230,64
+GNN x5 flat + LR + GB,4,goodscents,0.3768,0.8744,89

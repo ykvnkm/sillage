@@ -2,9 +2,10 @@
 
     uv run python scripts/build_map.py            # writes models/<name>/map.npz
 
-Each molecule is embedded by the model -- for the baseline, its 138 predicted
-descriptor probabilities; for the GNN of phase 2, its penultimate layer -- and UMAP
-lays that space out in two dimensions. Positions are the model's view; colours (the
+Each molecule is embedded by the model -- its 138 raw predicted descriptor
+probabilities, the mean of every component it has (for the ensemble, graph networks
+included: a penultimate layer would leave the linear and boosting parts out) -- and
+UMAP lays that space out in two dimensions. Positions are the model's view; colours (the
 odour family) come from what experts recorded, so the map shows where the two agree.
 
 UMAP runs here, once, and never in the service: it would pull numba and LLVM into the
@@ -24,9 +25,7 @@ import umap
 
 from sillage.adapters.models.odor_map import MAP_FILE, EmbeddingMap
 from sillage.domain.families import Family, dominant_family
-from sillage.features import sets as feature_sets
 from sillage.models.artifact import OdorModel
-from sillage.models.compiled import LinearMultilabel
 from sillage.paths import DEFAULT_MODEL, project_root
 
 SEED = 0
@@ -43,8 +42,7 @@ def main() -> int:
     reference = model.reference
 
     print(f"embedding {len(reference)} reference molecules", file=sys.stderr)
-    features = feature_sets.build(model.card.feature_set, model.reference_molecules())
-    embeddings = LinearMultilabel.from_classifier(model.estimator).predict_proba(features.values)
+    embeddings = model.scorer().raw(model.reference_molecules())
 
     frequency = dict(zip(model.label_names, model.calibrator.base_rates, strict=True))
     families = np.array(

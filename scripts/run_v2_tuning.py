@@ -15,12 +15,9 @@ from __future__ import annotations
 
 import warnings
 
-import numpy as np
 import pandas as pd
-from sklearn.ensemble import HistGradientBoostingClassifier
 
 from sillage.features import sets as feature_sets
-from sillage.models import MultilabelClassifier
 from sillage.paths import project_root
 from sillage.research import train_v2
 from sillage.research.dataset_v2 import build
@@ -60,7 +57,7 @@ def main() -> int:
         lr_test = by_c[best][1]
         rows += _rows("LR best-val", seed, lr_test, truths, split.test, chosen=best)
 
-        gb = fit_boosting(desc, targets, split.train, seed=seed)
+        gb = train_v2.fit_boosting(desc, targets, split.train, seed=seed)
         gb_test = gb.predict_proba(desc.values[split.test])
         rows += _rows("GB desc", seed, gb_test, truths, split.test)
         rows += _rows(
@@ -78,31 +75,6 @@ def main() -> int:
 
 def fit(matrix, targets, rows, *, c: float, seed: int):
     return train_v2.fit(matrix.values, targets, rows, matrix.names, seed=seed, c=c)
-
-
-def fit_boosting(matrix, targets, rows, *, seed: int):
-    """Per-descriptor histogram boosting with the same missing/soft label handling."""
-    estimators, constant = [], np.zeros(targets.shape[1])
-    for j in range(targets.shape[1]):
-        y = targets[rows, j]
-        known = ~np.isnan(y)
-        x, y = matrix.values[rows][known], y[known]
-        constant[j] = float(y.mean()) if y.size else 0.0
-        if not ((y > 0).any() and (y < 1).any()):
-            estimators.append(None)
-            continue
-        hard = (y == 0) | (y == 1)
-        x_all = np.vstack([x[hard], x[~hard], x[~hard]])
-        y_all = np.concatenate([y[hard], np.ones((~hard).sum()), np.zeros((~hard).sum())])
-        w_all = np.concatenate([np.ones(hard.sum()), y[~hard], 1 - y[~hard]])
-        model = HistGradientBoostingClassifier(
-            max_iter=150, learning_rate=0.1, random_state=seed, early_stopping=False
-        )
-        estimators.append(model.fit(x_all, y_all.astype(int), sample_weight=w_all))
-    classifier = MultilabelClassifier(lambda: None)
-    classifier.estimators_ = estimators
-    classifier.constant_scores_ = constant
-    return classifier
 
 
 def _rows(name, seed, predicted, truths, test, chosen=None) -> list[dict]:

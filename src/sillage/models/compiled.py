@@ -25,6 +25,7 @@ from dataclasses import dataclass
 
 import numpy as np
 from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MaxAbsScaler, StandardScaler
@@ -134,3 +135,101 @@ def _affine(scaler: object) -> tuple[np.ndarray, np.ndarray]:
     if isinstance(scaler, MaxAbsScaler):
         return np.zeros_like(scaler.scale_), scaler.scale_
     raise NotCompilable(f"Scaler {type(scaler).__name__} is not a supported affine map")
+
+
+@dataclass(frozen=True, slots=True)
+class BoostedMultilabel:
+    """Every label's boosted trees in flat arrays, walked for all trees at once.
+
+    Scikit-learn's histogram boosting predicts one label at a time, and on a single
+    molecule its per-call overhead dominates: 138 labels cost about 60 ms (journal
+    E-020). The trees themselves are small -- at most 31 leaves -- so here every node
+    of every tree sits in one set of arrays, and each step of the descent moves all
+    20 000-odd trees one level down with a handful of NumPy gathers. Same numbers as
+    scikit-learn to floating-point precision; ``tests/test_compiled.py`` holds it to that.
+    """
+
+    feature: np.ndarray
+    threshold: np.ndarray
+    missing_left: np.ndarray
+    left: np.ndarray
+    right: np.ndarray
+    is_leaf: np.ndarray
+    value: np.ndarray
+    roots: np.ndarray
+    """Global index of each tree's root."""
+
+    tree_label: np.ndarray
+    """Label each tree contributes to."""
+
+    baseline: np.ndarray
+    constant: np.ndarray
+    constant_scores: np.ndarray
+    depth: int
+
+    def predict_proba(self, x: np.ndarray) -> np.ndarray:
+        x = np.asarray(x, dtype=np.float64)
+        node = np.broadcast_to(self.roots, (x.shape[0], self.roots.size)).copy()
+        rows = np.arange(x.shape[0])[:, None]
+        for _ in range(self.depth):
+            if self.is_leaf[node].all():
+                break
+            value = x[rows, self.feature[node]]
+            go_left = np.where(
+                np.isnan(value), self.missing_left[node], value <= self.threshold[node]
+            )
+            step = np.where(go_left, self.left[node], self.right[node])
+            node = np.where(self.is_leaf[node], node, step)
+        n_labels = self.baseline.size
+        raw = np.zeros((x.shape[0], n_labels))
+        for i in range(x.shape[0]):
+            raw[i] = np.bincount(self.tree_label, self.value[node[i]], minlength=n_labels)
+        scores = 1.0 / (1.0 + np.exp(-(raw + self.baseline)))
+        return np.where(self.constant, self.constant_scores, scores)
+
+    @classmethod
+    def from_classifier(cls, classifier: MultilabelClassifier) -> BoostedMultilabel:
+        """Flatten every per-label boosting model. Raises :class:`NotCompilable` otherwise."""
+        if classifier.constant_scores_ is None:
+            raise NotCompilable("The classifier has not been fitted")
+        fields = {k: [] for k in ("feature", "threshold", "missing_left", "left", "right")}
+        fields |= {"is_leaf": [], "value": []}
+        roots, tree_label = [], []
+        n_labels = len(classifier.estimators_)
+        baseline = np.zeros(n_labels)
+        constant = np.array([e is None for e in classifier.estimators_])
+        offset, depth = 0, 0
+        for label, estimator in enumerate(classifier.estimators_):
+            if estimator is None:
+                continue
+            if not isinstance(estimator, HistGradientBoostingClassifier) or (
+                estimator.n_trees_per_iteration_ != 1
+            ):
+                raise NotCompilable(f"Expected binary histogram boosting, got {estimator!r}")
+            if getattr(estimator, "is_categorical_", None) is not None:
+                raise NotCompilable("Categorical splits are not supported")
+            baseline[label] = float(np.ravel(estimator._baseline_prediction)[0])
+            for (tree,) in estimator._predictors:
+                nodes = tree.nodes
+                fields["feature"].append(nodes["feature_idx"].astype(np.int64))
+                fields["threshold"].append(nodes["num_threshold"])
+                fields["missing_left"].append(nodes["missing_go_to_left"].astype(bool))
+                fields["left"].append(nodes["left"].astype(np.int64) + offset)
+                fields["right"].append(nodes["right"].astype(np.int64) + offset)
+                fields["is_leaf"].append(nodes["is_leaf"].astype(bool))
+                fields["value"].append(nodes["value"])
+                roots.append(offset)
+                tree_label.append(label)
+                depth = max(depth, int(nodes["depth"].max()))
+                offset += len(nodes)
+        if not roots:
+            raise NotCompilable("No fitted estimators to compile")
+        return cls(
+            **{k: np.concatenate(v) for k, v in fields.items()},
+            roots=np.asarray(roots),
+            tree_label=np.asarray(tree_label),
+            baseline=baseline,
+            constant=constant,
+            constant_scores=np.asarray(classifier.constant_scores_, dtype=np.float64),
+            depth=depth,
+        )

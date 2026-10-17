@@ -1,15 +1,17 @@
 {
   "model": {
-    "name": "odor-baseline-v2",
-    "repo": "ykvnkm/sillage-odor-baseline-v2",
-    "revision": "439ad73f6940e34cce31816835f70ebce0665e0d",
+    "name": "odor-ensemble-v3",
+    "repo": "ykvnkm/sillage-odor-ensemble-v3",
+    "revision": "3d15ba738d8bf3871dc670d69b75ee88ed600f4b",
     "files": {
-      "card.json": "18739bddb0b1f9ddd5218b7e8df807f797cc3154f3c028bb43461d5aee89cd30",
-      "estimator.joblib": "bd791f6cb99b1ed139258906b433df7eb3a261afbf8ac56d5c3436dae812471d",
-      "calibrator.joblib": "14379153b7f3a1d5907d809f19f67c41ce7bc5eb05f1d832e3c74f6712e3b687",
+      "card.json": "7255318e674a38833ddb90d35b7ceb4aeab9ef589246237dfb3d5c44baf5266e",
+      "estimator.joblib": "52130a668f32a5f13e623acb0fe77c19f732f204ab14dd16f608f902f2eec72b",
+      "calibrator.joblib": "9977cfc66ac2fecd8bb381bdf7febd1edd44e645225d5bb984864369b8e46b38",
       "reference.json": "dbe726d7fb0e422436d08a1c51ae006a84169b00f8d85eed3eea35fb5d7b2643",
+      "boosting.joblib": "55147edd5d18a5c5fdc54eaf7a36397315ec8d50d5b39164bba2d14382fb2416",
+      "graph.npz": "32fc9e3eefe0b378dc34f425a069ff1d69866b567ab15c87c64a30e0d33d386c",
       "names.json": "1a575156cede96dba67de36e5f59b178f21a8e31e82ff65514cc2167060b5498",
-      "map.npz": "5b6c2093ffa8f3a130e785925b1208b2f2fae476f599cc585247f2326ed9d1ce"
+      "map.npz": "f445f9be8f6a1977cf9c3ef630953e7bd9e28739a6b1c80f3a2995ff8fe2c1f8"
     }
   }
 }

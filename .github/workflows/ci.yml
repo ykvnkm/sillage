@@ -38,8 +38,10 @@ jobs:
       # --locked fails if uv.lock is out of sync with pyproject.toml instead of
       # silently re-resolving. This is the actual reproducibility check: it proves
       # the committed lock file describes the committed intent.
+      # The gnn group brings torch (CPU build) for the graph network's tests; the
+      # service and its image never install it.
       - name: Install dependencies from the lock file
-        run: uv sync --locked
+        run: uv sync --locked --group gnn
 
       - name: Cache pre-commit environments
         uses: actions/cache@v6.1.0

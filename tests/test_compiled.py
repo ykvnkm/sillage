@@ -111,3 +111,39 @@ def test_compiled_artifact_gives_the_same_probabilities(artifact: Path) -> None:
         model.probabilities(x),
         atol=1e-5,
     )
+
+
+# --- boosted trees (journal E-020) ----------------------------------------------------
+
+
+def test_compiled_boosting_matches_scikit_learn(data: tuple[np.ndarray, np.ndarray]) -> None:
+    from sillage.models.compiled import BoostedMultilabel
+    from sillage.research import train_v2
+
+    x, y = data
+    y = y.astype(float)
+    y[::7, 0] = np.nan  # not asked
+    y[1::9, 1] = 0.5  # experts split
+    matrix = type("Matrix", (), {"values": x})()
+    boosting = train_v2.fit_boosting(matrix, y, np.arange(len(x)))
+    probe = x.copy()
+    probe[0, 0] = np.nan  # missing values take the side training sent them
+
+    compiled = BoostedMultilabel.from_classifier(boosting)
+
+    np.testing.assert_allclose(
+        compiled.predict_proba(probe), boosting.predict_proba(probe), atol=1e-12
+    )
+    np.testing.assert_allclose(
+        compiled.predict_proba(probe[:1]), boosting.predict_proba(probe[:1]), atol=1e-12
+    )
+
+
+def test_boosting_compiler_refuses_linear_models(data: tuple[np.ndarray, np.ndarray]) -> None:
+    from sillage.models.compiled import BoostedMultilabel
+
+    x, y = data
+    linear = MultilabelClassifier(BlockScaledLogisticRegression(feature_names=NAMES)).fit(x, y)
+
+    with pytest.raises(NotCompilable):
+        BoostedMultilabel.from_classifier(linear)

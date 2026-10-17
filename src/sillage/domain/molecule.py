@@ -17,13 +17,12 @@ class InvalidMolecule(ValueError):
 
 @dataclass(frozen=True, slots=True)
 class Molecule:
-    """A parsed molecule, reduced to what the model can actually distinguish."""
+    """A parsed molecule: its identity, and the exact form a model reads."""
 
     smiles: str
-    """Canonical SMILES **without stereochemistry**. Two inputs that differ only in
-    stereo -- (R)- and (S)-carvone -- map to the same string, because the training
-    data has no stereo either (the source column is ``nonStereoSMILES``) and the
-    model cannot tell them apart. Pretending otherwise would be the worse option."""
+    """Canonical SMILES **without stereochemistry** -- the molecule's identity for
+    everything that looks it up: the reference library, the name directory, the map.
+    Those sources record no stereo, so (R)- and (S)-carvone are one entry there."""
 
     input_smiles: str
     """Exactly what the caller sent, so the answer can be traced back to the question."""
@@ -32,9 +31,22 @@ class Molecule:
     weight: float
     """Average molecular weight, Da."""
 
-    stereo_discarded: bool
-    """True when the input carried stereo information that was dropped. The product
-    must say so: carvone is caraway on one side of the mirror and mint on the other."""
+    isomeric_smiles: str = ""
+    """Canonical SMILES **with** the stereochemistry the input gave; what a model is
+    fed, since dataset v2 trains on isomeric structures (journal E-019, E-020). Equal
+    to :attr:`smiles` when the input gave no stereo; empty in hand-built test objects,
+    where it falls back to :attr:`smiles`."""
+
+    @property
+    def model_smiles(self) -> str:
+        return self.isomeric_smiles or self.smiles
+
+    @property
+    def has_stereo(self) -> bool:
+        """True when the input specified stereochemistry -- carvone is caraway on one
+        side of the mirror and mint on the other, and the answer must say what the
+        model did with that."""
+        return self.model_smiles != self.smiles
 
 
 @dataclass(frozen=True, slots=True)

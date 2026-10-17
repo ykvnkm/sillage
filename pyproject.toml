@@ -42,6 +42,21 @@ dev = [
     "ruff>=0.14",
     "umap-learn>=0.5.12",
 ]
+# Training graph networks (journal E-020). A group of its own, not part of dev: the
+# service never imports torch, and the Docker image must not carry it. CI installs it
+# for the tests of the graph code; on Linux from PyTorch's CPU index, since the
+# default wheel drags in two gigabytes of CUDA that no job here can use.
+gnn = [
+    "torch>=2.8",
+]
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [build-system]
 requires = ["hatchling"]

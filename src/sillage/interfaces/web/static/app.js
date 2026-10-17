@@ -232,8 +232,8 @@ function renderReport(report) {
     h(
       "dl",
       { class: "label__rows" },
-      h("div", {}, h("dt", {}, "SMILES"), h("dd", {}, h("code", { lang: "en" }, m.smiles))),
-      m.input_smiles !== m.smiles &&
+      h("div", {}, h("dt", {}, "SMILES"), h("dd", {}, h("code", { lang: "en" }, m.isomeric_smiles))),
+      m.input_smiles !== m.isomeric_smiles &&
         h("div", {}, h("dt", {}, "Введено"), h("dd", {}, h("code", { lang: "en" }, m.input_smiles))),
       h("div", {}, h("dt", {}, "В данных"), h("dd", {}, knownLine(known))),
       report.names?.pubchem_url &&
@@ -250,6 +250,13 @@ function renderReport(report) {
         { class: "caveat", role: "note" },
         h("strong", {}, "Стереохимия не учтена. "),
         "Модель не различает зеркальные молекулы, поэтому обе формы получают этот же ответ.",
+      ),
+    report.caveats.includes("stereo_unreliable") &&
+      h(
+        "p",
+        { class: "caveat", role: "note" },
+        h("strong", {}, "Стереохимия учтена, но разница между изомерами ненадёжна. "),
+        "Эксперты, на чьих описаниях училась модель, сами противоречиво описывают изомеры одной молекулы, поэтому сравнивать ответы для них не стоит.",
       ),
   );
 

@@ -24,18 +24,20 @@ class RdkitMoleculeReader:
             input_smiles=text,
             formula=rdMolDescriptors.CalcMolFormula(parsed),
             weight=float(Descriptors.MolWt(parsed)),
-            stereo_discarded=Chem.MolToSmiles(parsed) != flat,
+            isomeric_smiles=Chem.MolToSmiles(parsed),
         )
 
 
 def to_rdkit(molecule: Molecule) -> Mol:
-    """The RDKit graph behind a domain molecule.
+    """The RDKit graph behind a domain molecule, stereo included where the input gave it.
 
     Re-parsed from the canonical string rather than carried alongside it: the domain
     object stays free of RDKit, and parsing a hundred-character SMILES costs tens of
     microseconds -- nothing next to the 100 ms the estimator takes.
     """
-    parsed = Chem.MolFromSmiles(molecule.smiles)
+    parsed = Chem.MolFromSmiles(molecule.model_smiles)
     if parsed is None:  # canonical output of RDKit itself; failing here is a bug
-        raise RuntimeError(f"RDKit cannot re-read its own canonical SMILES {molecule.smiles!r}")
+        raise RuntimeError(
+            f"RDKit cannot re-read its own canonical SMILES {molecule.model_smiles!r}"
+        )
     return parsed
