@@ -1,0 +1,1213 @@
+variant,note,smiles,hit,chance
+ensemble,sour,C/C(=C\C(C)C)C(=O)O,True,0.3333
+ensemble,cheesy,C/C(=C\C(C)C)C(=O)O,True,0.3333
+linear only,sour,C/C(=C\C(C)C)C(=O)O,True,0.3333
+linear only,cheesy,C/C(=C\C(C)C)C(=O)O,False,0.3333
+graph only,sour,C/C(=C\C(C)C)C(=O)O,True,0.3333
+graph only,cheesy,C/C(=C\C(C)C)C(=O)O,True,0.3333
+"graph, shuffled weights",sour,C/C(=C\C(C)C)C(=O)O,True,0.3333
+"graph, shuffled weights",cheesy,C/C(=C\C(C)C)C(=O)O,False,0.3333
+ensemble,fruity,C/C=C(/C)C(=O)OCCC,True,0.4000
+linear only,fruity,C/C=C(/C)C(=O)OCCC,True,0.4000
+graph only,fruity,C/C=C(/C)C(=O)OCCC,True,0.4000
+"graph, shuffled weights",fruity,C/C=C(/C)C(=O)OCCC,True,0.4000
+ensemble,fruity,C/C=C(/C)C(=O)OCCC(C)C,True,0.3333
+linear only,fruity,C/C=C(/C)C(=O)OCCC(C)C,False,0.3333
+graph only,fruity,C/C=C(/C)C(=O)OCCC(C)C,True,0.3333
+"graph, shuffled weights",fruity,C/C=C(/C)C(=O)OCCC(C)C,False,0.3333
+ensemble,fruity,C/C=C(/C)C(=O)OCCCC,True,0.3636
+linear only,fruity,C/C=C(/C)C(=O)OCCCC,False,0.3636
+graph only,fruity,C/C=C(/C)C(=O)OCCCC,True,0.3636
+"graph, shuffled weights",fruity,C/C=C(/C)C(=O)OCCCC,True,0.3636
+ensemble,fruity,C/C=C(\C)C(=O)OCC,True,0.4444
+linear only,fruity,C/C=C(\C)C(=O)OCC,True,0.4444
+graph only,fruity,C/C=C(\C)C(=O)OCC,True,0.4444
+"graph, shuffled weights",fruity,C/C=C(\C)C(=O)OCC,True,0.4444
+ensemble,fruity,C/C=C(\C)C(=O)OCCC,True,0.4000
+linear only,fruity,C/C=C(\C)C(=O)OCCC,True,0.4000
+graph only,fruity,C/C=C(\C)C(=O)OCCC,True,0.4000
+"graph, shuffled weights",fruity,C/C=C(\C)C(=O)OCCC,True,0.4000
+ensemble,fruity,C/C=C(\C)C(=O)OCCC(C)C,True,0.3333
+linear only,fruity,C/C=C(\C)C(=O)OCCC(C)C,False,0.3333
+graph only,fruity,C/C=C(\C)C(=O)OCCC(C)C,True,0.3333
+"graph, shuffled weights",fruity,C/C=C(\C)C(=O)OCCC(C)C,True,0.3333
+ensemble,fruity,C/C=C(\C)C(=O)OCCCC,True,0.3636
+linear only,fruity,C/C=C(\C)C(=O)OCCCC,False,0.3636
+graph only,fruity,C/C=C(\C)C(=O)OCCCC,True,0.3636
+"graph, shuffled weights",fruity,C/C=C(\C)C(=O)OCCCC,True,0.3636
+ensemble,garlic,C/C=C/SSC(C)CC,True,0.2222
+linear only,garlic,C/C=C/SSC(C)CC,False,0.2222
+graph only,garlic,C/C=C/SSC(C)CC,True,0.2222
+"graph, shuffled weights",garlic,C/C=C/SSC(C)CC,False,0.2222
+ensemble,fishy,C1CCNCC1,True,0.1667
+linear only,fishy,C1CCNCC1,True,0.1667
+graph only,fishy,C1CCNCC1,True,0.1667
+"graph, shuffled weights",fishy,C1CCNCC1,True,0.1667
+ensemble,fruity,C=C(C)C1CC=C(COC(C)=O)CC1,True,0.2857
+linear only,fruity,C=C(C)C1CC=C(COC(C)=O)CC1,True,0.2857
+graph only,fruity,C=C(C)C1CC=C(COC(C)=O)CC1,True,0.2857
+"graph, shuffled weights",fruity,C=C(C)C1CC=C(COC(C)=O)CC1,False,0.2857
+ensemble,fruity,C=C(C)C=COC(=O)CCCCC,True,0.3077
+linear only,fruity,C=C(C)C=COC(=O)CCCCC,False,0.3077
+graph only,fruity,C=C(C)C=COC(=O)CCCCC,True,0.3077
+"graph, shuffled weights",fruity,C=C(C)C=COC(=O)CCCCC,True,0.3077
+ensemble,fruity,C=C(C)CCCC(C)CCOC(=O)C(C)C,True,0.2500
+linear only,fruity,C=C(C)CCCC(C)CCOC(=O)C(C)C,True,0.2500
+graph only,fruity,C=C(C)CCCC(C)CCOC(=O)C(C)C,True,0.2500
+"graph, shuffled weights",fruity,C=C(C)CCCC(C)CCOC(=O)C(C)C,False,0.2500
+ensemble,fruity,C=C(C)CCOC(C)=O,True,0.4444
+linear only,fruity,C=C(C)CCOC(C)=O,True,0.4444
+graph only,fruity,C=C(C)CCOC(C)=O,True,0.4444
+"graph, shuffled weights",fruity,C=C(C)CCOC(C)=O,True,0.4444
+ensemble,roasted,C=C(C)c1cc(C(C)=O)ccn1,True,0.0833
+linear only,roasted,C=C(C)c1cc(C(C)=O)ccn1,False,0.0833
+graph only,roasted,C=C(C)c1cc(C(C)=O)ccn1,True,0.0833
+"graph, shuffled weights",roasted,C=C(C)c1cc(C(C)=O)ccn1,False,0.0833
+ensemble,aldehydic,C=C/C(C)=C/C/C=C(\C)CC/C=C(\C)C=O,True,0.1875
+linear only,aldehydic,C=C/C(C)=C/C/C=C(\C)CC/C=C(\C)C=O,False,0.1875
+graph only,aldehydic,C=C/C(C)=C/C/C=C(\C)CC/C=C(\C)C=O,True,0.1875
+"graph, shuffled weights",aldehydic,C=C/C(C)=C/C/C=C(\C)CC/C=C(\C)C=O,False,0.1875
+ensemble,fruity,C=C1C(OC(C)=O)CC2CC1C2(C)C,True,0.2857
+linear only,fruity,C=C1C(OC(C)=O)CC2CC1C2(C)C,True,0.2857
+graph only,fruity,C=C1C(OC(C)=O)CC2CC1C2(C)C,True,0.2857
+"graph, shuffled weights",fruity,C=C1C(OC(C)=O)CC2CC1C2(C)C,True,0.2857
+ensemble,fruity,C=CCOC(=O)C(C)C,True,0.4444
+linear only,fruity,C=CCOC(=O)C(C)C,True,0.4444
+graph only,fruity,C=CCOC(=O)C(C)C,True,0.4444
+"graph, shuffled weights",fruity,C=CCOC(=O)C(C)C,False,0.4444
+ensemble,fruity,C=CCOC(=O)CCCC1CCCCC1,True,0.2667
+linear only,fruity,C=CCOC(=O)CCCC1CCCCC1,True,0.2667
+graph only,fruity,C=CCOC(=O)CCCC1CCCCC1,True,0.2667
+"graph, shuffled weights",fruity,C=CCOC(=O)CCCC1CCCCC1,False,0.2667
+ensemble,fruity,C=CCOC(=O)Cc1ccccc1,False,0.3077
+linear only,fruity,C=CCOC(=O)Cc1ccccc1,False,0.3077
+graph only,fruity,C=CCOC(=O)Cc1ccccc1,False,0.3077
+"graph, shuffled weights",fruity,C=CCOC(=O)Cc1ccccc1,False,0.3077
+ensemble,fruity,C=CCOC(C)=O,True,0.5714
+linear only,fruity,C=CCOC(C)=O,True,0.5714
+graph only,fruity,C=CCOC(C)=O,True,0.5714
+"graph, shuffled weights",fruity,C=CCOC(C)=O,True,0.5714
+ensemble,fruity,C=CCOC=O,True,0.6667
+linear only,fruity,C=CCOC=O,True,0.6667
+graph only,fruity,C=CCOC=O,True,0.6667
+"graph, shuffled weights",fruity,C=CCOC=O,True,0.6667
+ensemble,sulfurous,C=CCSS/C=C/C,True,0.2500
+ensemble,alliaceous,C=CCSS/C=C/C,False,0.2500
+linear only,sulfurous,C=CCSS/C=C/C,False,0.2500
+linear only,alliaceous,C=CCSS/C=C/C,False,0.2500
+graph only,sulfurous,C=CCSS/C=C/C,True,0.2500
+graph only,alliaceous,C=CCSS/C=C/C,False,0.2500
+"graph, shuffled weights",sulfurous,C=CCSS/C=C/C,True,0.2500
+"graph, shuffled weights",alliaceous,C=CCSS/C=C/C,True,0.2500
+ensemble,sulfurous,C=CCSSC,True,0.3333
+ensemble,alliaceous,C=CCSSC,False,0.3333
+ensemble,garlic,C=CCSSC,False,0.3333
+ensemble,onion,C=CCSSC,True,0.3333
+linear only,sulfurous,C=CCSSC,False,0.3333
+linear only,alliaceous,C=CCSSC,False,0.3333
+linear only,garlic,C=CCSSC,False,0.3333
+linear only,onion,C=CCSSC,False,0.3333
+graph only,sulfurous,C=CCSSC,True,0.3333
+graph only,alliaceous,C=CCSSC,True,0.3333
+graph only,garlic,C=CCSSC,True,0.3333
+graph only,onion,C=CCSSC,True,0.3333
+"graph, shuffled weights",sulfurous,C=CCSSC,False,0.3333
+"graph, shuffled weights",alliaceous,C=CCSSC,False,0.3333
+"graph, shuffled weights",garlic,C=CCSSC,False,0.3333
+"graph, shuffled weights",onion,C=CCSSC,False,0.3333
+ensemble,garlic,C=CCSSC=CC,False,0.2500
+ensemble,onion,C=CCSSC=CC,True,0.2500
+linear only,garlic,C=CCSSC=CC,False,0.2500
+linear only,onion,C=CCSSC=CC,False,0.2500
+graph only,garlic,C=CCSSC=CC,False,0.2500
+graph only,onion,C=CCSSC=CC,True,0.2500
+"graph, shuffled weights",garlic,C=CCSSC=CC,True,0.2500
+"graph, shuffled weights",onion,C=CCSSC=CC,True,0.2500
+ensemble,alliaceous,C=CCSSCC=C,False,0.2500
+ensemble,garlic,C=CCSSCC=C,True,0.2500
+ensemble,onion,C=CCSSCC=C,True,0.2500
+linear only,alliaceous,C=CCSSCC=C,True,0.2500
+linear only,garlic,C=CCSSCC=C,True,0.2500
+linear only,onion,C=CCSSCC=C,True,0.2500
+graph only,alliaceous,C=CCSSCC=C,False,0.2500
+graph only,garlic,C=CCSSCC=C,True,0.2500
+graph only,onion,C=CCSSCC=C,True,0.2500
+"graph, shuffled weights",alliaceous,C=CCSSCC=C,True,0.2500
+"graph, shuffled weights",garlic,C=CCSSCC=C,True,0.2500
+"graph, shuffled weights",onion,C=CCSSCC=C,False,0.2500
+ensemble,sulfurous,C=CCSSSCCC,False,0.3333
+ensemble,alliaceous,C=CCSSSCCC,False,0.3333
+ensemble,garlic,C=CCSSSCCC,True,0.3333
+ensemble,onion,C=CCSSSCCC,True,0.3333
+linear only,sulfurous,C=CCSSSCCC,True,0.3333
+linear only,alliaceous,C=CCSSSCCC,False,0.3333
+linear only,garlic,C=CCSSSCCC,True,0.3333
+linear only,onion,C=CCSSSCCC,False,0.3333
+graph only,sulfurous,C=CCSSSCCC,False,0.3333
+graph only,alliaceous,C=CCSSSCCC,False,0.3333
+graph only,garlic,C=CCSSSCCC,True,0.3333
+graph only,onion,C=CCSSSCCC,True,0.3333
+"graph, shuffled weights",sulfurous,C=CCSSSCCC,True,0.3333
+"graph, shuffled weights",alliaceous,C=CCSSSCCC,True,0.3333
+"graph, shuffled weights",garlic,C=CCSSSCCC,True,0.3333
+"graph, shuffled weights",onion,C=CCSSSCCC,True,0.3333
+ensemble,cheesy,CC(=CC(C)C)C(=O)O,True,0.3333
+ensemble,sweaty,CC(=CC(C)C)C(=O)O,True,0.3333
+linear only,cheesy,CC(=CC(C)C)C(=O)O,False,0.3333
+linear only,sweaty,CC(=CC(C)C)C(=O)O,True,0.3333
+graph only,cheesy,CC(=CC(C)C)C(=O)O,True,0.3333
+graph only,sweaty,CC(=CC(C)C)C(=O)O,True,0.3333
+"graph, shuffled weights",cheesy,CC(=CC(C)C)C(=O)O,False,0.3333
+"graph, shuffled weights",sweaty,CC(=CC(C)C)C(=O)O,True,0.3333
+ensemble,aldehydic,CC(=CC=O)CCC=C(C)CC(C)C,False,0.2143
+linear only,aldehydic,CC(=CC=O)CCC=C(C)CC(C)C,False,0.2143
+graph only,aldehydic,CC(=CC=O)CCC=C(C)CC(C)C,True,0.2143
+"graph, shuffled weights",aldehydic,CC(=CC=O)CCC=C(C)CC(C)C,False,0.2143
+ensemble,onion,CC(=O)C1=NCCS1,True,0.1250
+linear only,onion,CC(=O)C1=NCCS1,False,0.1250
+graph only,onion,CC(=O)C1=NCCS1,True,0.1250
+"graph, shuffled weights",onion,CC(=O)C1=NCCS1,False,0.1250
+ensemble,sulfurous,CC(=O)CC(C)S,True,0.1429
+ensemble,meaty,CC(=O)CC(C)S,True,0.1429
+linear only,sulfurous,CC(=O)CC(C)S,False,0.1429
+linear only,meaty,CC(=O)CC(C)S,False,0.1429
+graph only,sulfurous,CC(=O)CC(C)S,True,0.1429
+graph only,meaty,CC(=O)CC(C)S,True,0.1429
+"graph, shuffled weights",sulfurous,CC(=O)CC(C)S,False,0.1429
+"graph, shuffled weights",meaty,CC(=O)CC(C)S,False,0.1429
+ensemble,meaty,CC(=O)CC(C)SCc1ccco1,True,0.0769
+linear only,meaty,CC(=O)CC(C)SCc1ccco1,False,0.0769
+graph only,meaty,CC(=O)CC(C)SCc1ccco1,True,0.0769
+"graph, shuffled weights",meaty,CC(=O)CC(C)SCc1ccco1,False,0.0769
+ensemble,fruity,CC(=O)O/C=C\c1ccccc1,True,0.3333
+linear only,fruity,CC(=O)O/C=C\c1ccccc1,True,0.3333
+graph only,fruity,CC(=O)O/C=C\c1ccccc1,True,0.3333
+"graph, shuffled weights",fruity,CC(=O)O/C=C\c1ccccc1,True,0.3333
+ensemble,fruity,CC(=O)OC(C)CCc1ccccc1,True,0.2857
+linear only,fruity,CC(=O)OC(C)CCc1ccccc1,True,0.2857
+graph only,fruity,CC(=O)OC(C)CCc1ccccc1,True,0.2857
+"graph, shuffled weights",fruity,CC(=O)OC(C)CCc1ccccc1,True,0.2857
+ensemble,fruity,CC(=O)OC1=C(C)OC(C)C1=O,True,0.3333
+linear only,fruity,CC(=O)OC1=C(C)OC(C)C1=O,False,0.3333
+graph only,fruity,CC(=O)OC1=C(C)OC(C)C1=O,True,0.3333
+"graph, shuffled weights",fruity,CC(=O)OC1=C(C)OC(C)C1=O,False,0.3333
+ensemble,fruity,CC(=O)OC1=C(C)O[C@@H](C)C1=O,True,0.3333
+linear only,fruity,CC(=O)OC1=C(C)O[C@@H](C)C1=O,False,0.3333
+graph only,fruity,CC(=O)OC1=C(C)O[C@@H](C)C1=O,True,0.3333
+"graph, shuffled weights",fruity,CC(=O)OC1=C(C)O[C@@H](C)C1=O,False,0.3333
+ensemble,fruity,CC(=O)OCCC(C)CCC=C(C)C,True,0.2857
+linear only,fruity,CC(=O)OCCC(C)CCC=C(C)C,True,0.2857
+graph only,fruity,CC(=O)OCCC(C)CCC=C(C)C,True,0.2857
+"graph, shuffled weights",fruity,CC(=O)OCCC(C)CCC=C(C)C,False,0.2857
+ensemble,sulfurous,CC(=O)OCCCCCCSC(C)=O,True,0.0714
+ensemble,fruity,CC(=O)OCCCCCCSC(C)=O,True,0.2857
+linear only,sulfurous,CC(=O)OCCCCCCSC(C)=O,True,0.0714
+linear only,fruity,CC(=O)OCCCCCCSC(C)=O,True,0.2857
+graph only,sulfurous,CC(=O)OCCCCCCSC(C)=O,True,0.0714
+graph only,fruity,CC(=O)OCCCCCCSC(C)=O,True,0.2857
+"graph, shuffled weights",sulfurous,CC(=O)OCCCCCCSC(C)=O,False,0.0714
+"graph, shuffled weights",fruity,CC(=O)OCCCCCCSC(C)=O,True,0.2857
+ensemble,alliaceous,CC(=O)OCCCCS,False,0.1111
+ensemble,fruity,CC(=O)OCCCCS,True,0.4444
+linear only,alliaceous,CC(=O)OCCCCS,False,0.1111
+linear only,fruity,CC(=O)OCCCCS,True,0.4444
+graph only,alliaceous,CC(=O)OCCCCS,True,0.1111
+graph only,fruity,CC(=O)OCCCCS,True,0.4444
+"graph, shuffled weights",alliaceous,CC(=O)OCCCCS,False,0.1111
+"graph, shuffled weights",fruity,CC(=O)OCCCCS,True,0.4444
+ensemble,fruity,CC(=O)OCCOc1ccccc1,True,0.3077
+linear only,fruity,CC(=O)OCCOc1ccccc1,True,0.3077
+graph only,fruity,CC(=O)OCCOc1ccccc1,True,0.3077
+"graph, shuffled weights",fruity,CC(=O)OCCOc1ccccc1,True,0.3077
+ensemble,fruity,CC(=O)OCC[C@@H](C)CCC=C(C)C,True,0.2857
+linear only,fruity,CC(=O)OCC[C@@H](C)CCC=C(C)C,True,0.2857
+graph only,fruity,CC(=O)OCC[C@@H](C)CCC=C(C)C,True,0.2857
+"graph, shuffled weights",fruity,CC(=O)OCC[C@@H](C)CCC=C(C)C,True,0.2857
+ensemble,meaty,CC(=O)OCCc1scnc1C,True,0.0833
+ensemble,nutty,CC(=O)OCCc1scnc1C,True,0.0833
+linear only,meaty,CC(=O)OCCc1scnc1C,False,0.0833
+linear only,nutty,CC(=O)OCCc1scnc1C,True,0.0833
+graph only,meaty,CC(=O)OCCc1scnc1C,False,0.0833
+graph only,nutty,CC(=O)OCCc1scnc1C,True,0.0833
+"graph, shuffled weights",meaty,CC(=O)OCCc1scnc1C,False,0.0833
+"graph, shuffled weights",nutty,CC(=O)OCCc1scnc1C,False,0.0833
+ensemble,fruity,CC(=O)OCc1ccco1,True,0.4000
+linear only,fruity,CC(=O)OCc1ccco1,True,0.4000
+graph only,fruity,CC(=O)OCc1ccco1,True,0.4000
+"graph, shuffled weights",fruity,CC(=O)OCc1ccco1,False,0.4000
+ensemble,fruity,CC(=O)O[C@H](C)CCc1ccccc1,True,0.2857
+linear only,fruity,CC(=O)O[C@H](C)CCc1ccccc1,True,0.2857
+graph only,fruity,CC(=O)O[C@H](C)CCc1ccccc1,True,0.2857
+"graph, shuffled weights",fruity,CC(=O)O[C@H](C)CCc1ccccc1,True,0.2857
+ensemble,phenolic,CC(=O)c1cc(C)ccc1O,True,0.1818
+linear only,phenolic,CC(=O)c1cc(C)ccc1O,False,0.1818
+graph only,phenolic,CC(=O)c1cc(C)ccc1O,True,0.1818
+"graph, shuffled weights",phenolic,CC(=O)c1cc(C)ccc1O,False,0.1818
+ensemble,nutty,CC(=O)c1cccnc1,False,0.1111
+ensemble,roasted,CC(=O)c1cccnc1,True,0.1111
+linear only,nutty,CC(=O)c1cccnc1,False,0.1111
+linear only,roasted,CC(=O)c1cccnc1,False,0.1111
+graph only,nutty,CC(=O)c1cccnc1,True,0.1111
+graph only,roasted,CC(=O)c1cccnc1,True,0.1111
+"graph, shuffled weights",nutty,CC(=O)c1cccnc1,False,0.1111
+"graph, shuffled weights",roasted,CC(=O)c1cccnc1,False,0.1111
+ensemble,meaty,CC(=O)c1sc(C)cc1O,True,0.1000
+linear only,meaty,CC(=O)c1sc(C)cc1O,False,0.1000
+graph only,meaty,CC(=O)c1sc(C)cc1O,True,0.1000
+"graph, shuffled weights",meaty,CC(=O)c1sc(C)cc1O,False,0.1000
+ensemble,aldehydic,CC(C)(C=O)COCc1ccccc1,True,0.2143
+linear only,aldehydic,CC(C)(C=O)COCc1ccccc1,True,0.2143
+graph only,aldehydic,CC(C)(C=O)COCc1ccccc1,True,0.2143
+"graph, shuffled weights",aldehydic,CC(C)(C=O)COCc1ccccc1,False,0.2143
+ensemble,aldehydic,CC(C)=CCC/C(C)=C/CCC=O,True,0.2308
+linear only,aldehydic,CC(C)=CCC/C(C)=C/CCC=O,False,0.2308
+graph only,aldehydic,CC(C)=CCC/C(C)=C/CCC=O,True,0.2308
+"graph, shuffled weights",aldehydic,CC(C)=CCC/C(C)=C/CCC=O,False,0.2308
+ensemble,fruity,CC(C)=CCC/C(C)=C/COC(=O)CC(C)C,True,0.2353
+linear only,fruity,CC(C)=CCC/C(C)=C/COC(=O)CC(C)C,True,0.2353
+graph only,fruity,CC(C)=CCC/C(C)=C/COC(=O)CC(C)C,True,0.2353
+"graph, shuffled weights",fruity,CC(C)=CCC/C(C)=C/COC(=O)CC(C)C,True,0.2353
+ensemble,fruity,CC(C)=CCC/C(C)=C\COC(=O)CC(C)C,True,0.2353
+linear only,fruity,CC(C)=CCC/C(C)=C\COC(=O)CC(C)C,True,0.2353
+graph only,fruity,CC(C)=CCC/C(C)=C\COC(=O)CC(C)C,True,0.2353
+"graph, shuffled weights",fruity,CC(C)=CCC/C(C)=C\COC(=O)CC(C)C,True,0.2353
+ensemble,aldehydic,CC(C)=CCCC(C)CC=O,True,0.2727
+linear only,aldehydic,CC(C)=CCCC(C)CC=O,False,0.2727
+graph only,aldehydic,CC(C)=CCCC(C)CC=O,True,0.2727
+"graph, shuffled weights",aldehydic,CC(C)=CCCC(C)CC=O,False,0.2727
+ensemble,fruity,CC(C)C(=O)OC/C=C/c1ccccc1,True,0.2667
+linear only,fruity,CC(C)C(=O)OC/C=C/c1ccccc1,False,0.2667
+graph only,fruity,CC(C)C(=O)OC/C=C/c1ccccc1,True,0.2667
+"graph, shuffled weights",fruity,CC(C)C(=O)OC/C=C/c1ccccc1,False,0.2667
+ensemble,fruity,CC(C)C(=O)OCc1ccc2c(c1)OCO2,True,0.2500
+linear only,fruity,CC(C)C(=O)OCc1ccc2c(c1)OCO2,True,0.2500
+graph only,fruity,CC(C)C(=O)OCc1ccc2c(c1)OCO2,True,0.2500
+"graph, shuffled weights",fruity,CC(C)C(=O)OCc1ccc2c(c1)OCO2,False,0.2500
+ensemble,fruity,CC(C)CCC(=O)OC(C)C,True,0.3636
+linear only,fruity,CC(C)CCC(=O)OC(C)C,False,0.3636
+graph only,fruity,CC(C)CCC(=O)OC(C)C,True,0.3636
+"graph, shuffled weights",fruity,CC(C)CCC(=O)OC(C)C,True,0.3636
+ensemble,aldehydic,CC(C)CCCC1=CCC(C)(C=O)CC1,True,0.2000
+linear only,aldehydic,CC(C)CCCC1=CCC(C)(C=O)CC1,True,0.2000
+graph only,aldehydic,CC(C)CCCC1=CCC(C)(C=O)CC1,True,0.2000
+"graph, shuffled weights",aldehydic,CC(C)CCCC1=CCC(C)(C=O)CC1,False,0.2000
+ensemble,fruity,CC(C)CCCOC(=O)CC(C)C,True,0.3077
+linear only,fruity,CC(C)CCCOC(=O)CC(C)C,True,0.3077
+graph only,fruity,CC(C)CCCOC(=O)CC(C)C,True,0.3077
+"graph, shuffled weights",fruity,CC(C)CCCOC(=O)CC(C)C,True,0.3077
+ensemble,fruity,CC(C)CCOC=O,True,0.5000
+linear only,fruity,CC(C)CCOC=O,False,0.5000
+graph only,fruity,CC(C)CCOC=O,True,0.5000
+"graph, shuffled weights",fruity,CC(C)CCOC=O,False,0.5000
+ensemble,fruity,CC(C)OC(=O)C(C)O,True,0.4444
+linear only,fruity,CC(C)OC(=O)C(C)O,True,0.4444
+graph only,fruity,CC(C)OC(=O)C(C)O,True,0.4444
+"graph, shuffled weights",fruity,CC(C)OC(=O)C(C)O,True,0.4444
+ensemble,fruity,CC(C)OC(=O)c1ccccc1,True,0.3333
+linear only,fruity,CC(C)OC(=O)c1ccccc1,True,0.3333
+graph only,fruity,CC(C)OC(=O)c1ccccc1,True,0.3333
+"graph, shuffled weights",fruity,CC(C)OC(=O)c1ccccc1,True,0.3333
+ensemble,phenolic,CC(C)c1ccc(O)cc1,True,0.2000
+linear only,phenolic,CC(C)c1ccc(O)cc1,True,0.2000
+graph only,phenolic,CC(C)c1ccc(O)cc1,True,0.2000
+"graph, shuffled weights",phenolic,CC(C)c1ccc(O)cc1,False,0.2000
+ensemble,phenolic,CC(C)c1cccc(O)c1,True,0.2000
+linear only,phenolic,CC(C)c1cccc(O)c1,False,0.2000
+graph only,phenolic,CC(C)c1cccc(O)c1,True,0.2000
+"graph, shuffled weights",phenolic,CC(C)c1cccc(O)c1,True,0.2000
+ensemble,nutty,CC(C)c1cnccn1,True,0.2222
+linear only,nutty,CC(C)c1cnccn1,False,0.2222
+graph only,nutty,CC(C)c1cnccn1,True,0.2222
+"graph, shuffled weights",nutty,CC(C)c1cnccn1,False,0.2222
+ensemble,sour,CC(CC(=O)O)CC(C)(C)C,True,0.2727
+linear only,sour,CC(CC(=O)O)CC(C)(C)C,True,0.2727
+graph only,sour,CC(CC(=O)O)CC(C)(C)C,True,0.2727
+"graph, shuffled weights",sour,CC(CC(=O)O)CC(C)(C)C,True,0.2727
+ensemble,fruity,CC/C=C/CCC(=O)OCC,True,0.3636
+linear only,fruity,CC/C=C/CCC(=O)OCC,True,0.3636
+graph only,fruity,CC/C=C/CCC(=O)OCC,True,0.3636
+"graph, shuffled weights",fruity,CC/C=C/CCC(=O)OCC,True,0.3636
+ensemble,fruity,CC/C=C/CCOC(=O)CCCCCCCCC,True,0.2222
+linear only,fruity,CC/C=C/CCOC(=O)CCCCCCCCC,True,0.2222
+graph only,fruity,CC/C=C/CCOC(=O)CCCCCCCCC,True,0.2222
+"graph, shuffled weights",fruity,CC/C=C/CCOC(=O)CCCCCCCCC,False,0.2222
+ensemble,fruity,CC/C=C\CCC(=O)OCC,True,0.3636
+linear only,fruity,CC/C=C\CCC(=O)OCC,True,0.3636
+graph only,fruity,CC/C=C\CCC(=O)OCC,True,0.3636
+"graph, shuffled weights",fruity,CC/C=C\CCC(=O)OCC,True,0.3636
+ensemble,fruity,CC/C=C\CCOC(=O)/C=C/CCC,False,0.2857
+linear only,fruity,CC/C=C\CCOC(=O)/C=C/CCC,False,0.2857
+graph only,fruity,CC/C=C\CCOC(=O)/C=C/CCC,True,0.2857
+"graph, shuffled weights",fruity,CC/C=C\CCOC(=O)/C=C/CCC,False,0.2857
+ensemble,fruity,CC/C=C\CCOC(=O)C/C=C\CC,True,0.2857
+linear only,fruity,CC/C=C\CCOC(=O)C/C=C\CC,True,0.2857
+graph only,fruity,CC/C=C\CCOC(=O)C/C=C\CC,True,0.2857
+"graph, shuffled weights",fruity,CC/C=C\CCOC(=O)C/C=C\CC,False,0.2857
+ensemble,sulfurous,CC1(C)C2CCC(CS)C1C2,True,0.0909
+linear only,sulfurous,CC1(C)C2CCC(CS)C1C2,True,0.0909
+graph only,sulfurous,CC1(C)C2CCC(CS)C1C2,True,0.0909
+"graph, shuffled weights",sulfurous,CC1(C)C2CCC(CS)C1C2,False,0.0909
+ensemble,sulfurous,CC1(C)CSSSS1,True,0.5000
+ensemble,garlic,CC1(C)CSSSS1,True,0.5000
+ensemble,onion,CC1(C)CSSSS1,False,0.5000
+linear only,sulfurous,CC1(C)CSSSS1,False,0.5000
+linear only,garlic,CC1(C)CSSSS1,False,0.5000
+linear only,onion,CC1(C)CSSSS1,False,0.5000
+graph only,sulfurous,CC1(C)CSSSS1,False,0.5000
+graph only,garlic,CC1(C)CSSSS1,True,0.5000
+graph only,onion,CC1(C)CSSSS1,False,0.5000
+"graph, shuffled weights",sulfurous,CC1(C)CSSSS1,True,0.5000
+"graph, shuffled weights",garlic,CC1(C)CSSSS1,True,0.5000
+"graph, shuffled weights",onion,CC1(C)CSSSS1,False,0.5000
+ensemble,fruity,CC1=CCC(C(C)(C)OC=O)CC1,True,0.3077
+linear only,fruity,CC1=CCC(C(C)(C)OC=O)CC1,False,0.3077
+graph only,fruity,CC1=CCC(C(C)(C)OC=O)CC1,True,0.3077
+"graph, shuffled weights",fruity,CC1=CCC(C(C)(C)OC=O)CC1,False,0.3077
+ensemble,sulfurous,CC1=NC(CC(C)C)SC1C,True,0.0909
+ensemble,meaty,CC1=NC(CC(C)C)SC1C,True,0.0909
+linear only,sulfurous,CC1=NC(CC(C)C)SC1C,True,0.0909
+linear only,meaty,CC1=NC(CC(C)C)SC1C,False,0.0909
+graph only,sulfurous,CC1=NC(CC(C)C)SC1C,True,0.0909
+graph only,meaty,CC1=NC(CC(C)C)SC1C,True,0.0909
+"graph, shuffled weights",sulfurous,CC1=NC(CC(C)C)SC1C,False,0.0909
+"graph, shuffled weights",meaty,CC1=NC(CC(C)C)SC1C,False,0.0909
+ensemble,sulfurous,CC1=NCCS1,True,0.1667
+ensemble,meaty,CC1=NCCS1,False,0.1667
+linear only,sulfurous,CC1=NCCS1,False,0.1667
+linear only,meaty,CC1=NCCS1,False,0.1667
+graph only,sulfurous,CC1=NCCS1,True,0.1667
+graph only,meaty,CC1=NCCS1,True,0.1667
+"graph, shuffled weights",sulfurous,CC1=NCCS1,False,0.1667
+"graph, shuffled weights",meaty,CC1=NCCS1,False,0.1667
+ensemble,garlic,CC1=NCSC1,True,0.1667
+linear only,garlic,CC1=NCSC1,False,0.1667
+graph only,garlic,CC1=NCSC1,True,0.1667
+"graph, shuffled weights",garlic,CC1=NCSC1,False,0.1667
+ensemble,nutty,CC1CC(C)c2nccnc21,True,0.1818
+ensemble,roasted,CC1CC(C)c2nccnc21,True,0.1818
+linear only,nutty,CC1CC(C)c2nccnc21,False,0.1818
+linear only,roasted,CC1CC(C)c2nccnc21,False,0.1818
+graph only,nutty,CC1CC(C)c2nccnc21,True,0.1818
+graph only,roasted,CC1CC(C)c2nccnc21,True,0.1818
+"graph, shuffled weights",nutty,CC1CC(C)c2nccnc21,False,0.1818
+"graph, shuffled weights",roasted,CC1CC(C)c2nccnc21,False,0.1818
+ensemble,sulfurous,CC1CCC2CC1SC2(C)C,True,0.0909
+linear only,sulfurous,CC1CCC2CC1SC2(C)C,False,0.0909
+graph only,sulfurous,CC1CCC2CC1SC2(C)C,True,0.0909
+"graph, shuffled weights",sulfurous,CC1CCC2CC1SC2(C)C,False,0.0909
+ensemble,sulfurous,CC1CSC(C)S1,False,0.2857
+linear only,sulfurous,CC1CSC(C)S1,False,0.2857
+graph only,sulfurous,CC1CSC(C)S1,False,0.2857
+"graph, shuffled weights",sulfurous,CC1CSC(C)S1,True,0.2857
+ensemble,meaty,CC1SC(C)N2CCCC2S1,False,0.1818
+linear only,meaty,CC1SC(C)N2CCCC2S1,False,0.1818
+graph only,meaty,CC1SC(C)N2CCCC2S1,False,0.1818
+"graph, shuffled weights",meaty,CC1SC(C)N2CCCC2S1,True,0.1818
+ensemble,fruity,CC=CCOC(=O)CCCCC,True,0.3333
+linear only,fruity,CC=CCOC(=O)CCCCC,False,0.3333
+graph only,fruity,CC=CCOC(=O)CCCCC,True,0.3333
+"graph, shuffled weights",fruity,CC=CCOC(=O)CCCCC,True,0.3333
+ensemble,phenolic,CC=Cc1ccc(O)c(OC)c1OC,True,0.1429
+ensemble,smoky,CC=Cc1ccc(O)c(OC)c1OC,False,0.1429
+linear only,phenolic,CC=Cc1ccc(O)c(OC)c1OC,False,0.1429
+linear only,smoky,CC=Cc1ccc(O)c(OC)c1OC,True,0.1429
+graph only,phenolic,CC=Cc1ccc(O)c(OC)c1OC,True,0.1429
+graph only,smoky,CC=Cc1ccc(O)c(OC)c1OC,False,0.1429
+"graph, shuffled weights",phenolic,CC=Cc1ccc(O)c(OC)c1OC,False,0.1429
+"graph, shuffled weights",smoky,CC=Cc1ccc(O)c(OC)c1OC,False,0.1429
+ensemble,fruity,CCC(=O)OC1C=CC2C3CCC(C3)C12,False,0.2667
+linear only,fruity,CCC(=O)OC1C=CC2C3CCC(C3)C12,False,0.2667
+graph only,fruity,CCC(=O)OC1C=CC2C3CCC(C3)C12,True,0.2667
+"graph, shuffled weights",fruity,CCC(=O)OC1C=CC2C3CCC(C3)C12,False,0.2667
+ensemble,fruity,CCC(=O)OC1CC2CC1C1CC=CC21,False,0.2667
+linear only,fruity,CCC(=O)OC1CC2CC1C1CC=CC21,False,0.2667
+graph only,fruity,CCC(=O)OC1CC2CC1C1CC=CC21,True,0.2667
+"graph, shuffled weights",fruity,CCC(=O)OC1CC2CC1C1CC=CC21,True,0.2667
+ensemble,fruity,CCC(=O)OCc1ccc(OC)cc1,True,0.2857
+linear only,fruity,CCC(=O)OCc1ccc(OC)cc1,True,0.2857
+graph only,fruity,CCC(=O)OCc1ccc(OC)cc1,True,0.2857
+"graph, shuffled weights",fruity,CCC(=O)OCc1ccc(OC)cc1,False,0.2857
+ensemble,fruity,CCC(C)(CCC=C(C)C)OC(C)=O,True,0.2857
+linear only,fruity,CCC(C)(CCC=C(C)C)OC(C)=O,False,0.2857
+graph only,fruity,CCC(C)(CCC=C(C)C)OC(C)=O,True,0.2857
+"graph, shuffled weights",fruity,CCC(C)(CCC=C(C)C)OC(C)=O,False,0.2857
+ensemble,fruity,CCC(C)(CCc1ccccc1)OC(C)=O,True,0.2500
+linear only,fruity,CCC(C)(CCc1ccccc1)OC(C)=O,False,0.2500
+graph only,fruity,CCC(C)(CCc1ccccc1)OC(C)=O,True,0.2500
+"graph, shuffled weights",fruity,CCC(C)(CCc1ccccc1)OC(C)=O,True,0.2500
+ensemble,onion,CCC(C)/C=C(\C=O)CSC,True,0.0909
+ensemble,meaty,CCC(C)/C=C(\C=O)CSC,True,0.0909
+linear only,onion,CCC(C)/C=C(\C=O)CSC,False,0.0909
+linear only,meaty,CCC(C)/C=C(\C=O)CSC,False,0.0909
+graph only,onion,CCC(C)/C=C(\C=O)CSC,True,0.0909
+graph only,meaty,CCC(C)/C=C(\C=O)CSC,True,0.0909
+"graph, shuffled weights",onion,CCC(C)/C=C(\C=O)CSC,False,0.0909
+"graph, shuffled weights",meaty,CCC(C)/C=C(\C=O)CSC,False,0.0909
+ensemble,fruity,CCC(C)C(=O)OC/C=C(\C)CCC=C(C)C,True,0.2353
+linear only,fruity,CCC(C)C(=O)OC/C=C(\C)CCC=C(C)C,True,0.2353
+graph only,fruity,CCC(C)C(=O)OC/C=C(\C)CCC=C(C)C,True,0.2353
+"graph, shuffled weights",fruity,CCC(C)C(=O)OC/C=C(\C)CCC=C(C)C,False,0.2353
+ensemble,fruity,CCC(C)COC(=O)C(C)C,True,0.3636
+linear only,fruity,CCC(C)COC(=O)C(C)C,True,0.3636
+graph only,fruity,CCC(C)COC(=O)C(C)C,True,0.3636
+"graph, shuffled weights",fruity,CCC(C)COC(=O)C(C)C,False,0.3636
+ensemble,fruity,CCC(C)COC(=O)c1ccccc1,True,0.2857
+linear only,fruity,CCC(C)COC(=O)c1ccccc1,False,0.2857
+graph only,fruity,CCC(C)COC(=O)c1ccccc1,False,0.2857
+"graph, shuffled weights",fruity,CCC(C)COC(=O)c1ccccc1,True,0.2857
+ensemble,fishy,CCC(C)N,True,0.2000
+linear only,fishy,CCC(C)N,True,0.2000
+graph only,fishy,CCC(C)N,True,0.2000
+"graph, shuffled weights",fishy,CCC(C)N,False,0.2000
+ensemble,fruity,CCC/C=C/C(=O)OC,True,0.4444
+linear only,fruity,CCC/C=C/C(=O)OC,False,0.4444
+graph only,fruity,CCC/C=C/C(=O)OC,True,0.4444
+"graph, shuffled weights",fruity,CCC/C=C/C(=O)OC,False,0.4444
+ensemble,fruity,CCC/C=C/COC(=O)CC(C)C,True,0.3077
+linear only,fruity,CCC/C=C/COC(=O)CC(C)C,False,0.3077
+graph only,fruity,CCC/C=C/COC(=O)CC(C)C,True,0.3077
+"graph, shuffled weights",fruity,CCC/C=C/COC(=O)CC(C)C,False,0.3077
+ensemble,fruity,CCC/C=C/COC(=O)CCCCC,True,0.2857
+linear only,fruity,CCC/C=C/COC(=O)CCCCC,False,0.2857
+graph only,fruity,CCC/C=C/COC(=O)CCCCC,True,0.2857
+"graph, shuffled weights",fruity,CCC/C=C/COC(=O)CCCCC,False,0.2857
+ensemble,fruity,CCC/C=C/COC=O,True,0.4444
+linear only,fruity,CCC/C=C/COC=O,False,0.4444
+graph only,fruity,CCC/C=C/COC=O,True,0.4444
+"graph, shuffled weights",fruity,CCC/C=C/COC=O,False,0.4444
+ensemble,fruity,CCC/C=C\COC(=O)CCCCC,True,0.2857
+linear only,fruity,CCC/C=C\COC(=O)CCCCC,False,0.2857
+graph only,fruity,CCC/C=C\COC(=O)CCCCC,True,0.2857
+"graph, shuffled weights",fruity,CCC/C=C\COC(=O)CCCCC,False,0.2857
+ensemble,aldehydic,CCC=CC=CC=CC=O,True,0.3000
+linear only,aldehydic,CCC=CC=CC=CC=O,True,0.3000
+graph only,aldehydic,CCC=CC=CC=CC=O,True,0.3000
+"graph, shuffled weights",aldehydic,CCC=CC=CC=CC=O,False,0.3000
+ensemble,fruity,CCCC(=O)OC(C)(C)C1CC=C(C)CC1,True,0.2500
+linear only,fruity,CCCC(=O)OC(C)(C)C1CC=C(C)CC1,False,0.2500
+graph only,fruity,CCCC(=O)OC(C)(C)C1CC=C(C)CC1,True,0.2500
+"graph, shuffled weights",fruity,CCCC(=O)OC(C)(C)C1CC=C(C)CC1,False,0.2500
+ensemble,fruity,CCCC(=O)OC1=C(C)CCC1=O,True,0.3077
+linear only,fruity,CCCC(=O)OC1=C(C)CCC1=O,False,0.3077
+graph only,fruity,CCCC(=O)OC1=C(C)CCC1=O,True,0.3077
+"graph, shuffled weights",fruity,CCCC(=O)OC1=C(C)CCC1=O,False,0.3077
+ensemble,fruity,CCCC(=O)OC1=C(C)OC(C)C1=O,True,0.2857
+linear only,fruity,CCCC(=O)OC1=C(C)OC(C)C1=O,True,0.2857
+graph only,fruity,CCCC(=O)OC1=C(C)OC(C)C1=O,True,0.2857
+"graph, shuffled weights",fruity,CCCC(=O)OC1=C(C)OC(C)C1=O,False,0.2857
+ensemble,fruity,CCCC(=O)OCC,True,0.5000
+linear only,fruity,CCCC(=O)OCC,True,0.5000
+graph only,fruity,CCCC(=O)OCC,True,0.5000
+"graph, shuffled weights",fruity,CCCC(=O)OCC,True,0.5000
+ensemble,fruity,CCCC(=O)OCCC(C)C,True,0.3636
+linear only,fruity,CCCC(=O)OCCC(C)C,True,0.3636
+graph only,fruity,CCCC(=O)OCCC(C)C,True,0.3636
+"graph, shuffled weights",fruity,CCCC(=O)OCCC(C)C,True,0.3636
+ensemble,fruity,CCCC(=O)OCCC(C)CCC=C(C)C,True,0.2500
+linear only,fruity,CCCC(=O)OCCC(C)CCC=C(C)C,True,0.2500
+graph only,fruity,CCCC(=O)OCCC(C)CCC=C(C)C,True,0.2500
+"graph, shuffled weights",fruity,CCCC(=O)OCCC(C)CCC=C(C)C,True,0.2500
+ensemble,fruity,CCCC(=O)Oc1ccc(C)cc1,False,0.3077
+linear only,fruity,CCCC(=O)Oc1ccc(C)cc1,False,0.3077
+graph only,fruity,CCCC(=O)Oc1ccc(C)cc1,True,0.3077
+"graph, shuffled weights",fruity,CCCC(=O)Oc1ccc(C)cc1,False,0.3077
+ensemble,fruity,CCCC(C)OC(C)=O,True,0.4444
+linear only,fruity,CCCC(C)OC(C)=O,False,0.4444
+graph only,fruity,CCCC(C)OC(C)=O,True,0.4444
+"graph, shuffled weights",fruity,CCCC(C)OC(C)=O,True,0.4444
+ensemble,sulfurous,CCCC(CCOC)[SH]=C(O)OCC,True,0.0714
+linear only,sulfurous,CCCC(CCOC)[SH]=C(O)OCC,False,0.0714
+graph only,sulfurous,CCCC(CCOC)[SH]=C(O)OCC,True,0.0714
+"graph, shuffled weights",sulfurous,CCCC(CCOC)[SH]=C(O)OCC,False,0.0714
+ensemble,cheesy,CCCC(O)CC(=O)O,True,0.3333
+linear only,cheesy,CCCC(O)CC(=O)O,True,0.3333
+graph only,cheesy,CCCC(O)CC(=O)O,True,0.3333
+"graph, shuffled weights",cheesy,CCCC(O)CC(=O)O,True,0.3333
+ensemble,fruity,CCCC=CC(=O)OC,True,0.4444
+linear only,fruity,CCCC=CC(=O)OC,False,0.4444
+graph only,fruity,CCCC=CC(=O)OC,True,0.4444
+"graph, shuffled weights",fruity,CCCC=CC(=O)OC,False,0.4444
+ensemble,fruity,CCCC=CCOC(=O)CCCCC,True,0.2857
+linear only,fruity,CCCC=CCOC(=O)CCCCC,False,0.2857
+graph only,fruity,CCCC=CCOC(=O)CCCCC,True,0.2857
+"graph, shuffled weights",fruity,CCCC=CCOC(=O)CCCCC,False,0.2857
+ensemble,fruity,CCCCC(=O)OC,True,0.5000
+linear only,fruity,CCCCC(=O)OC,True,0.5000
+graph only,fruity,CCCCC(=O)OC,True,0.5000
+"graph, shuffled weights",fruity,CCCCC(=O)OC,True,0.5000
+ensemble,fruity,CCCCC(=O)OCC,True,0.4444
+linear only,fruity,CCCCC(=O)OCC,True,0.4444
+graph only,fruity,CCCCC(=O)OCC,True,0.4444
+"graph, shuffled weights",fruity,CCCCC(=O)OCC,True,0.4444
+ensemble,fruity,CCCCC(=O)OCC(C)CC,True,0.3333
+linear only,fruity,CCCCC(=O)OCC(C)CC,True,0.3333
+graph only,fruity,CCCCC(=O)OCC(C)CC,True,0.3333
+"graph, shuffled weights",fruity,CCCCC(=O)OCC(C)CC,True,0.3333
+ensemble,fruity,CCCCC(CC)C(=O)OCC,True,0.3333
+linear only,fruity,CCCCC(CC)C(=O)OCC,True,0.3333
+graph only,fruity,CCCCC(CC)C(=O)OCC,True,0.3333
+"graph, shuffled weights",fruity,CCCCC(CC)C(=O)OCC,False,0.3333
+ensemble,fruity,CCCCC(CC)COC(=O)CC,True,0.3077
+linear only,fruity,CCCCC(CC)COC(=O)CC,True,0.3077
+graph only,fruity,CCCCC(CC)COC(=O)CC,True,0.3077
+"graph, shuffled weights",fruity,CCCCC(CC)COC(=O)CC,False,0.3077
+ensemble,fruity,CCCCC/C=C/C=C/C(=O)OCCC,True,0.2667
+linear only,fruity,CCCCC/C=C/C=C/C(=O)OCCC,False,0.2667
+graph only,fruity,CCCCC/C=C/C=C/C(=O)OCCC,True,0.2667
+"graph, shuffled weights",fruity,CCCCC/C=C/C=C/C(=O)OCCC,False,0.2667
+ensemble,fruity,CCCCC/C=C/CCC(=O)OCC,True,0.2857
+linear only,fruity,CCCCC/C=C/CCC(=O)OCC,True,0.2857
+graph only,fruity,CCCCC/C=C/CCC(=O)OCC,True,0.2857
+"graph, shuffled weights",fruity,CCCCC/C=C/CCC(=O)OCC,True,0.2857
+ensemble,aldehydic,CCCCC/C=C\CC/C=C/C=O,True,0.2308
+linear only,aldehydic,CCCCC/C=C\CC/C=C/C=O,False,0.2308
+graph only,aldehydic,CCCCC/C=C\CC/C=C/C=O,True,0.2308
+"graph, shuffled weights",aldehydic,CCCCC/C=C\CC/C=C/C=O,False,0.2308
+ensemble,fruity,CCCCC/C=C\CCC(=O)OCC,True,0.2857
+linear only,fruity,CCCCC/C=C\CCC(=O)OCC,True,0.2857
+graph only,fruity,CCCCC/C=C\CCC(=O)OCC,True,0.2857
+"graph, shuffled weights",fruity,CCCCC/C=C\CCC(=O)OCC,True,0.2857
+ensemble,fruity,CCCCC/C=C\CCOC(C)=O,True,0.3077
+linear only,fruity,CCCCC/C=C\CCOC(C)=O,False,0.3077
+graph only,fruity,CCCCC/C=C\CCOC(C)=O,True,0.3077
+"graph, shuffled weights",fruity,CCCCC/C=C\CCOC(C)=O,True,0.3077
+ensemble,fruity,CCCCC1(OC(C)=O)CCCCC1,True,0.2857
+linear only,fruity,CCCCC1(OC(C)=O)CCCCC1,True,0.2857
+graph only,fruity,CCCCC1(OC(C)=O)CCCCC1,True,0.2857
+"graph, shuffled weights",fruity,CCCCC1(OC(C)=O)CCCCC1,True,0.2857
+ensemble,fruity,CCCCC1CCCCC(=O)O1,True,0.3333
+linear only,fruity,CCCCC1CCCCC(=O)O1,True,0.3333
+graph only,fruity,CCCCC1CCCCC(=O)O1,True,0.3333
+"graph, shuffled weights",fruity,CCCCC1CCCCC(=O)O1,True,0.3333
+ensemble,fruity,CCCCC=COC(=O)CCC,True,0.3333
+linear only,fruity,CCCCC=COC(=O)CCC,True,0.3333
+graph only,fruity,CCCCC=COC(=O)CCC,True,0.3333
+"graph, shuffled weights",fruity,CCCCC=COC(=O)CCC,False,0.3333
+ensemble,fruity,CCCCCC(=O)OC/C=C(\C)CCC=C(C)C,True,0.2222
+linear only,fruity,CCCCCC(=O)OC/C=C(\C)CCC=C(C)C,False,0.2222
+graph only,fruity,CCCCCC(=O)OC/C=C(\C)CCC=C(C)C,True,0.2222
+"graph, shuffled weights",fruity,CCCCCC(=O)OC/C=C(\C)CCC=C(C)C,True,0.2222
+ensemble,fruity,CCCCCC(=O)OCC(CC)CCCC,True,0.2500
+linear only,fruity,CCCCCC(=O)OCC(CC)CCCC,True,0.2500
+graph only,fruity,CCCCCC(=O)OCC(CC)CCCC,True,0.2500
+"graph, shuffled weights",fruity,CCCCCC(=O)OCC(CC)CCCC,False,0.2500
+ensemble,fruity,CCCCCC(O)CCCC(=O)OCC1COC(C)(C)O1,True,0.1905
+linear only,fruity,CCCCCC(O)CCCC(=O)OCC1COC(C)(C)O1,False,0.1905
+graph only,fruity,CCCCCC(O)CCCC(=O)OCC1COC(C)(C)O1,True,0.1905
+"graph, shuffled weights",fruity,CCCCCC(O)CCCC(=O)OCC1COC(C)(C)O1,False,0.1905
+ensemble,fruity,CCCCCC=CC=CC(=O)OCCC,True,0.2667
+linear only,fruity,CCCCCC=CC=CC(=O)OCCC,False,0.2667
+graph only,fruity,CCCCCC=CC=CC(=O)OCCC,True,0.2667
+"graph, shuffled weights",fruity,CCCCCC=CC=CC(=O)OCCC,False,0.2667
+ensemble,fruity,CCCCCCC(=O)OC(C)CCC,True,0.2857
+linear only,fruity,CCCCCCC(=O)OC(C)CCC,True,0.2857
+graph only,fruity,CCCCCCC(=O)OC(C)CCC,True,0.2857
+"graph, shuffled weights",fruity,CCCCCCC(=O)OC(C)CCC,True,0.2857
+ensemble,fruity,CCCCCCC1=CCC(=O)O1,False,0.3333
+linear only,fruity,CCCCCCC1=CCC(=O)O1,False,0.3333
+graph only,fruity,CCCCCCC1=CCC(=O)O1,False,0.3333
+"graph, shuffled weights",fruity,CCCCCCC1=CCC(=O)O1,False,0.3333
+ensemble,fruity,CCCCCCCC(=O)OCCCCC,True,0.2667
+linear only,fruity,CCCCCCCC(=O)OCCCCC,True,0.2667
+graph only,fruity,CCCCCCCC(=O)OCCCCC,True,0.2667
+"graph, shuffled weights",fruity,CCCCCCCC(=O)OCCCCC,False,0.2667
+ensemble,fruity,CCCCCCCC(=O)OCc1ccccc1,True,0.2353
+linear only,fruity,CCCCCCCC(=O)OCc1ccccc1,True,0.2353
+graph only,fruity,CCCCCCCC(=O)OCc1ccccc1,True,0.2353
+"graph, shuffled weights",fruity,CCCCCCCC(=O)OCc1ccccc1,False,0.2353
+ensemble,fruity,CCCCCCCCC(=O)OCC,True,0.3077
+linear only,fruity,CCCCCCCCC(=O)OCC,True,0.3077
+graph only,fruity,CCCCCCCCC(=O)OCC,True,0.3077
+"graph, shuffled weights",fruity,CCCCCCCCC(=O)OCC,True,0.3077
+ensemble,fruity,CCCCCCCCC(=O)OCCC(C)C,True,0.2500
+linear only,fruity,CCCCCCCCC(=O)OCCC(C)C,False,0.2500
+graph only,fruity,CCCCCCCCC(=O)OCCC(C)C,True,0.2500
+"graph, shuffled weights",fruity,CCCCCCCCC(=O)OCCC(C)C,True,0.2500
+ensemble,fruity,CCCCCCCCC(C(C)=O)C(=O)OCC,True,0.2353
+linear only,fruity,CCCCCCCCC(C(C)=O)C(=O)OCC,True,0.2353
+graph only,fruity,CCCCCCCCC(C(C)=O)C(=O)OCC,True,0.2353
+"graph, shuffled weights",fruity,CCCCCCCCC(C(C)=O)C(=O)OCC,False,0.2353
+ensemble,fruity,CCCCCCCCCC(=O)OC,True,0.3077
+linear only,fruity,CCCCCCCCCC(=O)OC,False,0.3077
+graph only,fruity,CCCCCCCCCC(=O)OC,True,0.3077
+"graph, shuffled weights",fruity,CCCCCCCCCC(=O)OC,False,0.3077
+ensemble,fruity,CCCCCCCCCC(=O)OCCCC,True,0.2500
+linear only,fruity,CCCCCCCCCC(=O)OCCCC,True,0.2500
+graph only,fruity,CCCCCCCCCC(=O)OCCCC,True,0.2500
+"graph, shuffled weights",fruity,CCCCCCCCCC(=O)OCCCC,True,0.2500
+ensemble,fruity,CCCCCCCCCCCC(=O)OC(C)C,True,0.2353
+linear only,fruity,CCCCCCCCCCCC(=O)OC(C)C,False,0.2353
+graph only,fruity,CCCCCCCCCCCC(=O)OC(C)C,True,0.2353
+"graph, shuffled weights",fruity,CCCCCCCCCCCC(=O)OC(C)C,True,0.2353
+ensemble,fruity,CCCCCCCCCOC(C)=O,True,0.3077
+linear only,fruity,CCCCCCCCCOC(C)=O,True,0.3077
+graph only,fruity,CCCCCCCCCOC(C)=O,True,0.3077
+"graph, shuffled weights",fruity,CCCCCCCCCOC(C)=O,True,0.3077
+ensemble,fruity,CCCCCCCCOC(=O)C(C)C,True,0.2857
+linear only,fruity,CCCCCCCCOC(=O)C(C)C,True,0.2857
+graph only,fruity,CCCCCCCCOC(=O)C(C)C,True,0.2857
+"graph, shuffled weights",fruity,CCCCCCCCOC(=O)C(C)C,False,0.2857
+ensemble,fruity,CCCCCCCCOC(=O)CC,True,0.3077
+linear only,fruity,CCCCCCCCOC(=O)CC,True,0.3077
+graph only,fruity,CCCCCCCCOC(=O)CC,True,0.3077
+"graph, shuffled weights",fruity,CCCCCCCCOC(=O)CC,False,0.3077
+ensemble,fruity,CCCCCCCCOC(=O)CC(C)=O,True,0.2667
+linear only,fruity,CCCCCCCCOC(=O)CC(C)=O,True,0.2667
+graph only,fruity,CCCCCCCCOC(=O)CC(C)=O,True,0.2667
+"graph, shuffled weights",fruity,CCCCCCCCOC(=O)CC(C)=O,True,0.2667
+ensemble,fruity,CCCCCCCCOC=O,True,0.3636
+linear only,fruity,CCCCCCCCOC=O,False,0.3636
+graph only,fruity,CCCCCCCCOC=O,True,0.3636
+"graph, shuffled weights",fruity,CCCCCCCCOC=O,False,0.3636
+ensemble,fruity,CCCCCCCOC(C)=O,True,0.3636
+linear only,fruity,CCCCCCCOC(C)=O,True,0.3636
+graph only,fruity,CCCCCCCOC(C)=O,True,0.3636
+"graph, shuffled weights",fruity,CCCCCCCOC(C)=O,True,0.3636
+ensemble,fruity,CCCCCCOC(=O)CC(C)S,True,0.3077
+linear only,fruity,CCCCCCOC(=O)CC(C)S,True,0.3077
+graph only,fruity,CCCCCCOC(=O)CC(C)S,True,0.3077
+"graph, shuffled weights",fruity,CCCCCCOC(=O)CC(C)S,False,0.3077
+ensemble,fruity,CCCCCCOC(=O)CCc1ccccc1,True,0.2353
+linear only,fruity,CCCCCCOC(=O)CCc1ccccc1,True,0.2353
+graph only,fruity,CCCCCCOC(=O)CCc1ccccc1,True,0.2353
+"graph, shuffled weights",fruity,CCCCCCOC(=O)CCc1ccccc1,False,0.2353
+ensemble,nutty,CCCCCCc1ccccn1,True,0.0833
+linear only,nutty,CCCCCCc1ccccn1,False,0.0833
+graph only,nutty,CCCCCCc1ccccn1,True,0.0833
+"graph, shuffled weights",nutty,CCCCCCc1ccccn1,False,0.0833
+ensemble,sulfurous,CCCCCCc1cccs1,True,0.0909
+ensemble,meaty,CCCCCCc1cccs1,True,0.0909
+linear only,sulfurous,CCCCCCc1cccs1,False,0.0909
+linear only,meaty,CCCCCCc1cccs1,False,0.0909
+graph only,sulfurous,CCCCCCc1cccs1,True,0.0909
+graph only,meaty,CCCCCCc1cccs1,True,0.0909
+"graph, shuffled weights",sulfurous,CCCCCCc1cccs1,False,0.0909
+"graph, shuffled weights",meaty,CCCCCCc1cccs1,False,0.0909
+ensemble,fruity,CCCCCOC(=O)c1ccccc1,False,0.2857
+linear only,fruity,CCCCCOC(=O)c1ccccc1,False,0.2857
+graph only,fruity,CCCCCOC(=O)c1ccccc1,False,0.2857
+"graph, shuffled weights",fruity,CCCCCOC(=O)c1ccccc1,True,0.2857
+ensemble,sulfurous,CCCCCc1cccs1,True,0.1000
+ensemble,meaty,CCCCCc1cccs1,True,0.1000
+linear only,sulfurous,CCCCCc1cccs1,False,0.1000
+linear only,meaty,CCCCCc1cccs1,False,0.1000
+graph only,sulfurous,CCCCCc1cccs1,True,0.1000
+graph only,meaty,CCCCCc1cccs1,True,0.1000
+"graph, shuffled weights",sulfurous,CCCCCc1cccs1,False,0.1000
+"graph, shuffled weights",meaty,CCCCCc1cccs1,False,0.1000
+ensemble,fishy,CCCCN,True,0.2000
+linear only,fishy,CCCCN,True,0.2000
+graph only,fishy,CCCCN,True,0.2000
+"graph, shuffled weights",fishy,CCCCN,False,0.2000
+ensemble,onion,CCCCSSS,True,0.4286
+linear only,onion,CCCCSSS,True,0.4286
+graph only,onion,CCCCSSS,True,0.4286
+"graph, shuffled weights",onion,CCCCSSS,True,0.4286
+ensemble,sulfurous,CCCCc1ccc(CC)s1,True,0.0909
+linear only,sulfurous,CCCCc1ccc(CC)s1,True,0.0909
+graph only,sulfurous,CCCCc1ccc(CC)s1,True,0.0909
+"graph, shuffled weights",sulfurous,CCCCc1ccc(CC)s1,False,0.0909
+ensemble,fruity,CCCOC(=O)C(C)=O,True,0.4444
+linear only,fruity,CCCOC(=O)C(C)=O,False,0.4444
+graph only,fruity,CCCOC(=O)C(C)=O,True,0.4444
+"graph, shuffled weights",fruity,CCCOC(=O)C(C)=O,False,0.4444
+ensemble,fruity,CCCOC(=O)CC(C)C,True,0.4000
+linear only,fruity,CCCOC(=O)CC(C)C,False,0.4000
+graph only,fruity,CCCOC(=O)CC(C)C,True,0.4000
+"graph, shuffled weights",fruity,CCCOC(=O)CC(C)C,False,0.4000
+ensemble,fruity,CCCOC(=O)CCC(C)C,True,0.3636
+linear only,fruity,CCCOC(=O)CCC(C)C,False,0.3636
+graph only,fruity,CCCOC(=O)CCC(C)C,True,0.3636
+"graph, shuffled weights",fruity,CCCOC(=O)CCC(C)C,False,0.3636
+ensemble,phenolic,CCCc1ccc(O)c(OC)c1,True,0.1667
+linear only,phenolic,CCCc1ccc(O)c(OC)c1,True,0.1667
+graph only,phenolic,CCCc1ccc(O)c(OC)c1,True,0.1667
+"graph, shuffled weights",phenolic,CCCc1ccc(O)c(OC)c1,False,0.1667
+ensemble,roasted,CCCc1nc(C)c(C)o1,False,0.1000
+linear only,roasted,CCCc1nc(C)c(C)o1,False,0.1000
+graph only,roasted,CCCc1nc(C)c(C)o1,True,0.1000
+"graph, shuffled weights",roasted,CCCc1nc(C)c(C)o1,False,0.1000
+ensemble,fishy,CCN,True,0.3333
+linear only,fishy,CCN,True,0.3333
+graph only,fishy,CCN,True,0.3333
+"graph, shuffled weights",fishy,CCN,False,0.3333
+ensemble,garlic,CCN=C=S,False,0.2000
+linear only,garlic,CCN=C=S,False,0.2000
+graph only,garlic,CCN=C=S,True,0.2000
+"graph, shuffled weights",garlic,CCN=C=S,True,0.2000
+ensemble,fruity,CCOC(=O)C(C)(O)CC,True,0.4000
+linear only,fruity,CCOC(=O)C(C)(O)CC,True,0.4000
+graph only,fruity,CCOC(=O)C(C)(O)CC,True,0.4000
+"graph, shuffled weights",fruity,CCOC(=O)C(C)(O)CC,True,0.4000
+ensemble,fruity,CCOC(=O)C(O)C(C)CC,True,0.3636
+linear only,fruity,CCOC(=O)C(O)C(C)CC,True,0.3636
+graph only,fruity,CCOC(=O)C(O)C(C)CC,True,0.3636
+"graph, shuffled weights",fruity,CCOC(=O)C(O)C(C)CC,True,0.3636
+ensemble,fruity,CCOC(=O)C(O)CC(C)C,True,0.3636
+linear only,fruity,CCOC(=O)C(O)CC(C)C,True,0.3636
+graph only,fruity,CCOC(=O)C(O)CC(C)C,True,0.3636
+"graph, shuffled weights",fruity,CCOC(=O)C(O)CC(C)C,False,0.3636
+ensemble,fruity,CCOC(=O)C1(c2ccccc2)OC1(C)CC,True,0.2353
+linear only,fruity,CCOC(=O)C1(c2ccccc2)OC1(C)CC,True,0.2353
+graph only,fruity,CCOC(=O)C1(c2ccccc2)OC1(C)CC,True,0.2353
+"graph, shuffled weights",fruity,CCOC(=O)C1(c2ccccc2)OC1(C)CC,True,0.2353
+ensemble,fruity,CCOC(=O)C1CCC(C(=O)OCC)CC1,True,0.5000
+linear only,fruity,CCOC(=O)C1CCC(C(=O)OCC)CC1,False,0.5000
+graph only,fruity,CCOC(=O)C1CCC(C(=O)OCC)CC1,True,0.5000
+"graph, shuffled weights",fruity,CCOC(=O)C1CCC(C(=O)OCC)CC1,True,0.5000
+ensemble,fruity,CCOC(=O)CC(=O)OCc1ccccc1,True,0.5000
+linear only,fruity,CCOC(=O)CC(=O)OCc1ccccc1,True,0.5000
+graph only,fruity,CCOC(=O)CC(=O)OCc1ccccc1,True,0.5000
+"graph, shuffled weights",fruity,CCOC(=O)CC(=O)OCc1ccccc1,False,0.5000
+ensemble,fruity,CCOC(=O)CC1(C)OCCO1,True,0.3333
+linear only,fruity,CCOC(=O)CC1(C)OCCO1,True,0.3333
+graph only,fruity,CCOC(=O)CC1(C)OCCO1,True,0.3333
+"graph, shuffled weights",fruity,CCOC(=O)CC1(C)OCCO1,True,0.3333
+ensemble,fruity,CCOC(=O)CCCCC(=O)OCC,True,0.5714
+linear only,fruity,CCOC(=O)CCCCC(=O)OCC,False,0.5714
+graph only,fruity,CCOC(=O)CCCCC(=O)OCC,True,0.5714
+"graph, shuffled weights",fruity,CCOC(=O)CCCCC(=O)OCC,True,0.5714
+ensemble,fruity,CCOC(=O)CCCCCOC(C)=O,True,0.5714
+linear only,fruity,CCOC(=O)CCCCCOC(C)=O,True,0.5714
+graph only,fruity,CCOC(=O)CCCCCOC(C)=O,True,0.5714
+"graph, shuffled weights",fruity,CCOC(=O)CCCCCOC(C)=O,True,0.5714
+ensemble,fruity,CCOC(=O)COc1ccc(C)cc1,True,0.2857
+linear only,fruity,CCOC(=O)COc1ccc(C)cc1,False,0.2857
+graph only,fruity,CCOC(=O)COc1ccc(C)cc1,True,0.2857
+"graph, shuffled weights",fruity,CCOC(=O)COc1ccc(C)cc1,False,0.2857
+ensemble,fruity,CCOC(=O)[C@@H](O)CC(C)C,True,0.3636
+linear only,fruity,CCOC(=O)[C@@H](O)CC(C)C,True,0.3636
+graph only,fruity,CCOC(=O)[C@@H](O)CC(C)C,True,0.3636
+"graph, shuffled weights",fruity,CCOC(=O)[C@@H](O)CC(C)C,False,0.3636
+ensemble,fruity,CCOC(=O)[C@H](O)CC(C)C,True,0.3636
+linear only,fruity,CCOC(=O)[C@H](O)CC(C)C,True,0.3636
+graph only,fruity,CCOC(=O)[C@H](O)CC(C)C,True,0.3636
+"graph, shuffled weights",fruity,CCOC(=O)[C@H](O)CC(C)C,False,0.3636
+ensemble,fruity,CCOC(=O)c1ccccc1O,True,0.3333
+linear only,fruity,CCOC(=O)c1ccccc1O,True,0.3333
+graph only,fruity,CCOC(=O)c1ccccc1O,True,0.3333
+"graph, shuffled weights",fruity,CCOC(=O)c1ccccc1O,True,0.3333
+ensemble,fruity,CCOC(=O)c1cccnc1,True,0.3636
+linear only,fruity,CCOC(=O)c1cccnc1,True,0.3636
+graph only,fruity,CCOC(=O)c1cccnc1,True,0.3636
+"graph, shuffled weights",fruity,CCOC(=O)c1cccnc1,True,0.3636
+ensemble,fruity,CCOC(=O)c1ccco1,True,0.4000
+linear only,fruity,CCOC(=O)c1ccco1,True,0.4000
+graph only,fruity,CCOC(=O)c1ccco1,True,0.4000
+"graph, shuffled weights",fruity,CCOC(=O)c1ccco1,False,0.4000
+ensemble,fruity,CCOC(C)OC(C)=O,True,0.4444
+linear only,fruity,CCOC(C)OC(C)=O,True,0.4444
+graph only,fruity,CCOC(C)OC(C)=O,True,0.4444
+"graph, shuffled weights",fruity,CCOC(C)OC(C)=O,True,0.4444
+ensemble,nutty,CCOC(C)c1cnccn1,True,0.1818
+ensemble,roasted,CCOC(C)c1cnccn1,True,0.1818
+linear only,nutty,CCOC(C)c1cnccn1,False,0.1818
+linear only,roasted,CCOC(C)c1cnccn1,False,0.1818
+graph only,nutty,CCOC(C)c1cnccn1,True,0.1818
+graph only,roasted,CCOC(C)c1cnccn1,True,0.1818
+"graph, shuffled weights",nutty,CCOC(C)c1cnccn1,False,0.1818
+"graph, shuffled weights",roasted,CCOC(C)c1cnccn1,False,0.1818
+ensemble,fruity,CCOC=O,True,0.8000
+linear only,fruity,CCOC=O,True,0.8000
+graph only,fruity,CCOC=O,True,0.8000
+"graph, shuffled weights",fruity,CCOC=O,True,0.8000
+ensemble,phenolic,CCOc1cc(C2OC(C)CC(C)(C)O2)ccc1O,True,0.1053
+linear only,phenolic,CCOc1cc(C2OC(C)CC(C)(C)O2)ccc1O,False,0.1053
+graph only,phenolic,CCOc1cc(C2OC(C)CC(C)(C)O2)ccc1O,True,0.1053
+"graph, shuffled weights",phenolic,CCOc1cc(C2OC(C)CC(C)(C)O2)ccc1O,False,0.1053
+ensemble,nutty,CCOc1cncc(C)n1,False,0.2000
+ensemble,roasted,CCOc1cncc(C)n1,True,0.2000
+linear only,nutty,CCOc1cncc(C)n1,False,0.2000
+linear only,roasted,CCOc1cncc(C)n1,False,0.2000
+graph only,nutty,CCOc1cncc(C)n1,True,0.2000
+graph only,roasted,CCOc1cncc(C)n1,True,0.2000
+"graph, shuffled weights",nutty,CCOc1cncc(C)n1,False,0.2000
+"graph, shuffled weights",roasted,CCOc1cncc(C)n1,True,0.2000
+ensemble,sulfurous,CC[C@@H](C)SS[C@@H](C)CC,True,0.2000
+ensemble,alliaceous,CC[C@@H](C)SS[C@@H](C)CC,True,0.2000
+ensemble,meaty,CC[C@@H](C)SS[C@@H](C)CC,True,0.2000
+linear only,sulfurous,CC[C@@H](C)SS[C@@H](C)CC,True,0.2000
+linear only,alliaceous,CC[C@@H](C)SS[C@@H](C)CC,False,0.2000
+linear only,meaty,CC[C@@H](C)SS[C@@H](C)CC,True,0.2000
+graph only,sulfurous,CC[C@@H](C)SS[C@@H](C)CC,True,0.2000
+graph only,alliaceous,CC[C@@H](C)SS[C@@H](C)CC,True,0.2000
+graph only,meaty,CC[C@@H](C)SS[C@@H](C)CC,True,0.2000
+"graph, shuffled weights",sulfurous,CC[C@@H](C)SS[C@@H](C)CC,False,0.2000
+"graph, shuffled weights",alliaceous,CC[C@@H](C)SS[C@@H](C)CC,False,0.2000
+"graph, shuffled weights",meaty,CC[C@@H](C)SS[C@@H](C)CC,False,0.2000
+ensemble,sulfurous,CC[C@H](C)SS[C@@H](C)CC,True,0.2000
+linear only,sulfurous,CC[C@H](C)SS[C@@H](C)CC,True,0.2000
+graph only,sulfurous,CC[C@H](C)SS[C@@H](C)CC,True,0.2000
+"graph, shuffled weights",sulfurous,CC[C@H](C)SS[C@@H](C)CC,False,0.2000
+ensemble,nutty,CCc1cnc(C)c(C)n1,True,0.2000
+ensemble,roasted,CCc1cnc(C)c(C)n1,True,0.2000
+linear only,nutty,CCc1cnc(C)c(C)n1,False,0.2000
+linear only,roasted,CCc1cnc(C)c(C)n1,False,0.2000
+graph only,nutty,CCc1cnc(C)c(C)n1,True,0.2000
+graph only,roasted,CCc1cnc(C)c(C)n1,True,0.2000
+"graph, shuffled weights",nutty,CCc1cnc(C)c(C)n1,False,0.2000
+"graph, shuffled weights",roasted,CCc1cnc(C)c(C)n1,False,0.2000
+ensemble,meaty,CCc1nccnc1SC,True,0.1000
+ensemble,nutty,CCc1nccnc1SC,True,0.2000
+ensemble,roasted,CCc1nccnc1SC,False,0.2000
+linear only,meaty,CCc1nccnc1SC,True,0.1000
+linear only,nutty,CCc1nccnc1SC,False,0.2000
+linear only,roasted,CCc1nccnc1SC,False,0.2000
+graph only,meaty,CCc1nccnc1SC,True,0.1000
+graph only,nutty,CCc1nccnc1SC,True,0.2000
+graph only,roasted,CCc1nccnc1SC,False,0.2000
+"graph, shuffled weights",meaty,CCc1nccnc1SC,True,0.1000
+"graph, shuffled weights",nutty,CCc1nccnc1SC,False,0.2000
+"graph, shuffled weights",roasted,CCc1nccnc1SC,False,0.2000
+ensemble,fishy,CN,True,0.5000
+linear only,fishy,CN,True,0.5000
+graph only,fishy,CN,True,0.5000
+"graph, shuffled weights",fishy,CN,False,0.5000
+ensemble,fruity,COC(=O)C1OC1(C)C1CC2C=CC1C2,True,0.2667
+linear only,fruity,COC(=O)C1OC1(C)C1CC2C=CC1C2,False,0.2667
+graph only,fruity,COC(=O)C1OC1(C)C1CC2C=CC1C2,True,0.2667
+"graph, shuffled weights",fruity,COC(=O)C1OC1(C)C1CC2C=CC1C2,False,0.2667
+ensemble,fruity,COC(=O)C1OC1c1ccccc1,True,0.3077
+linear only,fruity,COC(=O)C1OC1c1ccccc1,False,0.3077
+graph only,fruity,COC(=O)C1OC1c1ccccc1,True,0.3077
+"graph, shuffled weights",fruity,COC(=O)C1OC1c1ccccc1,False,0.3077
+ensemble,fruity,COC(=O)C=C1CCCC1,True,0.4000
+linear only,fruity,COC(=O)C=C1CCCC1,True,0.4000
+graph only,fruity,COC(=O)C=C1CCCC1,True,0.4000
+"graph, shuffled weights",fruity,COC(=O)C=C1CCCC1,False,0.4000
+ensemble,fruity,COC(=O)CC(C)C,True,0.5000
+linear only,fruity,COC(=O)CC(C)C,False,0.5000
+graph only,fruity,COC(=O)CC(C)C,True,0.5000
+"graph, shuffled weights",fruity,COC(=O)CC(C)C,False,0.5000
+ensemble,fruity,COC(=O)c1ccccc1OC,True,0.3333
+linear only,fruity,COC(=O)c1ccccc1OC,True,0.3333
+graph only,fruity,COC(=O)c1ccccc1OC,True,0.3333
+"graph, shuffled weights",fruity,COC(=O)c1ccccc1OC,False,0.3333
+ensemble,fruity,COC(=O)c1ccco1,True,0.4444
+linear only,fruity,COC(=O)c1ccco1,True,0.4444
+graph only,fruity,COC(=O)c1ccco1,True,0.4444
+"graph, shuffled weights",fruity,COC(=O)c1ccco1,False,0.4444
+ensemble,sulfurous,COC(=S)C(C)C,False,0.1429
+linear only,sulfurous,COC(=S)C(C)C,False,0.1429
+graph only,sulfurous,COC(=S)C(C)C,False,0.1429
+"graph, shuffled weights",sulfurous,COC(=S)C(C)C,False,0.1429
+ensemble,aldehydic,COC1CC2CC1C1CC(C=O)CC21,True,0.2143
+linear only,aldehydic,COC1CC2CC1C1CC(C=O)CC21,True,0.2143
+graph only,aldehydic,COC1CC2CC1C1CC(C=O)CC21,True,0.2143
+"graph, shuffled weights",aldehydic,COC1CC2CC1C1CC(C=O)CC21,False,0.2143
+ensemble,phenolic,COc1cc(C(C)=O)cc(OC)c1O,True,0.1429
+linear only,phenolic,COc1cc(C(C)=O)cc(OC)c1O,True,0.1429
+graph only,phenolic,COc1cc(C(C)=O)cc(OC)c1O,True,0.1429
+"graph, shuffled weights",phenolic,COc1cc(C(C)=O)cc(OC)c1O,False,0.1429
+ensemble,fruity,COc1cc(C=O)ccc1OC(=O)C(C)C,False,0.2500
+linear only,fruity,COc1cc(C=O)ccc1OC(=O)C(C)C,False,0.2500
+graph only,fruity,COc1cc(C=O)ccc1OC(=O)C(C)C,False,0.2500
+"graph, shuffled weights",fruity,COc1cc(C=O)ccc1OC(=O)C(C)C,False,0.2500
+ensemble,phenolic,COc1cc(CCC(C)=O)ccc1O,True,0.1429
+linear only,phenolic,COc1cc(CCC(C)=O)ccc1O,True,0.1429
+graph only,phenolic,COc1cc(CCC(C)=O)ccc1O,True,0.1429
+"graph, shuffled weights",phenolic,COc1cc(CCC(C)=O)ccc1O,False,0.1429
+ensemble,nutty,COc1cnc(C)cn1,True,0.2222
+ensemble,roasted,COc1cnc(C)cn1,True,0.2222
+linear only,nutty,COc1cnc(C)cn1,False,0.2222
+linear only,roasted,COc1cnc(C)cn1,False,0.2222
+graph only,nutty,COc1cnc(C)cn1,True,0.2222
+graph only,roasted,COc1cnc(C)cn1,True,0.2222
+"graph, shuffled weights",nutty,COc1cnc(C)cn1,False,0.2222
+"graph, shuffled weights",roasted,COc1cnc(C)cn1,False,0.2222
+ensemble,sulfurous,COc1cnc(C)s1,True,0.1250
+ensemble,cabbage,COc1cnc(C)s1,True,0.1250
+linear only,sulfurous,COc1cnc(C)s1,True,0.1250
+linear only,cabbage,COc1cnc(C)s1,False,0.1250
+graph only,sulfurous,COc1cnc(C)s1,True,0.1250
+graph only,cabbage,COc1cnc(C)s1,True,0.1250
+"graph, shuffled weights",sulfurous,COc1cnc(C)s1,False,0.1250
+"graph, shuffled weights",cabbage,COc1cnc(C)s1,False,0.1250
+ensemble,sulfurous,CS(C)(=O)=O,True,0.2000
+linear only,sulfurous,CS(C)(=O)=O,False,0.2000
+graph only,sulfurous,CS(C)(=O)=O,True,0.2000
+"graph, shuffled weights",sulfurous,CS(C)(=O)=O,False,0.2000
+ensemble,onion,CSC#N,False,0.2500
+linear only,onion,CSC#N,False,0.2500
+graph only,onion,CSC#N,True,0.2500
+"graph, shuffled weights",onion,CSC#N,True,0.2500
+ensemble,sulfurous,CSC(C)C(=O)O,True,0.1429
+ensemble,cheesy,CSC(C)C(=O)O,True,0.4286
+linear only,sulfurous,CSC(C)C(=O)O,False,0.1429
+linear only,cheesy,CSC(C)C(=O)O,True,0.4286
+graph only,sulfurous,CSC(C)C(=O)O,True,0.1429
+graph only,cheesy,CSC(C)C(=O)O,True,0.4286
+"graph, shuffled weights",sulfurous,CSC(C)C(=O)O,False,0.1429
+"graph, shuffled weights",cheesy,CSC(C)C(=O)O,True,0.4286
+ensemble,onion,CSC/C(C=O)=C/CC(C)C,True,0.0909
+ensemble,meaty,CSC/C(C=O)=C/CC(C)C,True,0.0909
+linear only,onion,CSC/C(C=O)=C/CC(C)C,False,0.0909
+linear only,meaty,CSC/C(C=O)=C/CC(C)C,False,0.0909
+graph only,onion,CSC/C(C=O)=C/CC(C)C,True,0.0909
+graph only,meaty,CSC/C(C=O)=C/CC(C)C,True,0.0909
+"graph, shuffled weights",onion,CSC/C(C=O)=C/CC(C)C,False,0.0909
+"graph, shuffled weights",meaty,CSC/C(C=O)=C/CC(C)C,False,0.0909
+ensemble,sulfurous,CSCCCC=O,True,0.1429
+ensemble,garlic,CSCCCC=O,True,0.1429
+ensemble,cabbage,CSCCCC=O,True,0.1429
+linear only,sulfurous,CSCCCC=O,False,0.1429
+linear only,garlic,CSCCCC=O,True,0.1429
+linear only,cabbage,CSCCCC=O,True,0.1429
+graph only,sulfurous,CSCCCC=O,True,0.1429
+graph only,garlic,CSCCCC=O,True,0.1429
+graph only,cabbage,CSCCCC=O,True,0.1429
+"graph, shuffled weights",sulfurous,CSCCCC=O,False,0.1429
+"graph, shuffled weights",garlic,CSCCCC=O,False,0.1429
+"graph, shuffled weights",cabbage,CSCCCC=O,False,0.1429
+ensemble,cabbage,CSCCCCC#N,True,0.1250
+linear only,cabbage,CSCCCCC#N,True,0.1250
+graph only,cabbage,CSCCCCC#N,True,0.1250
+"graph, shuffled weights",cabbage,CSCCCCC#N,False,0.1250
+ensemble,meaty,CSCC[C@H](N)C(=O)NCC(=O)O,True,0.0769
+ensemble,cheesy,CSCC[C@H](N)C(=O)NCC(=O)O,False,0.2308
+linear only,meaty,CSCC[C@H](N)C(=O)NCC(=O)O,True,0.0769
+linear only,cheesy,CSCC[C@H](N)C(=O)NCC(=O)O,False,0.2308
+graph only,meaty,CSCC[C@H](N)C(=O)NCC(=O)O,True,0.0769
+graph only,cheesy,CSCC[C@H](N)C(=O)NCC(=O)O,False,0.2308
+"graph, shuffled weights",meaty,CSCC[C@H](N)C(=O)NCC(=O)O,False,0.0769
+"graph, shuffled weights",cheesy,CSCC[C@H](N)C(=O)NCC(=O)O,True,0.2308
+ensemble,sulfurous,CSCSC,True,0.4000
+ensemble,alliaceous,CSCSC,False,0.4000
+ensemble,garlic,CSCSC,True,0.4000
+ensemble,onion,CSCSC,False,0.4000
+ensemble,meaty,CSCSC,False,0.4000
+linear only,sulfurous,CSCSC,False,0.4000
+linear only,alliaceous,CSCSC,False,0.4000
+linear only,garlic,CSCSC,False,0.4000
+linear only,onion,CSCSC,False,0.4000
+linear only,meaty,CSCSC,True,0.4000
+graph only,sulfurous,CSCSC,True,0.4000
+graph only,alliaceous,CSCSC,False,0.4000
+graph only,garlic,CSCSC,False,0.4000
+graph only,onion,CSCSC,True,0.4000
+graph only,meaty,CSCSC,False,0.4000
+"graph, shuffled weights",sulfurous,CSCSC,False,0.4000
+"graph, shuffled weights",alliaceous,CSCSC,False,0.4000
+"graph, shuffled weights",garlic,CSCSC,False,0.4000
+"graph, shuffled weights",onion,CSCSC,False,0.4000
+"graph, shuffled weights",meaty,CSCSC,False,0.4000
+ensemble,sulfurous,CSS(C)(=O)=O,True,0.3333
+ensemble,alliaceous,CSS(C)(=O)=O,True,0.3333
+ensemble,onion,CSS(C)(=O)=O,True,0.3333
+linear only,sulfurous,CSS(C)(=O)=O,True,0.3333
+linear only,alliaceous,CSS(C)(=O)=O,True,0.3333
+linear only,onion,CSS(C)(=O)=O,True,0.3333
+graph only,sulfurous,CSS(C)(=O)=O,True,0.3333
+graph only,alliaceous,CSS(C)(=O)=O,True,0.3333
+graph only,onion,CSS(C)(=O)=O,True,0.3333
+"graph, shuffled weights",sulfurous,CSS(C)(=O)=O,False,0.3333
+"graph, shuffled weights",alliaceous,CSS(C)(=O)=O,False,0.3333
+"graph, shuffled weights",onion,CSS(C)(=O)=O,False,0.3333
+ensemble,sulfurous,CSSC,True,0.5000
+ensemble,onion,CSSC,True,0.5000
+ensemble,cabbage,CSSC,False,0.5000
+linear only,sulfurous,CSSC,True,0.5000
+linear only,onion,CSSC,True,0.5000
+linear only,cabbage,CSSC,True,0.5000
+graph only,sulfurous,CSSC,True,0.5000
+graph only,onion,CSSC,True,0.5000
+graph only,cabbage,CSSC,False,0.5000
+"graph, shuffled weights",sulfurous,CSSC,True,0.5000
+"graph, shuffled weights",onion,CSSC,True,0.5000
+"graph, shuffled weights",cabbage,CSSC,False,0.5000
+ensemble,sulfurous,CSSCCC(C)C,True,0.2500
+ensemble,onion,CSSCCC(C)C,True,0.2500
+ensemble,meaty,CSSCCC(C)C,True,0.2500
+linear only,sulfurous,CSSCCC(C)C,False,0.2500
+linear only,onion,CSSCCC(C)C,True,0.2500
+linear only,meaty,CSSCCC(C)C,False,0.2500
+graph only,sulfurous,CSSCCC(C)C,True,0.2500
+graph only,onion,CSSCCC(C)C,True,0.2500
+graph only,meaty,CSSCCC(C)C,True,0.2500
+"graph, shuffled weights",sulfurous,CSSCCC(C)C,True,0.2500
+"graph, shuffled weights",onion,CSSCCC(C)C,False,0.2500
+"graph, shuffled weights",meaty,CSSCCC(C)C,False,0.2500
+ensemble,sulfurous,CSc1cnccn1,True,0.1250
+ensemble,alliaceous,CSc1cnccn1,True,0.1250
+ensemble,nutty,CSc1cnccn1,True,0.2500
+linear only,sulfurous,CSc1cnccn1,False,0.1250
+linear only,alliaceous,CSc1cnccn1,True,0.1250
+linear only,nutty,CSc1cnccn1,False,0.2500
+graph only,sulfurous,CSc1cnccn1,True,0.1250
+graph only,alliaceous,CSc1cnccn1,True,0.1250
+graph only,nutty,CSc1cnccn1,True,0.2500
+"graph, shuffled weights",sulfurous,CSc1cnccn1,False,0.1250
+"graph, shuffled weights",alliaceous,CSc1cnccn1,False,0.1250
+"graph, shuffled weights",nutty,CSc1cnccn1,False,0.2500
+ensemble,sulfurous,CSc1nc2ccccc2s1,False,0.1818
+ensemble,roasted,CSc1nc2ccccc2s1,True,0.0909
+linear only,sulfurous,CSc1nc2ccccc2s1,False,0.1818
+linear only,roasted,CSc1nc2ccccc2s1,False,0.0909
+graph only,sulfurous,CSc1nc2ccccc2s1,False,0.1818
+graph only,roasted,CSc1nc2ccccc2s1,True,0.0909
+"graph, shuffled weights",sulfurous,CSc1nc2ccccc2s1,False,0.1818
+"graph, shuffled weights",roasted,CSc1nc2ccccc2s1,False,0.0909
+ensemble,meaty,C[C@H]1S[C@@H](C)N2CCC[C@H]2S1,False,0.1818
+linear only,meaty,C[C@H]1S[C@@H](C)N2CCC[C@H]2S1,False,0.1818
+graph only,meaty,C[C@H]1S[C@@H](C)N2CCC[C@H]2S1,False,0.1818
+"graph, shuffled weights",meaty,C[C@H]1S[C@@H](C)N2CCC[C@H]2S1,False,0.1818
+ensemble,sulfurous,Cc1cc(S)c(C)o1,True,0.1250
+ensemble,meaty,Cc1cc(S)c(C)o1,False,0.1250
+linear only,sulfurous,Cc1cc(S)c(C)o1,True,0.1250
+linear only,meaty,Cc1cc(S)c(C)o1,True,0.1250
+graph only,sulfurous,Cc1cc(S)c(C)o1,True,0.1250
+graph only,meaty,Cc1cc(S)c(C)o1,False,0.1250
+"graph, shuffled weights",sulfurous,Cc1cc(S)c(C)o1,False,0.1250
+"graph, shuffled weights",meaty,Cc1cc(S)c(C)o1,False,0.1250
+ensemble,meaty,Cc1cc(SC(=O)c2ccco2)c(C)o1,True,0.0667
+linear only,meaty,Cc1cc(SC(=O)c2ccco2)c(C)o1,False,0.0667
+graph only,meaty,Cc1cc(SC(=O)c2ccco2)c(C)o1,True,0.0667
+"graph, shuffled weights",meaty,Cc1cc(SC(=O)c2ccco2)c(C)o1,True,0.0667
+ensemble,phenolic,Cc1ccc(C(C)C)cc1O,True,0.1818
+ensemble,smoky,Cc1ccc(C(C)C)cc1O,True,0.1818
+linear only,phenolic,Cc1ccc(C(C)C)cc1O,False,0.1818
+linear only,smoky,Cc1ccc(C(C)C)cc1O,True,0.1818
+graph only,phenolic,Cc1ccc(C(C)C)cc1O,True,0.1818
+graph only,smoky,Cc1ccc(C(C)C)cc1O,True,0.1818
+"graph, shuffled weights",phenolic,Cc1ccc(C(C)C)cc1O,False,0.1818
+"graph, shuffled weights",smoky,Cc1ccc(C(C)C)cc1O,False,0.1818
+ensemble,sulfurous,Cc1cccc(C)c1S,True,0.1111
+ensemble,meaty,Cc1cccc(C)c1S,True,0.1111
+linear only,sulfurous,Cc1cccc(C)c1S,False,0.1111
+linear only,meaty,Cc1cccc(C)c1S,True,0.1111
+graph only,sulfurous,Cc1cccc(C)c1S,True,0.1111
+graph only,meaty,Cc1cccc(C)c1S,True,0.1111
+"graph, shuffled weights",sulfurous,Cc1cccc(C)c1S,False,0.1111
+"graph, shuffled weights",meaty,Cc1cccc(C)c1S,False,0.1111
+ensemble,phenolic,Cc1cccc(O)c1,True,0.2500
+linear only,phenolic,Cc1cccc(O)c1,False,0.2500
+graph only,phenolic,Cc1cccc(O)c1,True,0.2500
+"graph, shuffled weights",phenolic,Cc1cccc(O)c1,True,0.2500
+ensemble,phenolic,Cc1ccccc1O,True,0.2500
+linear only,phenolic,Cc1ccccc1O,False,0.2500
+graph only,phenolic,Cc1ccccc1O,True,0.2500
+"graph, shuffled weights",phenolic,Cc1ccccc1O,False,0.2500
+ensemble,sulfurous,Cc1cccs1,True,0.1667
+ensemble,alliaceous,Cc1cccs1,True,0.1667
+ensemble,onion,Cc1cccs1,True,0.1667
+linear only,sulfurous,Cc1cccs1,False,0.1667
+linear only,alliaceous,Cc1cccs1,False,0.1667
+linear only,onion,Cc1cccs1,False,0.1667
+graph only,sulfurous,Cc1cccs1,True,0.1667
+graph only,alliaceous,Cc1cccs1,True,0.1667
+graph only,onion,Cc1cccs1,True,0.1667
+"graph, shuffled weights",sulfurous,Cc1cccs1,False,0.1667
+"graph, shuffled weights",alliaceous,Cc1cccs1,False,0.1667
+"graph, shuffled weights",onion,Cc1cccs1,False,0.1667
+ensemble,sulfurous,Cc1cnc(SCc2ccco2)cn1,True,0.0714
+ensemble,meaty,Cc1cnc(SCc2ccco2)cn1,True,0.0714
+ensemble,nutty,Cc1cnc(SCc2ccco2)cn1,True,0.1429
+ensemble,roasted,Cc1cnc(SCc2ccco2)cn1,False,0.1429
+linear only,sulfurous,Cc1cnc(SCc2ccco2)cn1,False,0.0714
+linear only,meaty,Cc1cnc(SCc2ccco2)cn1,True,0.0714
+linear only,nutty,Cc1cnc(SCc2ccco2)cn1,False,0.1429
+linear only,roasted,Cc1cnc(SCc2ccco2)cn1,False,0.1429
+graph only,sulfurous,Cc1cnc(SCc2ccco2)cn1,True,0.0714
+graph only,meaty,Cc1cnc(SCc2ccco2)cn1,True,0.0714
+graph only,nutty,Cc1cnc(SCc2ccco2)cn1,True,0.1429
+graph only,roasted,Cc1cnc(SCc2ccco2)cn1,False,0.1429
+"graph, shuffled weights",sulfurous,Cc1cnc(SCc2ccco2)cn1,False,0.0714
+"graph, shuffled weights",meaty,Cc1cnc(SCc2ccco2)cn1,False,0.0714
+"graph, shuffled weights",nutty,Cc1cnc(SCc2ccco2)cn1,False,0.1429
+"graph, shuffled weights",roasted,Cc1cnc(SCc2ccco2)cn1,False,0.1429
+ensemble,nutty,Cc1cncc(C)n1,True,0.2500
+ensemble,roasted,Cc1cncc(C)n1,True,0.2500
+linear only,nutty,Cc1cncc(C)n1,False,0.2500
+linear only,roasted,Cc1cncc(C)n1,False,0.2500
+graph only,nutty,Cc1cncc(C)n1,True,0.2500
+graph only,roasted,Cc1cncc(C)n1,True,0.2500
+"graph, shuffled weights",nutty,Cc1cncc(C)n1,False,0.2500
+"graph, shuffled weights",roasted,Cc1cncc(C)n1,True,0.2500
+ensemble,sulfurous,Cc1cncs1,True,0.1667
+ensemble,roasted,Cc1cncs1,False,0.1667
+linear only,sulfurous,Cc1cncs1,True,0.1667
+linear only,roasted,Cc1cncs1,False,0.1667
+graph only,sulfurous,Cc1cncs1,True,0.1667
+graph only,roasted,Cc1cncs1,True,0.1667
+"graph, shuffled weights",sulfurous,Cc1cncs1,False,0.1667
+"graph, shuffled weights",roasted,Cc1cncs1,False,0.1667
+ensemble,alliaceous,Cc1cscn1,True,0.1667
+ensemble,meaty,Cc1cscn1,False,0.1667
+ensemble,nutty,Cc1cscn1,True,0.1667
+linear only,alliaceous,Cc1cscn1,False,0.1667
+linear only,meaty,Cc1cscn1,False,0.1667
+linear only,nutty,Cc1cscn1,False,0.1667
+graph only,alliaceous,Cc1cscn1,True,0.1667
+graph only,meaty,Cc1cscn1,True,0.1667
+graph only,nutty,Cc1cscn1,True,0.1667
+"graph, shuffled weights",alliaceous,Cc1cscn1,False,0.1667
+"graph, shuffled weights",meaty,Cc1cscn1,False,0.1667
+"graph, shuffled weights",nutty,Cc1cscn1,False,0.1667
+ensemble,sulfurous,Cc1occ2c1SCC2,True,0.1111
+linear only,sulfurous,Cc1occ2c1SCC2,False,0.1111
+graph only,sulfurous,Cc1occ2c1SCC2,True,0.1111
+"graph, shuffled weights",sulfurous,Cc1occ2c1SCC2,False,0.1111
+ensemble,sulfurous,Cc1occc1S,True,0.1429
+ensemble,meaty,Cc1occc1S,False,0.1429
+linear only,sulfurous,Cc1occc1S,False,0.1429
+linear only,meaty,Cc1occc1S,False,0.1429
+graph only,sulfurous,Cc1occc1S,True,0.1429
+graph only,meaty,Cc1occc1S,False,0.1429
+"graph, shuffled weights",sulfurous,Cc1occc1S,False,0.1429
+"graph, shuffled weights",meaty,Cc1occc1S,False,0.1429
+ensemble,sulfurous,Cc1occc1SSc1ccoc1C,False,0.1429
+ensemble,onion,Cc1occc1SSc1ccoc1C,False,0.1429
+ensemble,meaty,Cc1occc1SSc1ccoc1C,False,0.1429
+linear only,sulfurous,Cc1occc1SSc1ccoc1C,False,0.1429
+linear only,onion,Cc1occc1SSc1ccoc1C,False,0.1429
+linear only,meaty,Cc1occc1SSc1ccoc1C,True,0.1429
+graph only,sulfurous,Cc1occc1SSc1ccoc1C,False,0.1429
+graph only,onion,Cc1occc1SSc1ccoc1C,False,0.1429
+graph only,meaty,Cc1occc1SSc1ccoc1C,False,0.1429
+"graph, shuffled weights",sulfurous,Cc1occc1SSc1ccoc1C,False,0.1429
+"graph, shuffled weights",onion,Cc1occc1SSc1ccoc1C,False,0.1429
+"graph, shuffled weights",meaty,Cc1occc1SSc1ccoc1C,False,0.1429
+ensemble,fruity,Nc1ccccc1C(=O)OC/C=C/c1ccccc1,True,0.2105
+linear only,fruity,Nc1ccccc1C(=O)OC/C=C/c1ccccc1,False,0.2105
+graph only,fruity,Nc1ccccc1C(=O)OC/C=C/c1ccccc1,True,0.2105
+"graph, shuffled weights",fruity,Nc1ccccc1C(=O)OC/C=C/c1ccccc1,False,0.2105
+ensemble,fruity,O=C(/C=C\c1ccccc1)OCCCc1ccccc1,True,0.2000
+linear only,fruity,O=C(/C=C\c1ccccc1)OCCCc1ccccc1,True,0.2000
+graph only,fruity,O=C(/C=C\c1ccccc1)OCCCc1ccccc1,True,0.2000
+"graph, shuffled weights",fruity,O=C(/C=C\c1ccccc1)OCCCc1ccccc1,True,0.2000
+ensemble,sulfurous,O=CCS,True,0.2500
+ensemble,cabbage,O=CCS,True,0.2500
+ensemble,meaty,O=CCS,True,0.2500
+linear only,sulfurous,O=CCS,True,0.2500
+linear only,cabbage,O=CCS,False,0.2500
+linear only,meaty,O=CCS,True,0.2500
+graph only,sulfurous,O=CCS,True,0.2500
+graph only,cabbage,O=CCS,True,0.2500
+graph only,meaty,O=CCS,True,0.2500
+"graph, shuffled weights",sulfurous,O=CCS,False,0.2500
+"graph, shuffled weights",cabbage,O=CCS,False,0.2500
+"graph, shuffled weights",meaty,O=CCS,False,0.2500
+ensemble,sulfurous,O=CSCc1ccco1,True,0.1111
+linear only,sulfurous,O=CSCc1ccco1,False,0.1111
+graph only,sulfurous,O=CSCc1ccco1,True,0.1111
+"graph, shuffled weights",sulfurous,O=CSCc1ccco1,False,0.1111
+ensemble,sulfurous,O=Cc1cccs1,True,0.1429
+linear only,sulfurous,O=Cc1cccs1,False,0.1429
+graph only,sulfurous,O=Cc1cccs1,True,0.1429
+"graph, shuffled weights",sulfurous,O=Cc1cccs1,False,0.1429
+ensemble,sulfurous,SCc1ccccc1,True,0.1250
+ensemble,alliaceous,SCc1ccccc1,True,0.1250
+ensemble,garlic,SCc1ccccc1,True,0.1250
+ensemble,onion,SCc1ccccc1,False,0.1250
+linear only,sulfurous,SCc1ccccc1,True,0.1250
+linear only,alliaceous,SCc1ccccc1,False,0.1250
+linear only,garlic,SCc1ccccc1,True,0.1250
+linear only,onion,SCc1ccccc1,False,0.1250
+graph only,sulfurous,SCc1ccccc1,True,0.1250
+graph only,alliaceous,SCc1ccccc1,True,0.1250
+graph only,garlic,SCc1ccccc1,True,0.1250
+graph only,onion,SCc1ccccc1,True,0.1250
+"graph, shuffled weights",sulfurous,SCc1ccccc1,False,0.1250
+"graph, shuffled weights",alliaceous,SCc1ccccc1,False,0.1250
+"graph, shuffled weights",garlic,SCc1ccccc1,False,0.1250
+"graph, shuffled weights",onion,SCc1ccccc1,False,0.1250

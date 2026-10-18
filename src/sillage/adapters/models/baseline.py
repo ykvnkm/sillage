@@ -11,9 +11,18 @@ from __future__ import annotations
 import numpy as np
 
 from sillage.adapters.chem.reader import to_rdkit
-from sillage.domain import DescriptorScore, ModelDescription, Molecule, OdorProfile, Refusal
+from sillage.domain import (
+    DescriptorScore,
+    ModelDescription,
+    Molecule,
+    NoteExplanation,
+    OdorProfile,
+    Refusal,
+)
 from sillage.models.applicability import ChemicalScope
 from sillage.models.artifact import ArtifactError, OdorModel
+from sillage.models.attribution import FINGERPRINT_SETS
+from sillage.models.attribution import explain as attribute
 
 
 class ArtifactOdorPredictor:
@@ -60,6 +69,27 @@ class ArtifactOdorPredictor:
         """Raw predicted probabilities, before calibration: the model's own scale,
         and exactly what scripts/build_map.py embedded the reference molecules with."""
         return tuple(float(v) for v in self._scorer.raw([to_rdkit(molecule)])[0])
+
+    @property
+    def explains(self) -> bool:
+        """Whether this model's answers can be traced to atoms (journal E-021)."""
+        return self._model.card.feature_set in FINGERPRINT_SETS
+
+    def explain(self, molecule: Molecule, descriptor: str) -> NoteExplanation:
+        label = (
+            self._model.label_names.index(descriptor)
+            if descriptor in self._model.label_names
+            else None
+        )
+        if label is None:
+            raise KeyError(descriptor)
+        (found,) = attribute(self._scorer, self._calibrator, to_rdkit(molecule), [label])
+        return NoteExplanation(
+            descriptor=descriptor,
+            probability=found.probability if self._calibrated[label] else None,
+            smiles=molecule.model_smiles,
+            atoms=tuple(round(float(v), 4) for v in found.atoms),
+        )
 
     def describe(self) -> ModelDescription:
         card = self._model.card

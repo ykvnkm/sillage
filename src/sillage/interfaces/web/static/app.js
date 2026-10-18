@@ -218,6 +218,7 @@ function renderReport(report) {
   const m = report.molecule;
   const known = report.known;
   const knownSet = new Set(known ? known.descriptors : []);
+  const structure = explainableStructure(m);
 
   const label = h(
     "article",
@@ -228,7 +229,7 @@ function renderReport(report) {
       nameHeading(report),
       h("div", { class: "label__meta" }, formula(m.formula), h("span", { class: "label__weight" }, `масса ${molarMass(m.weight)}`)),
     ),
-    h("figure", { class: "label__structure" }, drawing(m.smiles, 480, 360, `Структура ${m.formula}`)),
+    structure.figure,
     h(
       "dl",
       { class: "label__rows" },
@@ -268,10 +269,12 @@ function renderReport(report) {
     h(
       "p",
       { class: "readout__sub" },
-      predicted.length ? "Ноты, которым модель даёт хотя бы один шанс из трёх; самые вероятные сверху." : "",
+      predicted.length
+        ? "Ноты, которым модель даёт хотя бы один шанс из трёх; самые вероятные сверху. Нажмите на ноту, чтобы увидеть, какие атомы её дают."
+        : "",
     ),
     predicted.length
-      ? h("ol", { class: "notes" }, predicted.map((d, i) => noteRow(d, i)))
+      ? h("ol", { class: "notes" }, predicted.map((d, i) => noteRow(d, i, structure.explain)))
       : h("p", { class: "empty-note" }, "Ни одна нота не дотягивает до «возможно». Уверенного мнения об этой молекуле у модели нет."),
     predicted.length > 0 &&
       h(
@@ -306,17 +309,95 @@ function renderReport(report) {
   return [label, readout, neighbours, map].filter(Boolean);
 }
 
+// The structure drawing, and the way to shade it by one note's atoms (journal E-021).
+// The drawing and the explanation both use the isomeric SMILES, so atom i in one is
+// atom i in the other.
+function explainableStructure(m) {
+  const alt = `Структура ${m.formula}`;
+  const img = drawing(m.isomeric_smiles, 480, 360, alt);
+  const caption = h("figcaption", { class: "structure__caption", hidden: true });
+  const figure = h("figure", { class: "label__structure", id: "structure", "aria-live": "polite" }, img, caption);
+  let shown = null;
+
+  function reset() {
+    img.src = drawing(m.isomeric_smiles, 480, 360, alt).src;
+    img.alt = alt;
+    caption.hidden = true;
+    shown = null;
+    for (const b of document.querySelectorAll(".note__explain")) b.setAttribute("aria-pressed", "false");
+  }
+
+  async function explain(descriptor, button) {
+    if (shown === descriptor) return reset();
+    for (const b of document.querySelectorAll(".note__explain")) b.setAttribute("aria-pressed", String(b === button));
+    shown = descriptor;
+    figure.classList.add("is-loading");
+    try {
+      const response = await fetch("/explain", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ smiles: m.isomeric_smiles, descriptor }),
+      });
+      if (!response.ok) throw new Error(String(response.status));
+      const body = await response.json();
+      if (shown !== descriptor) return; // another note was clicked meanwhile
+      img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(body.svg)}`;
+      img.alt = `${alt}: атомы, которые дают ноту «${noteName(descriptor)}»`;
+      caption.replaceChildren(
+        h("strong", {}, `Откуда «${noteName(descriptor)}». `),
+        h("span", { class: "swatch swatch--carries", "aria-hidden": "true" }),
+        " атомы, которые дают ноту, ",
+        h("span", { class: "swatch swatch--holds", "aria-hidden": "true" }),
+        " которые её ослабляют; чем ярче, тем сильнее. Часть ответа модель выводит из молекулы целиком (размер, летучесть), и атомам она не приписывается. ",
+        h("button", { type: "button", class: "link-button", onclick: reset }, "Убрать подсветку"),
+      );
+      caption.hidden = false;
+      revealIfHidden(figure);
+    } catch {
+      if (shown === descriptor) {
+        caption.replaceChildren("Не удалось получить объяснение. Попробуйте ещё раз.");
+        caption.hidden = false;
+      }
+    } finally {
+      figure.classList.remove("is-loading");
+    }
+  }
+
+  return { figure, explain };
+}
+
+// On a phone the drawing sits a screen above the notes: shading it out of sight would
+// look like nothing happened.
+function revealIfHidden(element) {
+  const box = element.getBoundingClientRect();
+  if (box.top >= 0 && box.bottom <= window.innerHeight) return;
+  // Instant, not smooth: a jump is what reduced motion asks for anyway, and smooth
+  // scrolling silently does nothing in some embedded browsers.
+  element.scrollIntoView({ block: "center" });
+}
+
 function knownLine(known) {
   if (!known) return "Нет: это настоящее предсказание.";
   return known.seen_in_training ? "Есть, и модель на ней обучалась" : "Есть, но в обучение не входила";
 }
 
-function noteRow(d, index) {
+function noteRow(d, index, explain) {
   const grade = d.confidence;
   return h(
     "li",
     { class: "note" },
-    h("span", { class: "note__name" }, noteName(d.descriptor)),
+    h(
+      "button",
+      {
+        type: "button",
+        class: "note__name note__explain",
+        "aria-pressed": "false",
+        "aria-controls": "structure",
+        title: "Показать атомы, которые дают эту ноту",
+        onclick: (event) => explain(d.descriptor, event.currentTarget),
+      },
+      noteName(d.descriptor),
+    ),
     h("span", { class: `grade grade--${grade}` }, GRADE_LABEL[grade] || grade),
     h(
       "span",
@@ -443,6 +524,15 @@ async function loadModelFacts() {
       if (node) node.textContent = value;
     }
     document.getElementById("unverified-count").textContent = model.unverified.length;
+    // Models trained since E-021 carry the check for every band; older ones only for
+    // the top, and the page's own numbers stand for them.
+    for (const band of ["likely", "probable", "possible"]) {
+      for (const side of ["promised", "observed"]) {
+        const value = model.metrics[`calibration_${band}_${side}`];
+        const node = document.querySelector(`[data-calibration="${band}-${side}"]`);
+        if (node && value != null && model.metrics[`calibration_${band}_cells`] != null) node.textContent = percent(value);
+      }
+    }
   } catch {
     // The static text in the page is already correct for the shipped model.
   }

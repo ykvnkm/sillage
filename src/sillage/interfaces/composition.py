@@ -19,7 +19,7 @@ from sillage.adapters.chem.names import NAMES_FILE, NameIndex
 from sillage.adapters.models import ArtifactOdorPredictor, ArtifactScopePolicy
 from sillage.adapters.models.odor_map import MAP_FILE, EmbeddingMap
 from sillage.adapters.pubchem import PubChemResolver
-from sillage.application import PredictOdor
+from sillage.application import ExplainNote, PredictOdor
 from sillage.domain.ports import MoleculeDepicter, NameDirectory, OdorMap
 from sillage.models.artifact import OdorModel
 from sillage.paths import model_dir
@@ -39,6 +39,9 @@ class Services:
     similarity_baseline: dict[float, float]
     """Quantiles of nearest-known-molecule similarity for ordinary inputs; the
     reference line drift monitoring compares live traffic against."""
+
+    explain: ExplainNote | None = None
+    """None when the model cannot trace its answers to atoms."""
 
 
 def build_predict_odor(directory: Path | None = None, *, online: bool | None = None) -> PredictOdor:
@@ -77,7 +80,14 @@ def build_services(directory: Path | None = None, *, online: bool | None = None)
         if isinstance(references, FingerprintReferenceLibrary)
         else {}
     )
+    predictor = predict.predictor
+    explain = (
+        ExplainNote(reader=predict.reader, scope=predict.scope, explainer=predictor)
+        if getattr(predictor, "explains", False)
+        else None
+    )
     return Services(
+        explain=explain,
         predict=predict,
         depict=RdkitDepicter(),
         names=predict.names,

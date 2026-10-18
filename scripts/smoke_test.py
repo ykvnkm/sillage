@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import time
 import urllib.error
@@ -43,6 +44,7 @@ def main() -> int:
         ("bromine is refused", lambda: refuses(base, "BrCCCCCC=O", "unseen_element")),
         ("model description", lambda: json.loads(get(f"{base}/model")[1])["descriptors"]),
         ("odour map", lambda: map_is_complete(base)),
+        ("sulfur carries the sulfurous note", lambda: sulfur_carries_it(base)),
     ]
     failed = 0
     for name, check in checks:
@@ -75,6 +77,18 @@ def predicts_vanilla(base: str, query: str) -> bool:
     status, body = post(f"{base}/predict", {"query": query})
     names = [d["descriptor"] for d in json.loads(body)["predicted"]]
     return status == 200 and names[:1] == ["vanilla"]
+
+
+def sulfur_carries_it(base: str) -> bool:
+    """Atom highlighting (journal E-021): in isoamyl methyl sulfide, the sulfur."""
+    status, body = post(f"{base}/explain", {"smiles": "CC(C)CCSC", "descriptor": "sulfurous"})
+    answer = json.loads(body)
+    # Atoms follow the returned SMILES, which the service canonicalised: read their
+    # symbols off it in order (no RDKit here: this script runs on the bare runner).
+    symbols = re.findall(r"\[[^\]]+\]|Cl|Br|[BCNOSPFI]|[bcnops]", answer["smiles"])
+    atoms = answer["atoms"]
+    strongest = max(range(len(atoms)), key=atoms.__getitem__)
+    return status == 200 and len(atoms) == len(symbols) == 7 and symbols[strongest] == "S"
 
 
 def map_is_complete(base: str) -> bool:

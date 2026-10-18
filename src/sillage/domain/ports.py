@@ -15,7 +15,7 @@ from typing import Protocol
 
 from sillage.domain.molecule import KnownMolecule, Molecule, Neighbour
 from sillage.domain.names import MoleculeNames, NameSuggestion
-from sillage.domain.odor import ModelDescription, OdorProfile
+from sillage.domain.odor import ModelDescription, NoteExplanation, OdorProfile
 from sillage.domain.odor_map import MapPoint, MapPosition
 from sillage.domain.report import Refusal
 
@@ -55,6 +55,15 @@ class OdorPredictor(Protocol):
     @property
     def sees_stereo(self) -> bool:
         """Whether two stereoisomers can get different answers from this model."""
+        ...
+
+
+class OdorExplainer(Protocol):
+    """Which atoms carry a note. Not every model can say: one without fingerprints or
+    graphs to trace has nothing to point at, and is simply not wired as one."""
+
+    def explain(self, molecule: Molecule, descriptor: str) -> NoteExplanation:
+        """Raises :class:`KeyError` for a descriptor the model does not know."""
         ...
 
 
@@ -104,8 +113,13 @@ class NameResolver(Protocol):
 class MoleculeDepicter(Protocol):
     """Draws a molecule for a person to look at."""
 
-    def svg(self, smiles: str, width: int, height: int) -> str:
-        """Raises :class:`~sillage.domain.molecule.InvalidMolecule` on bad input."""
+    def svg(
+        self, smiles: str, width: int, height: int, weights: tuple[float, ...] | None = None
+    ) -> str:
+        """Raises :class:`~sillage.domain.molecule.InvalidMolecule` on bad input.
+
+        *weights*, one per atom of *smiles* in its own order, shade the atoms: what
+        carries a note in one colour, what holds it back in another."""
         ...
 
 

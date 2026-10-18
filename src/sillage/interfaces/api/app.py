@@ -40,6 +40,8 @@ from sillage.application import MAX_INPUT_LENGTH
 from sillage.domain import InvalidMolecule, Refusal
 from sillage.interfaces.api.metrics import ServiceMetrics
 from sillage.interfaces.api.schemas import (
+    ExplainRequest,
+    ExplanationOut,
     MapOut,
     ModelOut,
     PredictRequest,
@@ -72,6 +74,7 @@ def create_app(load: Callable[[], Services] | None = None) -> FastAPI:
         else:
             services = load()
         app.state.predict = services.predict
+        app.state.explain = services.explain
         app.state.depict = services.depict
         app.state.names = services.names
         # The map never changes while the process runs: serialise it once.
@@ -141,6 +144,31 @@ def create_app(load: Callable[[], Services] | None = None) -> FastAPI:
         if isinstance(result, Refusal):
             return JSONResponse(refusal_out(result).model_dump(), status_code=REFUSAL_STATUS)
         return report_out(result)
+
+    @app.post(
+        "/explain",
+        response_model=ExplanationOut,
+        responses={
+            REFUSAL_STATUS: {"model": RefusalOut, "description": "Refused, with reason"},
+            404: {"description": "This model cannot trace its answers to atoms"},
+        },
+    )
+    def explain(body: ExplainRequest, request: Request) -> ExplanationOut | JSONResponse:
+        """Which atoms carry one note: each atom shaded by how much the note's
+        probability falls without it (journal E-021)."""
+        if request.app.state.explain is None:
+            return JSONResponse({"detail": "explanations unavailable"}, status_code=404)
+        result = request.app.state.explain(body.smiles, body.descriptor)
+        if isinstance(result, Refusal):
+            return JSONResponse(refusal_out(result).model_dump(), status_code=REFUSAL_STATUS)
+        svg = request.app.state.depict.svg(result.smiles, body.width, body.height, result.atoms)
+        return ExplanationOut(
+            descriptor=result.descriptor,
+            probability=result.probability,
+            smiles=result.smiles,
+            atoms=list(result.atoms),
+            svg=svg,
+        )
 
     @app.get("/", include_in_schema=False)
     def index() -> FileResponse:
