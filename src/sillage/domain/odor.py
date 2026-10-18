@@ -133,6 +133,25 @@ class ModelDescription:
 
 
 @dataclass(frozen=True, slots=True)
+class NoteExplanation:
+    """Which atoms make the model hear one note (journal E-021).
+
+    ``atoms`` follows the atom order of ``smiles``: drawing that very string puts each
+    number on its atom. A contribution is how many probability points the note loses
+    when the atom is taken away -- positive atoms carry the note, negative ones hold
+    it back. What the model infers from the molecule as a whole (size, volatility) is
+    no atom's, and is not spread over them.
+    """
+
+    descriptor: str
+    probability: float | None
+    """Calibrated probability of the note; None where the note is uncalibrated."""
+
+    smiles: str
+    atoms: tuple[float, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class OdorProfile:
     """Scores for every descriptor the model knows, in the model's label order."""
 

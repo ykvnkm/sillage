@@ -87,7 +87,7 @@
           <h3>Слова измерены</h3>
           <p>
             Каждое слово уверенности проверено на молекулах, которых модель не видела.
-            «Очень вероятно» обещает примерно девять случаев из десяти, и обещание держит.
+            «Очень вероятно» значит, что нота сбывается не реже 85 раз из ста, и это обещание держится.
           </p>
           <table class="calibration">
             <caption class="visually-hidden">Обещанная и наблюдаемая точность для каждого слова уверенности</caption>
@@ -95,9 +95,9 @@
               <tr><th scope="col">Слово</th><th scope="col">Диапазон</th><th scope="col">Обещано</th><th scope="col">Сбылось</th></tr>
             </thead>
             <tbody>
-              <tr><th scope="row"><span class="grade grade--likely">Очень вероятно</span></th><td>85–100%</td><td>90%</td><td>88%</td></tr>
-              <tr><th scope="row"><span class="grade grade--probable">Вероятно</span></th><td>55–85%</td><td>68%</td><td>70%</td></tr>
-              <tr><th scope="row"><span class="grade grade--possible">Возможно</span></th><td>35–55%</td><td>44%</td><td>45%</td></tr>
+              <tr><th scope="row"><span class="grade grade--likely">Очень вероятно</span></th><td>85–100%</td><td data-calibration="likely-promised">90%</td><td data-calibration="likely-observed">85%</td></tr>
+              <tr><th scope="row"><span class="grade grade--probable">Вероятно</span></th><td>55–85%</td><td data-calibration="probable-promised">68%</td><td data-calibration="probable-observed">66%</td></tr>
+              <tr><th scope="row"><span class="grade grade--possible">Возможно</span></th><td>35–55%</td><td data-calibration="possible-promised">43%</td><td data-calibration="possible-observed">45%</td></tr>
             </tbody>
           </table>
         </div>

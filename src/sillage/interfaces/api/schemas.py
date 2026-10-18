@@ -36,10 +36,38 @@ class PredictRequest(BaseModel):
         examples=["ванилин", "hedione", "COc1cc(C=O)ccc1O"],
         description=(
             "A molecule name (Russian or English) or a SMILES string. Stereochemistry is "
-            "accepted and dropped. `smiles` is accepted as the field name too."
+            "passed to the model; the `caveats` field says what it could do with it. "
+            "`smiles` is accepted as the field name too."
         ),
     )
     neighbours: int = Field(default=DEFAULT_NEIGHBOURS, ge=0, le=MAX_NEIGHBOURS)
+
+
+class ExplainRequest(BaseModel):
+    smiles: str = Field(
+        min_length=1,
+        max_length=MAX_INPUT_LENGTH,
+        examples=["COc1cc(C=O)ccc1O"],
+        description="The molecule, as the prediction report's `isomeric_smiles` gave it.",
+    )
+    descriptor: str = Field(min_length=1, max_length=40, examples=["vanilla"])
+    width: int = Field(default=480, ge=80, le=800)
+    height: int = Field(default=360, ge=80, le=800)
+
+
+class ExplanationOut(BaseModel):
+    descriptor: str
+    probability: float | None = Field(
+        description="Calibrated probability; null for descriptors too rare to calibrate."
+    )
+    smiles: str = Field(description="The molecule whose atom order `atoms` follows.")
+    atoms: list[float] = Field(
+        description=(
+            "Per atom: probability points the note loses without it. Positive atoms "
+            "carry the note, negative ones hold it back."
+        )
+    )
+    svg: str = Field(description="The molecule drawn with its atoms shaded by `atoms`.")
 
 
 class MoleculeOut(BaseModel):

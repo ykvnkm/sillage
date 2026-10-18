@@ -80,6 +80,20 @@ Known detector false positive: `cramped-padding` on `.query__field` -- the
 `.combobox` wrapper touches the field's edge, but the text sits 16px inside it through
 the input's own padding.
 
+## Atom highlighting
+
+Every predicted note's name is a button; pressing it shades the structure drawing by
+how much each atom carries that note (journal E-021). Two hues, one meaning each:
+`--carries` (`#d08a32`, the "probable" amber: the atom adds probability to the note)
+and `--holds-back` (`#4f7cac`, a muted blue that appears nowhere else on the page:
+the atom takes it away). Strength is opacity towards the paper, scaled to the
+molecule's strongest atom but never stretched below 0.15 probability points, so a
+molecule whose atoms barely matter stays pale. The caption names the note, explains
+both colours with swatches, says that what the model reads off the molecule as a
+whole is not spread over atoms, and offers "Убрать подсветку". Pressing the same note
+again clears it; the pressed note carries an amber underline (`aria-pressed`). On
+phones the drawing sits above the notes, so it is scrolled into view, instantly.
+
 ## Odour map
 
 A canvas scatter of the 4777 reference molecules, positions from the model's

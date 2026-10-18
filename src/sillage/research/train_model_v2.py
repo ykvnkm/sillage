@@ -141,19 +141,25 @@ def _out_of_fold(features, targets, rows, groups, *, seed: int, c: float) -> np.
     return predicted
 
 
+CHECKED_BANDS = {"likely": (0.85, 1.01), "probable": (0.55, 0.85), "possible": (0.35, 0.55)}
+
+
 def _calibration_check(calibrator, raw: np.ndarray, truth: np.ndarray) -> dict[str, float]:
     """The product's promise, measured: when it says "likely", how often is it right?
 
-    On the test part, calibrated descriptors only, cells where experts were asked.
-    Truth is the share of experts who said yes, the quantity the model is trained on.
+    For every band the product names, on the test part, calibrated descriptors only,
+    cells where experts were asked. Truth is the share of experts who said yes, the
+    quantity the model is trained on. The web page reads these numbers from the card.
     """
     probability = calibrator.transform(raw)
-    usable = ~np.isnan(truth) & calibrator.fitted[None, :] & (probability >= 0.85)
-    return {
-        "calibration_likely_promised": float(probability[usable].mean()),
-        "calibration_likely_observed": float(truth[usable].mean()),
-        "calibration_likely_cells": float(usable.sum()),
-    }
+    asked = ~np.isnan(truth) & calibrator.fitted[None, :]
+    check = {}
+    for band, (low, high) in CHECKED_BANDS.items():
+        usable = asked & (probability >= low) & (probability < high)
+        check[f"calibration_{band}_promised"] = float(probability[usable].mean())
+        check[f"calibration_{band}_observed"] = float(truth[usable].mean())
+        check[f"calibration_{band}_cells"] = float(usable.sum())
+    return check
 
 
 def _metrics(scores: np.ndarray, experts: np.ndarray, consensus: np.ndarray) -> dict[str, float]:

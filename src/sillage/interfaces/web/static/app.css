@@ -9,6 +9,8 @@
   --amber-700: #6e3a10;
   --amber-600: #8a4b12;
   --amber-400: #d08a32;
+  --carries: #d08a32; /* atom highlighting: carries the note (journal E-021) */
+  --holds-back: #4f7cac; /* holds it back */
   --amber-300: #e6ae62;
   --amber-200: #f2d3a3;
   --amber-100: #f8e9d2;
@@ -356,7 +358,38 @@ main { width: var(--page); margin-inline: auto; }
   place-items: center;
   border-bottom: 1px dashed var(--rule);
 }
-.label__structure img { width: 100%; height: 100%; object-fit: contain; }
+.label__structure img { width: 100%; height: 100%; object-fit: contain; min-height: 0; }
+.label__structure:has(.structure__caption:not([hidden])) {
+  aspect-ratio: auto;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+.label__structure.is-loading img { opacity: 0.55; transition: opacity 0.2s; }
+.structure__caption {
+  justify-self: stretch;
+  margin: 8px 0 10px;
+  color: var(--ink-2);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+.structure__caption strong { color: var(--ink); font-weight: 600; }
+.swatch {
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  border-radius: 50%;
+  vertical-align: -0.05em;
+}
+.swatch--carries { background: var(--carries); }
+.swatch--holds { background: var(--holds-back); }
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--amber-700);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
 
 .label__rows { margin: 0; padding: 12px 18px 16px; }
 .label__rows div {
@@ -411,6 +444,20 @@ main { width: var(--page); margin-inline: auto; }
 }
 .note:last-child { border-bottom: 1px solid var(--rule); }
 .note__name { font-weight: 600; font-size: 1.05rem; }
+.note__explain {
+  justify-self: start;
+  padding: 2px 0;
+  border: 0;
+  border-bottom: 1px dashed var(--ink-3);
+  background: none;
+  color: var(--ink);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.note__explain:hover { border-bottom-color: var(--ink); }
+.note__explain[aria-pressed="true"] { border-bottom: 2px solid var(--carries); }
+.note__explain:focus-visible { outline: 2px solid var(--amber-700); outline-offset: 3px; }
 .note__pct { text-align: right; color: var(--ink-2); font-size: 0.95rem; }
 
 .grade {

@@ -16,6 +16,7 @@ from sillage.domain.odor import (
     Confidence,
     DescriptorScore,
     ModelDescription,
+    NoteExplanation,
     OdorProfile,
     confidence_of,
 )
@@ -40,6 +41,7 @@ __all__ = [
     "MoleculeNames",
     "NameSuggestion",
     "Neighbour",
+    "NoteExplanation",
     "OdorProfile",
     "OdorReport",
     "Refusal",
