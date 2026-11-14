@@ -11,6 +11,7 @@ Endpoints:
 - ``GET /`` -- the web interface (static HTML, CSS and JS; no build step).
 - ``GET /depict?smiles=...`` -- the molecule drawn as SVG.
 - ``GET /suggest?q=...`` -- known molecule names starting like the typed text.
+- ``GET /notes/{descriptor}`` -- known molecules experts described with this note.
 - ``GET /map`` -- every reference molecule on the odour map, with its family.
 - ``GET /model`` -- what model answers, its scope, metrics and their floor.
 - ``GET /health`` -- liveness, for the container healthcheck.
@@ -28,7 +29,7 @@ from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, Query, Request, Response
+from fastapi import FastAPI, HTTPException, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, JSONResponse
@@ -44,12 +45,15 @@ from sillage.interfaces.api.schemas import (
     ExplanationOut,
     MapOut,
     ModelOut,
+    NoteMoleculeOut,
+    NoteOut,
     PredictRequest,
     RefusalOut,
     ReportOut,
     SuggestionOut,
     map_out,
     model_out,
+    names_out,
     refusal_out,
     report_out,
     suggestion_out,
@@ -210,6 +214,30 @@ def create_app(load: Callable[[], Services] | None = None) -> FastAPI:
         if names is None:
             return []
         return [suggestion_out(s) for s in names.suggest(q, limit)]
+
+    @app.get("/notes/{descriptor}", response_model=NoteOut, responses={404: {}})
+    def note(
+        request: Request, descriptor: str, limit: int = Query(default=12, ge=1, le=50)
+    ) -> NoteOut:
+        """Known molecules that experts described with this note: the way in for someone
+        who thinks "bergamot", not "linalyl acetate". Dataset records, not predictions.
+        """
+        found = request.app.state.predict.references.labelled(descriptor)
+        if not found:
+            raise HTTPException(404, f"no known molecule is described as {descriptor!r}")
+        names = request.app.state.names
+        named = [(s, d, names.names_of(s) if names is not None else None) for s, d in found]
+        # Stable. A Russian name is the nearest thing to "a material people have heard
+        # of": Wikidata has one for linalool, not for a catalogue ester.
+        named.sort(key=lambda entry: entry[2] is None or entry[2].ru is None)
+        return NoteOut(
+            descriptor=descriptor,
+            total=len(found),
+            molecules=[
+                NoteMoleculeOut(smiles=s, descriptors=list(d), names=names_out(n))
+                for s, d, n in named[:limit]
+            ],
+        )
 
     @app.get("/map", response_model=MapOut, responses={404: {"description": "No map shipped"}})
     def odor_map(request: Request) -> Response:

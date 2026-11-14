@@ -251,3 +251,15 @@ def test_metrics_publish_the_similarity_baseline_for_drift(client: TestClient) -
 
     for quantile in ("0.1", "0.25", "0.5"):
         assert f'sillage_baseline_nearest_similarity{{quantile="{quantile}"}}' in text
+
+
+def test_a_note_lists_the_molecules_experts_gave_it(client: TestClient) -> None:
+    body = client.get("/notes/oxygenated", params={"limit": 3}).json()
+
+    assert body["descriptor"] == "oxygenated"
+    assert body["total"] >= len(body["molecules"]) == 3
+    assert all("oxygenated" in m["descriptors"] for m in body["molecules"])
+
+
+def test_a_note_nobody_was_given_is_404(client: TestClient) -> None:
+    assert client.get("/notes/bergamot").status_code == 404

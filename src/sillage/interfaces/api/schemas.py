@@ -176,6 +176,20 @@ class RefusalOut(BaseModel):
     molecule: MoleculeOut | None = None
 
 
+class NoteMoleculeOut(BaseModel):
+    smiles: str
+    descriptors: list[str] = Field(description="Everything experts wrote for this molecule.")
+    names: NamesOut | None
+
+
+class NoteOut(BaseModel):
+    descriptor: str
+    total: int = Field(description="How many known molecules experts gave this note.")
+    molecules: list[NoteMoleculeOut] = Field(
+        description="Well-known molecules first, then those the note describes most fully."
+    )
+
+
 class ModelOut(BaseModel):
     name: str
     scope: str

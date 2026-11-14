@@ -17,9 +17,7 @@ from scipy.stats import spearmanr
 from sklearn.metrics import average_precision_score
 
 from sillage.features import parse_smiles
-from sillage.features import sets as feature_sets
 from sillage.models.artifact import OdorModel
-from sillage.models.compiled import LinearMultilabel
 from sillage.paths import model_dir, project_root
 from sillage.research.ceiling import MIN_POSITIVES, kappas, load, matrix
 
@@ -41,9 +39,9 @@ def main() -> int:
     gs = matrix(collections.goodscents, unseen, vocabulary)
     lf = matrix(collections.leffingwell, unseen, vocabulary)
 
-    features = feature_sets.build(model.card.feature_set, parse_smiles(unseen))
-    raw = LinearMultilabel.from_classifier(model.estimator).predict_proba(features.values)
-    probability = model.calibrator.transform(raw)
+    # The whole model as the service runs it: every component, not only the linear one.
+    scorer = model.scorer()
+    probability = model.calibrator.transform(scorer.raw(parse_smiles(unseen)))
     columns = [model.label_names.index(d) for d in vocabulary]
     said = (probability[:, columns] >= 0.5).astype(np.int8)
 
@@ -82,8 +80,7 @@ def main() -> int:
     # as AP on every unseen molecule (not only the 233 in both collections), against
     # experts' kappa on all 2352 shared molecules: both sides measured on enough data.
     all_test = [r for r in model.reference if r.split == "test"]
-    x_all = feature_sets.build(model.card.feature_set, parse_smiles([r.smiles for r in all_test]))
-    p_all = LinearMultilabel.from_classifier(model.estimator).predict_proba(x_all.values)
+    p_all = scorer.raw(parse_smiles([r.smiles for r in all_test]))
     y_all = np.array([[d in r.descriptors for d in model.label_names] for r in all_test], dtype=int)
     pairs = []
     for _, row in table[stable].iterrows():

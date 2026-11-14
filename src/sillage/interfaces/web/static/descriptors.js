@@ -145,3 +145,9 @@ const DESCRIPTORS_RU = {
 function noteName(descriptor) {
   return DESCRIPTORS_RU[descriptor] || descriptor;
 }
+
+// The descriptor a typed word names, Russian or English: "Бергамот" -> "bergamot".
+function noteByName(text) {
+  const typed = text.trim().toLowerCase().replaceAll("ё", "е");
+  return Object.keys(DESCRIPTORS_RU).find((d) => d === typed || DESCRIPTORS_RU[d].replaceAll("ё", "е") === typed) || null;
+}

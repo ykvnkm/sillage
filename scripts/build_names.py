@@ -18,6 +18,11 @@ answers "ванилин" instantly and without depending on anyone's uptime:
    stereo, so isomer names are grouped back by that block. Both "geraniol" and "nerol"
    then lead to the same molecule -- which is exactly what the model can tell apart.
 3. **Wikidata**, by PubChem id: the Russian label ("ванилин") and Russian aliases.
+   Asked for the stereoisomers' ids too, for the same reason as step 2: Wikidata's
+   article is usually about one isomer ("(−)-ментол"), not the mixture record. When
+   every isomer of a structure is called the same once the stereo prefix is dropped,
+   that is the structure's Russian name; when they differ (гераниол, нерол), each
+   stays an alias, findable but not shown as the name.
 
 PubChem data is public domain, Wikidata is CC0. Both are credited in the model card.
 """
@@ -44,6 +49,7 @@ PUBCHEM = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
 WIKIDATA = "https://query.wikidata.org/sparql"
 USER_AGENT = "sillage/0.1 (https://github.com/ykvnkm/sillage; odour research project)"
 PUBCHEM_PAUSE = 0.25  # PubChem asks for at most 5 requests per second
+WIKIDATA_BATCH = 2000
 MAX_ALIASES = 15
 
 # A synonym worth searching by: letters first, ordinary punctuation, short. This drops
@@ -61,6 +67,9 @@ ISOTOPIC = re.compile(r"(-d\d+\b|\b13C\b|\(2H\d*\)|deuter|\(13C)", re.I)
 MAX_ISOMER_NAMES = 5
 # Stereo or mixture suffixes PubChem appends to titles: "Carvone, (+-)-", "Menthol, (-)-".
 TITLE_SUFFIX = re.compile(r",\s*\([^)]*\)-?\s*$")
+CYRILLIC = re.compile("[а-яё]", re.I)
+# Stereo marks in front of a Russian name: "(−)-ментол", "(R)-(+)-лимонен", "L-карвон".
+STEREO_PREFIX = re.compile(r"^(?:\(?[RSEZDLdl+\-−–±,]+\)?-)+(?=[а-яёА-ЯЁ])")
 
 
 def main() -> int:
@@ -73,15 +82,33 @@ def main() -> int:
     smiles = [entry["smiles"] for entry in reference]
 
     key_of = {s: inchikey(s) for s in smiles}
-    found = pubchem_by_inchikey(sorted({k for k in key_of.values() if k}))
+    # The PubChem half takes a quarter of an hour; kept, so that a failure in the
+    # Wikidata half does not cost it again. Delete the file to refresh.
+    cache = project_root() / "data" / "interim" / f"names_pubchem_{args.name}.json"
+    if cache.exists():
+        found, synonyms, isomer_names, isomer_block = json.loads(cache.read_text("utf-8"))
+        synonyms = {int(cid): names for cid, names in synonyms.items()}
+        isomer_block = {int(cid): block for cid, block in isomer_block.items()}
+        cids = sorted({row["cid"] for row in found.values()})
+    else:
+        found = pubchem_by_inchikey(sorted({k for k in key_of.values() if k}))
+        cids = sorted({row["cid"] for row in found.values()})
+        synonyms = pubchem_synonyms(cids)
+        isomer_names, isomer_block = pubchem_isomer_titles(cids)
+        cache.write_text(json.dumps([found, synonyms, isomer_names, isomer_block]), "utf-8")
     print(f"pubchem: {len(found)} of {len(set(key_of.values()))} structures found", file=sys.stderr)
-
-    cids = sorted({row["cid"] for row in found.values()})
-    synonyms = pubchem_synonyms(cids)
-    isomer_names = pubchem_isomer_titles(cids)
     print(f"pubchem: names of stereoisomers for {len(isomer_names)} skeletons", file=sys.stderr)
     russian = wikidata_russian(cids)
     print(f"wikidata: {len(russian)} of {len(cids)} compounds have a Russian name", file=sys.stderr)
+    isomer_russian: dict[str, list[str]] = {}
+    for cid, ru in wikidata_russian(sorted(isomer_block)).items():
+        for name in (ru["label"], *ru["aliases"]):
+            if CYRILLIC.search(name):
+                isomer_russian.setdefault(isomer_block[cid], []).append(STEREO_PREFIX.sub("", name))
+    print(
+        f"wikidata: Russian names of stereoisomers for {len(isomer_russian)} skeletons",
+        file=sys.stderr,
+    )
 
     names: dict[str, dict] = {}
     for s in smiles:
@@ -90,17 +117,21 @@ def main() -> int:
             continue
         cid = row["cid"]
         ru = russian.get(cid, {})
+        from_isomers = unique(isomer_russian.get(key_of[s][:14], []), exclude=set())
+        label = ru.get("label") or (from_isomers[0] if len(from_isomers) == 1 else None)
         names[s] = {
             "cid": cid,
             "en": row["title"],
-            "ru": ru.get("label"),
+            "ru": label,
+            # Russian aliases are few and go first, so the cap never cuts them.
             "aliases": unique(
                 [
+                    *ru.get("aliases", []),
+                    *from_isomers,
                     *isomer_names.get(key_of[s][:14], []),
                     *synonyms.get(cid, []),
-                    *ru.get("aliases", []),
                 ],
-                exclude={row["title"], ru.get("label")},
+                exclude={row["title"], label},
             )[:MAX_ALIASES],
         }
 
@@ -145,8 +176,9 @@ def pubchem_synonyms(cids: Sequence[int]) -> dict[int, list[str]]:
     return out
 
 
-def pubchem_isomer_titles(cids: Sequence[int]) -> dict[str, list[str]]:
-    """InChIKey skeleton block -> titles of every record sharing that skeleton."""
+def pubchem_isomer_titles(cids: Sequence[int]) -> tuple[dict[str, list[str]], dict[int, str]]:
+    """InChIKey skeleton block -> titles of every record sharing that skeleton, and
+    each such record's id -> its block."""
     variants: set[int] = set()
     for batch in chunks(cids, 100):
         body = urllib.parse.urlencode({"cid": ",".join(map(str, batch))}).encode()
@@ -156,24 +188,30 @@ def pubchem_isomer_titles(cids: Sequence[int]) -> dict[str, list[str]]:
         time.sleep(PUBCHEM_PAUSE)
 
     titles: dict[str, list[str]] = {}
+    block_of: dict[int, str] = {}
     for batch in chunks(sorted(variants - set(cids)), 300):
         body = urllib.parse.urlencode({"cid": ",".join(map(str, batch))}).encode()
         payload = request(f"{PUBCHEM}/compound/cid/property/InChIKey,Title/JSON", body)
         for row in (payload or {}).get("PropertyTable", {}).get("Properties", []):
             title, key = row.get("Title"), row.get("InChIKey")
+            if key and not ISOTOPIC.search(title or ""):
+                block_of[row["CID"]] = key[:14]
             if title and key and is_name(title) and not ISOTOPIC.search(title):
                 titles.setdefault(key[:14], []).append(TITLE_SUFFIX.sub("", title))
         time.sleep(PUBCHEM_PAUSE)
     # Short names first: "Geraniol" before "(2E)-3,7-dimethylocta-2,6-dien-1-ol".
-    return {
-        block: sorted(set(names), key=len)[:MAX_ISOMER_NAMES] for block, names in titles.items()
-    }
+    return (
+        {block: sorted(set(names), key=len)[:MAX_ISOMER_NAMES] for block, names in titles.items()},
+        block_of,
+    )
 
 
 def wikidata_russian(cids: Sequence[int]) -> dict[int, dict]:
     """PubChem id -> {label, aliases} in Russian, from Wikidata's P662 property."""
     out: dict[int, dict] = {}
-    for batch in chunks(cids, 300):
+    # Few large requests, sent as POST: the query service throttles by request count
+    # (down to one a minute during its outages), not by size.
+    for batch in chunks(cids, WIKIDATA_BATCH):
         values = " ".join(f'"{cid}"' for cid in batch)
         query = f"""
             SELECT ?cid ?label (GROUP_CONCAT(DISTINCT ?alias; separator="|") AS ?aliases) WHERE {{
@@ -182,19 +220,19 @@ def wikidata_russian(cids: Sequence[int]) -> dict[int, dict]:
               ?item rdfs:label ?label . FILTER(lang(?label) = "ru")
               OPTIONAL {{ ?item skos:altLabel ?alias . FILTER(lang(?alias) = "ru") }}
             }} GROUP BY ?cid ?label"""
-        url = f"{WIKIDATA}?{urllib.parse.urlencode({'query': query})}"
-        payload = request(url, accept="application/sparql-results+json")
+        body = urllib.parse.urlencode({"query": query}).encode()
+        payload = request(WIKIDATA, body, accept="application/sparql-results+json")
         for row in (payload or {}).get("results", {}).get("bindings", []):
             cid = int(row["cid"]["value"])
             aliases = [a for a in row.get("aliases", {}).get("value", "").split("|") if a]
             out.setdefault(cid, {"label": row["label"]["value"], "aliases": aliases})
-        time.sleep(1.0)
+        time.sleep(2.0)
     return out
 
 
 def request(url: str, body: bytes | None = None, accept: str = "application/json") -> dict | None:
     headers = {"User-Agent": USER_AGENT, "Accept": accept}
-    for attempt in range(1, 5):
+    for attempt in range(1, 9):
         try:
             with urllib.request.urlopen(
                 urllib.request.Request(url, data=body, headers=headers), timeout=60
@@ -203,10 +241,13 @@ def request(url: str, body: bytes | None = None, accept: str = "application/json
         except urllib.error.HTTPError as error:
             if error.code == 404:  # none of the batch matched
                 return None
-            if attempt == 4:
+            if error.code == 429:  # told to slow down: wait as long as asked, try again
+                time.sleep(int(error.headers.get("Retry-After") or 60) + 5)
+                continue
+            if attempt >= 4:
                 raise
         except OSError:
-            if attempt == 4:
+            if attempt >= 4:
                 raise
         time.sleep(2**attempt)
     return None

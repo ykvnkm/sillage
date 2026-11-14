@@ -2,6 +2,8 @@
 name = "sillage"
 description = "Open molecule -> mixture -> perception system for perfumery"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "ykvnkm", email = "michailyakovenk3@gmail.com" }]
 
 # What the package supports. Deliberately open-ended upwards: training runs on
