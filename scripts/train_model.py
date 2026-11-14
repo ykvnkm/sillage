@@ -10,6 +10,7 @@ even by someone who never downloads it.
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 
 from sillage.models.artifact import OdorModel
@@ -91,8 +92,8 @@ micro AUC начинается с 0.78 просто от ранжировани�
    расплывчатых словах (`fresh`, `sweet`, `warm`, `sharp`) эксперты двух баз
    согласны друг с другом слабо. Там слабее и модель.
 4. **«Во сколько раз лучше случайного» обманчиво для частых нот.** Этот множитель
-   ограничен сверху единицей, делённой на частоту ноты: у `fruity` (40% молекул)
-   потолок — 2.5, и модель с её 2.0 берёт 80% возможного, при AP 0.79. Сравнивать
+   ограничен сверху единицей, делённой на частоту ноты: у `fruity`, которая есть у
+   40% молекул, он не может превысить 2.5 даже при безошибочном ответе. Сравнивать
    ноты по нему нельзя; по AP и по согласию экспертов — можно.
 """
 
@@ -237,6 +238,24 @@ def _render_ceiling(model_name: str) -> str:
     )
 
 
+def _render_reliability(model_name: str) -> str:
+    """The top band on ten times more pairs, if scripts/run_reliability.py measured it."""
+    path = project_root() / "results" / f"reliability_{model_name}.csv"
+    if not path.exists():
+        return ""
+    with path.open(encoding="utf-8") as handle:
+        rows = {(r["set"], r["band"]): r for r in csv.DictReader(handle)}
+    top = rows["cross", "likely"]
+    return (
+        f"\n\nСто пар — мало, чтобы отличить разрыв от случайности. На {top['pairs']} парах "
+        "перекрёстной проверки (молекулы, которых не видели ни модель, ни калибратор) та же "
+        f"полоса обещает {float(top['promised']):.3f} и сбывается в {float(top['observed']):.3f} "
+        f"случаев; разрыв с вероятностью 95% лежит между {float(top['gap_low']) * 100:+.1f} и "
+        f"{float(top['gap_high']) * 100:+.1f} п.п. (журнал E-023, "
+        f"`results/reliability_{model_name}.csv`)."
+    )
+
+
 def _render_card(outcome) -> str:
     card = outcome.model.card
     metrics, floor = card.metrics, card.baseline_metrics
@@ -252,6 +271,7 @@ def _render_card(outcome) -> str:
             "Проверено на тестовом сплите: в диапазоне 0.85–1.00 модель обещает 0.903 и\n"
             "оказывается права в 0.889 случаев. До калибровки обещала 0.942 при реальных 0.826."
         )
+    calibration_check += _render_reliability(card.name)
     consensus_row = ""
     if "consensus_macro_average_precision" in metrics:
         consensus_row = (

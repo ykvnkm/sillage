@@ -219,3 +219,16 @@ def test_json_output_never_carries_a_number_for_an_uncalibrated_label(artifact: 
         assert entry["probability"] is not None
     for entry in payload["unverified"]:
         assert entry["probability"] is None
+
+
+def test_labelled_puts_the_molecule_the_note_describes_most_fully_first() -> None:
+    library = FingerprintReferenceLibrary(
+        [
+            ReferenceMolecule("CCO", ("sweet", "ethereal"), "train"),
+            ReferenceMolecule("CCCO", ("sweet",), "test"),
+            ReferenceMolecule("CCCCO", ("fatty",), "train"),
+        ]
+    )
+
+    assert library.labelled("sweet") == (("CCCO", ("sweet",)), ("CCO", ("sweet", "ethereal")))
+    assert library.labelled("woody") == ()

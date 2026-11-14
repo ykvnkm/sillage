@@ -44,7 +44,7 @@ and scripts/build_map.py add. Published when present."""
 GITHUB_URL = "https://github.com/ykvnkm/sillage"
 
 FRONT_MATTER = """---
-license: mit
+license: cc-by-nc-4.0
 library_name: sklearn
 language:
   - ru
@@ -70,6 +70,10 @@ and outputs are only meaningful together with them. The `.joblib` files are
 scikit-learn pickles; load them only from a revision you trust, and check them
 against the sha256 values pinned in the project's `deploy/hub.json`. `graph.npz`
 holds plain arrays and is read without pickle.
+
+Licence: the weights are CC BY-NC 4.0, not MIT like the code. They are derived from
+collections published for research use without a licence of their own, so they are
+offered for research and teaching, not for commercial products.
 
 Data: the model learnt from the Goodscents and Leffingwell collections as archived
 by [Pyrfume](https://pyrfume.org); their records are not redistributed here, only

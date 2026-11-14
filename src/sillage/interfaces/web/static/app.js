@@ -157,6 +157,16 @@ async function predict(query, { push = true } = {}) {
   setBusy(true);
 
   try {
+    // A note is asked before a molecule: whoever types "сандал" means the smell, not
+    // the one material sold under that trade name.
+    const note = noteByName(query);
+    if (note) {
+      const found = await fetch(`/notes/${encodeURIComponent(note)}`, { signal: controller.signal });
+      if (found.ok) {
+        render(renderNote(await found.json()));
+        return;
+      }
+    }
     const response = await fetch("/predict", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -451,18 +461,35 @@ function specimen(n) {
       {
         type: "button",
         class: "specimen",
-        "aria-label": `Предсказать для ${n.names?.display || n.smiles}: сходство ${percent(n.similarity)}, эксперты: ${notes}`,
+        "aria-label": `Предсказать для ${n.names?.display || n.smiles}: ${n.similarity != null ? `сходство ${percent(n.similarity)}, ` : ""}эксперты: ${notes}`,
         onclick: () => {
           predict(n.names?.display || n.smiles);
           document.getElementById("query-title").scrollIntoView({ behavior: "smooth" });
         },
       },
-      h("span", { class: "specimen__band" }, h("strong", {}, percent(n.similarity)), "сходство"),
+      n.similarity != null && h("span", { class: "specimen__band" }, h("strong", {}, percent(n.similarity)), "сходство"),
       h("span", { class: "specimen__structure" }, drawing(n.smiles, 300, 225, "")),
       n.names?.display && h("span", { class: "specimen__name" }, capitalize(n.names.display)),
       h("code", { class: "specimen__smiles", lang: "en" }, n.smiles),
       h("span", { class: "specimen__notes" }, notes),
     ),
+  );
+}
+
+// ---- a note instead of a molecule ---------------------------------------------
+
+function renderNote(note) {
+  const name = noteName(note.descriptor);
+  return h(
+    "section",
+    { class: "neighbours", "aria-labelledby": "note-title" },
+    h("h2", { id: "note-title" }, `«${capitalize(name)}» — это нота, а не молекула`),
+    h(
+      "p",
+      {},
+      `Одну и ту же ноту дают разные вещества. Эксперты записали её у ${note.total} молекул из датасета; ниже ${note.molecules.length} из них: сначала самые известные вещества, среди них первыми те, в чьём описании нота занимает больше всего места. Это записи экспертов, не предсказания; нажмите на карточку, чтобы увидеть, что о молекуле скажет модель.`,
+    ),
+    h("ul", { class: "neighbours__list" }, note.molecules.map(specimen)),
   );
 }
 

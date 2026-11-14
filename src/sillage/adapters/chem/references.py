@@ -57,6 +57,11 @@ class FingerprintReferenceLibrary:
         nearest = similarity.max(axis=1)
         return {q: float(np.quantile(nearest, q)) for q in quantiles}
 
+    def labelled(self, descriptor: str) -> tuple[tuple[str, tuple[str, ...]], ...]:
+        found = [e for e in self._entries if descriptor in e.descriptors]
+        found.sort(key=lambda e: len(e.descriptors))  # stable: ties keep library order
+        return tuple((e.smiles, e.descriptors) for e in found)
+
     def nearest(self, molecule: Molecule, k: int) -> tuple[Neighbour, ...]:
         if k <= 0 or not self._entries:
             return ()

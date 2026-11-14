@@ -133,3 +133,10 @@ class ReferenceLibrary(Protocol):
     def nearest(self, molecule: Molecule, k: int) -> tuple[Neighbour, ...]:
         """The *k* most similar library molecules, most similar first, itself excluded."""
         ...
+
+    def labelled(self, descriptor: str) -> tuple[tuple[str, tuple[str, ...]], ...]:
+        """``(smiles, descriptors)`` of every molecule experts gave this note.
+
+        Fewest descriptors first: a molecule described as "bergamot" alone shows the
+        note better than one described with nine words, bergamot among them."""
+        ...

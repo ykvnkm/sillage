@@ -1,0 +1,9 @@
+{
+  "model": "odor-ensemble-v3",
+  "descriptors": 49,
+  "molecules": 247,
+  "experts": 0.453,
+  "model_vs_leffingwell": 0.351,
+  "model_vs_goodscents": 0.307,
+  "spearman_experts_vs_model_ap": 0.45
+}

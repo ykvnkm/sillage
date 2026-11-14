@@ -8,6 +8,8 @@ and says so (:attr:`ArtifactOdorPredictor.sees_stereo`).
 
 from __future__ import annotations
 
+from functools import lru_cache
+
 import numpy as np
 
 from sillage.adapters.chem.reader import to_rdkit
@@ -40,6 +42,14 @@ class ArtifactOdorPredictor:
         self._base_rates = model.calibrator.base_rates
 
         self._scorer = model.scorer()
+        # One report asks for the profile and the map position, and people retry the
+        # same molecule: the ensemble's raw output is computed once per structure.
+        self._raw = lru_cache(maxsize=256)(self._score)
+
+    def _score(self, molecule: Molecule) -> np.ndarray:
+        raw = self._scorer.raw([to_rdkit(molecule)])
+        raw.setflags(write=False)
+        return raw
 
     @property
     def name(self) -> str:
@@ -54,7 +64,7 @@ class ArtifactOdorPredictor:
         return self._scorer.sees_stereo
 
     def predict(self, molecule: Molecule) -> OdorProfile:
-        scores = self._calibrator.transform(self._scorer.raw([to_rdkit(molecule)]))[0]
+        scores = self._calibrator.transform(self._raw(molecule))[0]
         return OdorProfile.from_scores(
             DescriptorScore(
                 name=name,
@@ -68,7 +78,7 @@ class ArtifactOdorPredictor:
     def embed(self, molecule: Molecule) -> tuple[float, ...]:
         """Raw predicted probabilities, before calibration: the model's own scale,
         and exactly what scripts/build_map.py embedded the reference molecules with."""
-        return tuple(float(v) for v in self._scorer.raw([to_rdkit(molecule)])[0])
+        return tuple(float(v) for v in self._raw(molecule)[0])
 
     @property
     def explains(self) -> bool:

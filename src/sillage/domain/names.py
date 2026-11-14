@@ -1,6 +1,6 @@
 """Molecule names, and how a typed name is matched against them.
 
-Russian names exist for only 388 of the 4733 named reference molecules (Wikidata knows
+Russian names exist for only 430 of the 4733 named reference molecules (Wikidata knows
 famous compounds in Russian, not the long tail). But Russian chemical names are, almost
 always, transliterations of the English ones: ванилин - vanillin, гедион - hedione,
 амброксид - ambroxide, этилбутират - ethyl butyrate. So instead of translating, both

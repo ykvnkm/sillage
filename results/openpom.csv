@@ -1,0 +1,5 @@
+model,macro_average_precision,macro_roc_auc,micro_average_precision,micro_roc_auc,labels_scored,labels_total,consensus_macro_average_precision,consensus_macro_roc_auc,consensus_labels_scored
+odor-ensemble-v3,0.4018,0.8879,0.5050,0.9309,116.0000,138.0000,0.6163,0.9296,26.0000
+our graph networks alone,0.3864,0.8825,0.4934,0.9270,116.0000,138.0000,0.5941,0.9238,26.0000
+"openpom, mean of 10",0.3789,0.8866,0.4894,0.9269,116.0000,138.0000,0.5824,0.9172,26.0000
+"openpom, one network (mean over members)",0.3510,0.8742,0.4618,0.9171,116.0000,138.0000,0.5560,0.9080,26.0000
